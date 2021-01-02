@@ -102,3 +102,22 @@ data <- data %>%
   rowwise() %>%
   mutate(green_values = mean(c(`Verwendete Produkte Umwelt nicht belasten`, `Auswirkungen meiner Handlungen auf Umwelt`, `Kaufgewohnheiten, Sorge um Umwelt`, `Verschwendung Ressourcen`, Umweltverantwortlich, `Unannehmlichkeiten fuer Umwelt`)))
 #muss man runden?
+
+
+
+###Corona
+cols_corona <- c("Corona-Massnahmen uebertrieben", "Corona-Massnahmen muessten haerter sein", "Corona ist harmlos, gleich Grippe", "Glaube nicht an Corona")
+
+data[cols_corona] <- sapply(data[cols_corona], as.numeric)
+sapply(data[cols_corona], class)
+
+#checking: how to define?
+table(data$`Corona-Massnahmen uebertrieben`)
+table(data$`Corona-Massnahmen muessten haerter sein`)
+table(data$`Corona ist harmlos, gleich Grippe`)
+table(data$`Glaube nicht an Corona`)
+table(data$`Corona ist harmlos, gleich Grippe`, data$`Glaube nicht an Corona`)
+
+Corona <- data %>% transmute(Corona_Attitude = ifelse((`Corona ist harmlos, gleich Grippe` == 6 | `Corona ist harmlos, gleich Grippe` == 7 | `Glaube nicht an Corona` == 6 | `Glaube nicht an Corona` == 7), yes = "Reject", no = "Accept"))
+Corona <- as.factor(Corona$Corona_Attitude)
+data <- bind_cols(data, Corona)
