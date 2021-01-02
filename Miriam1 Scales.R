@@ -2,11 +2,6 @@
 library(plyr)
 library(dplyr)
 
-#data #später unnötig, auf Benennung achten
-
-data <- Final_Survey_Private_Kontakte_31_Dezember_2020_12_57
-data <- data[-(1:2),]
-
 ######Personality scale TIPI
 
 #prep, evtl löschen oder davor schon
