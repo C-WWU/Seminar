@@ -90,18 +90,6 @@ data <- data %>%
 
 #####GREEN scale (Q16)
 
-#replace NAs with 0 in all Q16 items
-#später unnötig? sonst nochmal schönere Lösung finden
-
-    
-data$Q16_1[is.na(data$Q16_1)] <- 0
-data$Q16_2[is.na(data$Q16_2)] <- 0
-data$Q16_3[is.na(data$Q16_3)] <- 0
-data$Q16_4[is.na(data$Q16_4)] <- 0
-data$Q16_5[is.na(data$Q16_5)] <- 0
-data$Q16_6[is.na(data$Q16_6)] <- 0
-data$Q16_7[is.na(data$Q16_7)] <- 0
-
 #transform character into numeric values
 
 cols_green <- c("Verwendete Produkte Umwelt nicht belasten", "Auswirkungen meiner Handlungen auf Umwelt", "Kaufgewohnheiten, Sorge um Umwelt", "Verschwendung Ressourcen", "Umweltverantwortlich", "Unannehmlichkeiten fuer Umwelt") #exclude Q16_5 as it is the control question
