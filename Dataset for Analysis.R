@@ -669,6 +669,7 @@ table(data$`Duration (in seconds)`) #exclude all who finished in under 5 min (un
 write.csv(data, "/Users/Miriam/Documents/Uni/Master/3. Semester/Seminar SRA/datasets/neu/datasets_combined.csv")
 save(data, file = 'datasets_combined.RData')
 
+load("datasets_combined.RData")
 
 #####
 #add or redefine variables: scales, re-coding, new info
