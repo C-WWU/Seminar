@@ -1,0 +1,10 @@
+test <- data %>% mutate(Age_Range = case_when(Alter >= 60 ~ '60plus',
+                                              Alter >= 55  & Alter <= 59 ~ '55-59',
+                                              Alter >= 50  & Alter <= 54 ~ '50-54',
+                                              Alter >= 45  & Alter <= 49 ~ '45-49',
+                                              Alter >= 40  & Alter <= 44 ~ '40-44',
+                                              Alter >= 35  & Alter <= 39 ~ '35-39',
+                                              Alter >= 30  & Alter <= 34 ~ '30-34',
+                                              Alter >= 25  & Alter <= 29 ~ '25-29',
+                                              Alter >= 20  & Alter <= 24 ~ '20-24',
+                                              Alter <= 19 ~ 'unter20'))
