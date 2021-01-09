@@ -51,7 +51,7 @@ ggplot(data, aes(x = factor(Age_Range, levels = Ordered_ranges)))+
   geom_bar()+
   geom_text(stat = "count", aes(label =..count..), vjust = -1)+
   labs(x = "Age Ranges", y = "Count", title = "Abs. Count per Age Range")+
-  ylim(0,500)
+  ylim(0,520)
   
   
 
