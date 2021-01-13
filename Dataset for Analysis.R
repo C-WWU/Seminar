@@ -667,7 +667,6 @@ table(data$`Kontrollfrage Umwelt`) #all okay
 table(data$`Duration (in seconds)`) #exclude all who finished too fast; what is too fast?
 summary(data$`Duration (in seconds)`)
 
-duration <- data$`Duration (in seconds)`
 duration_smaller_300 <- data %>% subset(duration < 300)
 duration_smaller_180 <- data %>% subset(duration < 180) 
 
@@ -766,6 +765,9 @@ data <- data %>% replace_with_na_all(condition = ~.x == "Keine Angabe")
 #Religiosity: Religious vs not???
 #Relationship status: single or taken
 
+#Offene Nennungen Parteien: Aufnahme von "Die Partei"
+data$`Wahl Partei Sonstiges` <- tolower(data$`Wahl Partei Sonstiges`)
+data$`Wahl Partei` <- ifelse(data$`Wahl Partei Sonstiges` %in% "die partei", "Die Partei", data$`Wahl Partei`)
 
 #####
 #new info
@@ -831,18 +833,21 @@ Accounts <- data %>% select(`Alman Memes` : `Selena Gomez`)
 Followers_Accounts <- as.data.frame(colSums(Accounts, na.rm = TRUE))
 colnames(Followers_Accounts) <- "Followers"
 
-#Are there accounts which have too little followers? Exclusion necessary?
+#Are there accounts which have too little followers? 
 #list of less than "a" followers:
-a <- 50
-delete <- Followers_Accounts %>% filter(Followers < a) #delete
-keep <-Followers_Accounts %>% filter(Followers > a) #keep and use for analysis
+a <- 30
+delete <- Followers_Accounts %>% filter(Followers < a)
+keep <-Followers_Accounts %>% filter(Followers > a) 
+#but: keep in sample nonetheless, just be aware!
+
 
 
 ######
 #define different datasets for analysis: with and without outliers
 
-
-
+full <- data
+reduced_set <- data %>% subset(data$`Duration (in seconds)` > 300 & data$Accounts_followed < 150)
+#ACHTUNG noch festlegen und abändern!
 
 
 #####
