@@ -73,7 +73,11 @@ table(data$`Sexuelle Orientierung`)
 
 #Children
 table(data$`Anzahl Kinder`) #most people without children
+#wir wissen, dass einer unserer Privatkontakte sich verklickt hat und statt 20 Kindern 0 eingeben wollte --> Korrektur hierfür, um Datensatz nicht aussortieren zu müssen:
+data$`Anzahl Kinder`[data$`Anzahl Kinder` == 20] <- 0
 ###necessary to clean 3 respondents with >10 children?
+many_children <- data %>% subset(data$`Anzahl Kinder` > 10) #prüfen ob sonstige Antworten Sinn ergeben --> keine Auffälligkeiten, daher kein Ausschluss notwendig
+
 
 #Education
 table(data$Bildungsabschluss)

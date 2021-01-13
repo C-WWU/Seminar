@@ -8,29 +8,37 @@ library(dplyr)
 library(tidyverse)
 library(ggplot2)
 library(scales)
+install.packages("naniar")
+library(naniar)
 
 #####
 #preparations
 #load datasets and delete unnecessary first rows using readr
   #USE data <- data[-1, ]
 
-#gapfish data: load and then remove last column (id) and first four rows (test ids)
+#gapfish data: load and then remove last column (id) and first four rows (test ids), add source information
 gapfish_text <- read_csv("~/Uni/Master/3. Semester/Seminar SRA/datasets/Gapfish Text.csv")
 gapfish_text <- gapfish_text[-(1:4), -303]
+gapfish_text$Quelle <- "Gapfish"
 gapfish_num <- read_csv("~/Uni/Master/3. Semester/Seminar SRA/datasets/Gapfish Numeric.csv")
 gapfish_num <- gapfish_num[-(1:4), -303]
+gapfish_num$Quelle <- "Gapfish"
 
-#private contacts data: load and then remove first two rows
+#private contacts data: load and then remove first two rows, add source information
 private_text <- read_csv("~/Uni/Master/3. Semester/Seminar SRA/datasets/Privat Text.csv")
 private_text <- private_text[-(1:2), ]
+private_text$Quelle <- "Privat"
 private_num <- read_csv("~/Uni/Master/3. Semester/Seminar SRA/datasets/Privat Numeric.csv")
 private_num<- private_num[-(1:2), ]
+private_num$Quelle <- "Privat"
 
-#surveycircle data
+#surveycircle data: load and then remove first two rows, add source information
 surveycircle_text <- read_csv("~/Uni/Master/3. Semester/Seminar SRA/datasets/Surveycircle Text.csv")
 surveycircle_text <- surveycircle_text[-(1:2), ]
+surveycircle_text$Quelle <- "Surveycircle"
 surveycircle_num <- read_csv("~/Uni/Master/3. Semester/Seminar SRA/datasets/Surveycircle Numeric.csv")
 surveycircle_num <- surveycircle_num[-(1:2), ]
+surveycircle_num$Quelle <- "Surveycircle"
 
   
 #create two datasets: text full and num full
@@ -626,7 +634,7 @@ num_full <- data
 #select relevant columns
 
 cols_names <- names(num_full)  
-cols_text <- cols_names[c(9, 22, 23, 264:266, 277, 278, 283, 291, 292, 293, 294, 295, 296, 297, 298, 299, 302)]
+cols_text <- cols_names[c(9, 22, 23, 264:266, 277, 278, 283, 291, 292, 293, 294, 295, 296, 297, 298, 299, 302, 303)]
 cols_num <- cols_names[c(3, 6, 7, 19, 20, 21, 24:252, 253:263, 267:276, 279:282, 284:290, 300, 301)]
   
 #combine relevant colums into final dataset
@@ -640,13 +648,6 @@ change_to_zero <- cols_names[c(24:252, 301)]
 data[ ,change_to_zero][is.na(data[ ,change_to_zero])] <- 0
 
 
-#reorder columns if needed?
-
-
-
-
-
-
 #clear respondents who did not finish survey
 data <- subset(data, Kinder != "NA")
 
@@ -657,13 +658,19 @@ data <- data[(data$`Kontrollfrage Ziele im Leben`== 7),] #xx respondents remain
 data <- data[(data$`Kontrollfrage Umwelt`== 6),] #xx respondents remain
 
 #check that all bad respondents were eliminated
-table(data$Finished) #xx respondents still are not marked as finished; however those are respondents who answered all questions but then did not press "continue" to end the questionnaire; we can still include them in the analysis
+table(data$Finished) #20 respondents still are not marked as finished; however those are respondents who answered all questions but then did not press "continue" to end the questionnaire; we can still include them in the analysis
 table(data$`Kontrollfrage Persoenlichkeit`)
 table(data$`Kontrollfrage Ziele im Leben`)
 table(data$`Kontrollfrage Umwelt`) #all okay
 
 #check how long the respondents needed: are there speeders left?
-table(data$`Duration (in seconds)`) #exclude all who finished in under 5 min (under 300 seconds)?
+table(data$`Duration (in seconds)`) #exclude all who finished too fast; what is too fast?
+summary(data$`Duration (in seconds)`)
+
+duration <- data$`Duration (in seconds)`
+duration_smaller_300 <- data %>% subset(duration < 300)
+duration_smaller_180 <- data %>% subset(duration < 180) 
+
 
 
 
@@ -747,6 +754,9 @@ data <- bind_cols(data, Corona)
 #####
 #recoding for analysis
 
+#"keine Angaben" als NA umcoden, um aus Analyse auszuschließen
+data <- data %>% replace_with_na_all(condition = ~.x == "Keine Angabe")
+
 #age: ranges? young, medium, old?
 #Germany/ PLZ: East/West? Regions?
 #Alcohol usage: often vs. not often
@@ -760,6 +770,9 @@ data <- bind_cols(data, Corona)
 #####
 #new info
 
+#add index (necessary?)
+data$index <- c(1:2047)
+
 #how many accounts does each respondent follow?
 Accounts <- data %>% select(`Alman Memes` : `Selena Gomez`)
 Account_names <- names(Accounts)
@@ -767,10 +780,18 @@ Account_names <- names(Accounts)
 data[c(Account_names)] <- sapply(data[c(Account_names)], as.numeric)
 data$Accounts_followed <- rowSums(data[ ,c(Account_names)], na.rm = TRUE)
 
+summary(data$Accounts_followed)
 table(data$Accounts_followed)
-#necessary to exclude respondents who follow too many or too little accounts?
 
-#more new info??
+#Ausschluss von respondents, die keinem der Accounts folgen:
+data <- data %>% subset(Accounts_followed > 0)
+
+
+ggplot(data, aes(Accounts_followed))+
+  geom_histogram(bins = 229)
+
+
+
 
 
 
@@ -816,7 +837,10 @@ a <- 50
 delete <- Followers_Accounts %>% filter(Followers < a) #delete
 keep <-Followers_Accounts %>% filter(Followers > a) #keep and use for analysis
 
-#next steps: save accounts with <a and delete them from dataset
+
+######
+#define different datasets for analysis: with and without outliers
+
 
 
 
