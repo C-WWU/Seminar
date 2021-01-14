@@ -667,8 +667,8 @@ table(data$`Kontrollfrage Umwelt`) #all okay
 table(data$`Duration (in seconds)`) #exclude all who finished too fast; what is too fast?
 summary(data$`Duration (in seconds)`)
 
-duration_smaller_300 <- data %>% subset(duration < 300)
-duration_smaller_180 <- data %>% subset(duration < 180) 
+duration_smaller_300 <- data %>% subset(data$`Duration (in seconds)` < 300)
+duration_smaller_180 <- data %>% subset(data$`Duration (in seconds)` < 180) 
 
 
 
@@ -681,6 +681,9 @@ load("datasets_combined.RData")
 
 #####
 #add or redefine variables: scales, re-coding, new info
+
+#"keine Angaben" als NA umcoden, um aus Analyse auszuschließen
+data <- data %>% replace_with_na_all(condition = ~.x == "Keine Angabe")
 
 #####
 #scales
@@ -746,24 +749,78 @@ table(data$`Glaube nicht an Corona`)
 table(data$`Corona ist harmlos, gleich Grippe`, data$`Glaube nicht an Corona`)
 
 #define new variable Corona_Attitude: Accept vs. Reject
-Corona <- data %>% transmute(Corona_Attitude = ifelse((`Corona ist harmlos, gleich Grippe` == 6 | `Corona ist harmlos, gleich Grippe` == 7 | `Glaube nicht an Corona` == 6 | `Glaube nicht an Corona` == 7), yes = "Reject", no = "Accept"))
-data <- bind_cols(data, Corona)
+data <- data %>% mutate(Corona_Hardliner = ifelse((`Corona-Massnahmen muessten haerter sein` == 6 | `Corona-Massnahmen muessten haerter sein` == 7), yes = 1, no = 0))
+data <- data %>% mutate(Corona_Softliner = ifelse((`Corona-Massnahmen uebertrieben` == 6 | `Corona-Massnahmen uebertrieben` == 7), yes = 1, no = 0))
+data <- data %>% mutate(Corona_Skeptiker = ifelse((`Corona ist harmlos, gleich Grippe` == 5 | `Corona ist harmlos, gleich Grippe` == 6 | `Corona ist harmlos, gleich Grippe` == 7), yes = 1, no = 0))
+data <- data %>% mutate(Corona_Leugner = ifelse((`Glaube nicht an Corona` == 5 | `Glaube nicht an Corona` == 6 | `Glaube nicht an Corona` == 7), yes = 1, no = 0))
 
+#überprüfen ob erfolgreich: 
+table(data$`Corona-Massnahmen muessten haerter sein`, data$Corona_Hardliner)
+table(data$`Corona-Massnahmen uebertrieben`, data$Corona_Softliner)
+table(data$`Corona ist harmlos, gleich Grippe`, data$Corona_skeptiker)
+table(data$`Glaube nicht an Corona`, data$Corona_Leugner)
 
 #####
 #recoding for analysis
 
-#"keine Angaben" als NA umcoden, um aus Analyse auszuschließen
-data <- data %>% replace_with_na_all(condition = ~.x == "Keine Angabe")
+#Wohnort innerhalb Deutschland: alte vs neue Bundesländer
+data <- data %>% mutate(Ost_West = case_when(PLZ <= 19 ~ 'Osten',
+                                                      PLZ >= 20 & PLZ <= 38 ~ 'Westen',
+                                                      PLZ == 39 ~ 'Osten',
+                                                      PLZ >= 40 & PLZ <= 97 ~ 'Westen',
+                                                      PLZ >= 98 ~ 'Osten'))
+#Altersgruppe: jung, mittel, alt
+data <- data %>% mutate(Age_Range = case_when(Alter >= 45 ~ 'hohes Alter',
+                                                      Alter >= 30  & Alter <= 44 ~ 'mittleres Alter',
+                                                      Alter <= 29 ~ 'niedriges Alter'))
 
-#age: ranges? young, medium, old?
-#Germany/ PLZ: East/West? Regions?
-#Alcohol usage: often vs. not often
-#Smoking usage: often vs. not often
-#Drug usage: often vs. not often
-#Education level: low vs. high
-#Religiosity: Religious vs not???
-#Relationship status: single or taken
+#Bildung: niedrig, mittel, hoch
+data <- data %>% mutate(Bildungsgruppe = case_when(Bildungsabschluss == "(Noch) kein Abschluss" ~ 'niedrige Bildung',
+                                                           Bildungsabschluss == "Hauptschulabschluss" ~ 'niedrige Bildung',
+                                                           Bildungsabschluss == "Realschulabschluss" ~ 'niedrige Bildung',
+                                                           Bildungsabschluss == "Abitur" ~ 'mittlere Bildung',
+                                                           Bildungsabschluss == "Hochschulabschluss (Bachelor oder Master)" ~ 'hohe Bildung',
+                                                           Bildungsabschluss == "Promotion" ~ 'hohe Bildung'))
+
+#Einkommen: hohe, mittlere, niedrige Einkommensgruppe
+data <- data %>% mutate(Einkommensgruppe = case_when(Nettoeinkommen == "0 € - 1000 €" ~ 'niedriges Einkommen',
+                                                               Nettoeinkommen == "1001 € - 2000€" ~ 'niedriges Einkommen',
+                                                               Nettoeinkommen == "2001 € - 3000 €" ~ 'mittleres Einkommen',
+                                                               Nettoeinkommen == "3001 € - 4000 €" ~ 'mittleres Einkommen',
+                                                               Nettoeinkommen == "4001 € - 5000 €" ~ 'hohes Einkommen',
+                                                               Nettoeinkommen == "Mehr als 5000 €" ~ 'hohes Einkommen'))
+#Beziehungsstatus: alleine oder in Beziehung
+data <- data %>% mutate(Allein_vs_Beziehung = case_when(Beziehungsstatus == "Single" ~ 'Allein',
+                                                    Beziehungsstatus == "Geschieden" ~ 'Allein',
+                                                    Beziehungsstatus == "Verwitwet" ~ 'Allein',
+                                                    Beziehungsstatus == "In einer Beziehung" ~ 'Beziehung',
+                                                    Beziehungsstatus == "Verheiratet" ~ 'Beziehung'))
+
+
+#Alkohol Konsum: nie, selten, häufig
+data <- data %>% mutate(Alkoholgruppe = case_when(`Alkohol Konsum` == "Nein" ~ 'kein Konsum',
+                                                          `Alkohol Konsum` == "Ja, mindestens einmal im Jahr" ~ 'niedriger Konsum',
+                                                          `Alkohol Konsum` == "Ja, mindestens einmal im Monat" ~ 'niedriger Konsum',
+                                                          `Alkohol Konsum` == "Ja, mindestens einmal pro Woche" ~ 'hoher Konsum',
+                                                          `Alkohol Konsum` == "Ja, mehrmals pro Woche" ~ 'hoher Konsum',
+                                                          `Alkohol Konsum` == "Ja, täglich" ~ 'hoher Konsum'))
+
+#Zigaretten Konsum: nie, selten, häufig
+data <- data %>% mutate(Zigarettengruppe = case_when(`Zigaretten Konsum` == "Nein" ~ 'kein Konsum',
+                                                                `Zigaretten Konsum` == "Ja, mindestens einmal im Jahr" ~ 'niedriger Konsum',
+                                                                `Zigaretten Konsum` == "Ja, mindestens einmal im Monat" ~ 'niedriger Konsum',
+                                                                `Zigaretten Konsum` == "Ja, mindestens einmal pro Woche" ~ 'hoher Konsum',
+                                                                `Zigaretten Konsum` == "Ja, mehrmals pro Woche" ~ 'hoher Konsum',
+                                                                `Zigaretten Konsum` == "Ja, täglich" ~ 'hoher Konsum'))
+
+#Drogen Konsum: nie, selten, häufig
+data <- data %>% mutate(Drogengruppe = case_when(`Drogen Konsum` == "Nein" ~ 'kein Konsum',
+                                                        `Drogen Konsum` == "Ja, mindestens einmal im Jahr" ~ 'niedriger Konsum',
+                                                        `Drogen Konsum` == "Ja, mindestens einmal im Monat" ~ 'niedriger Konsum',
+                                                        `Drogen Konsum` == "Ja, mindestens einmal pro Woche" ~ 'hoher Konsum',
+                                                        `Drogen Konsum` == "Ja, mehrmals pro Woche" ~ 'hoher Konsum',
+                                                        `Drogen Konsum` == "Ja, täglich" ~ 'hoher Konsum'))
+
 
 #Offene Nennungen Parteien: Aufnahme von "Die Partei"
 data$`Wahl Partei Sonstiges` <- tolower(data$`Wahl Partei Sonstiges`)
@@ -772,10 +829,10 @@ data$`Wahl Partei` <- ifelse(data$`Wahl Partei Sonstiges` %in% "die partei", "Di
 #####
 #new info
 
-#add index (necessary?)
-data$index <- c(1:2047)
+#laufender Zähler einfügen
+data$Index <- c(1:2047)
 
-#how many accounts does each respondent follow?
+#wie vielen Accounts folgt jeder der Befragten?
 Accounts <- data %>% select(`Alman Memes` : `Selena Gomez`)
 Account_names <- names(Accounts)
 #Account_names <- names(data %>% select(`Alman Memes` : `Selena Gomez`))
