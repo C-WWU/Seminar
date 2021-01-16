@@ -14,7 +14,6 @@ library(naniar)
 #####
 #preparations
 #load datasets and delete unnecessary first rows using readr
-  #USE data <- data[-1, ]
 
 #gapfish data: load and then remove last column (id) and first four rows (test ids), add source information
 gapfish_text <- read_csv("~/Uni/Master/3. Semester/Seminar SRA/datasets/Gapfish Text.csv")
@@ -821,10 +820,6 @@ data <- data %>% mutate(Drogengruppe = case_when(`Drogen Konsum` == "Nein" ~ 'ke
                                                         `Drogen Konsum` == "Ja, mehrmals pro Woche" ~ 'hoher Konsum',
                                                         `Drogen Konsum` == "Ja, täglich" ~ 'hoher Konsum'))
 
-
-#Offene Nennungen Parteien: Aufnahme von "Die Partei"
-data$`Wahl Partei Sonstiges` <- tolower(data$`Wahl Partei Sonstiges`)
-data$`Wahl Partei` <- ifelse(data$`Wahl Partei Sonstiges` %in% "die partei", "Die Partei", data$`Wahl Partei`)
 
 #####
 #new info
