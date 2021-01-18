@@ -4,16 +4,30 @@
 ##
 #####################################
 
+#install and load relevant packages
+library(ggplot2)
+install.packages("cowplot")
+library(cowplot)
+install.packages("randomForest")
+library(randomForest)
 
+#load data
 load("data_for_analysis.RData")
 
 cols_names <- names(data)  
 cols_names
 
 
-#####
-#Geschlecht
+###Erklärung:
+#eine Raute bedeutet, das hier als Kommentierung stehen lassen (dann sind wir einigermaßen gleich auch wenn alle verschieden Coden)
+###3 Rauten bedeuten, dass hier etw. angepasst werden muss. Das danach gerne löschen
+###auch gerne eigene Sachen kommentieren, was auch immer zu den Modellen auffällt!
 
+#####
+#Geschlecht 
+###(Name der DV die wir untersuchen austauschen)
+
+###hier: Zeilen anpassen, die wir auswählen, und Dateienname ändern zu jew. Variable
 data_Geschlecht <- data[,c(25, 27:255)]
 
 cols_Geschlecht <- names(data_Geschlecht)
@@ -23,103 +37,45 @@ data_Geschlecht$Geschlecht <- as.factor(data_Geschlecht$Geschlecht)
 #Training und Test Dataset
 set.seed(400)
 
-## ID NAs: impute any missing values in the training set using proximities
+###falls es NAs gibt (nur bei wenigen Daten) --> Zeile 41 Raute weg und Namen von Dataset anpassen
 #DATASET <- rfImpute(DATASET ~ ., data = data, iter=6)
 
+# Modell erstellen: 300 trees (default)
 
-
-
-
-## NOTE: iter = the number of iterations to run. Breiman says 4 to 6 iterations
-## is usually good enough. With this dataset, when we set iter=6, OOB-error
-## bounces around between 17% and 18%. When we set iter=20, 
-# set.seed(42)
-# data.imputed <- rfImpute(hd ~ ., data = data, iter=20)
-## we get values a little better and a little worse, so doing more 
-## iterations doesn't improve the situation.
-##
-## NOTE: If you really want to micromanage how rfImpute(),
-## you can change the number of trees it makes (the default is 300) and the
-## number of variables that it will consider at each step.
-
-
-## Now we are ready to build a random forest.
-
-
-## NOTE: If the thing we're trying to predict (in this case it is 
-## whether or not someone has heart disease) is a continuous number 
-## (i.e. "weight" or "height"), then by default, randomForest() will set 
-## "mtry", the number of variables to consider at each step, 
-## to the total number of variables divided by 3 (rounded down), or to 1 
-## (if the division results in a value less than 1).
-## If the thing we're trying to predict is a "factor" (i.e. either "yes/no"
-## or "ranked"), then randomForest() will set mtry to 
-## the square root of the number of variables (rounded down to the next
-## integer value).
-
-
-## In this example, "hd", the thing we are trying to predict, is a factor and
-## there are 13 variables. So by default, randomForest() will set 
-## mtry = sqrt(13) = 3.6 rounded down = 3
-## Also, by default random forest generates 500 trees (NOTE: rfImpute() only
-## generates 300 tress by default)
+###mtry: wenn numerisch, dann default = sqrt(229); wenn continuous, dann default = 229/3
+### generates 300 tress by default, können wir so lassen
+###anpassen: IV, data = neues Dataset; mtry anpassen zu entweder sqrt(229) oder 229/3
 model <- randomForest(Geschlecht ~ ., data=data_Geschlecht, proximity=TRUE, mtry = sqrt(229))
 
-
-## RandomForest returns all kinds of things
-model # gives us an overview of the call, along with...
-# 1) The OOB error rate for the forest with ntree trees. 
-#    In this case ntree=500 by default
-# 2) The confusion matrix for the forest with ntree trees.
-#    The confusion matrix is laid out like this:
-#          
-#                Healthy                      Unhealthy
-#          --------------------------------------------------------------
-# Healthy  | Number of healthy people   | Number of healthy people      |
-#          | correctly called "healthy" | incorectly called "unhealthy" |
-#          | by the forest.             | by the forest                 |
-#          --------------------------------------------------------------
-# Unhealthy| Number of unhealthy people | Number of unhealthy peole     |
-#          | incorrectly called         | correctly called "unhealthy"  |
-#          | "healthy" by the forest    | by the forest                 |
-#          --------------------------------------------------------------
+#Modell prüfen
+model 
 
 
-## Now check to see if the random forest is actually big enough...
-## Up to a point, the more trees in the forest, the better. You can tell when
-## you've made enough when the OOB no longer improves.
+#grafische Darstellung des OOB samples:
 
-#Anm. Miriam: anpassen: times = 1+Ausprägungen; Error = anpassen!!
+###anpassen: Z. 58 times = 1+Ausprägungen; Z. 59 rep anpassen mit ausprägungen, z. 60ff Error = anpassen!!
 oob.error.data <- data.frame(
   Trees=rep(1:nrow(model$err.rate), times=4),
   Type=rep(c("OOB", "1", "2", "3"), each=nrow(model$err.rate)),
   Error=c(model$err.rate[,"OOB"], 
-          model$err.rate[,"1"], 
+          model$err.rate[,"1"],  
           model$err.rate[,"2"],
           model$err.rate[,"3"]))
 
 
 ggplot(data=oob.error.data, aes(x=Trees, y=Error)) +
   geom_line(aes(color=Type))
-#save this plot
+
+#Plot und Modell speichern
+###NAmen anpassen zu richtiger Variable!
 ggsave("oob_error_rate_500_trees_Geschlecht.pdf")
 
+###Model abspeichern: Variablenname anpassen
 model_Geschlecht_500 <- model
 
-## Blue line = The error rate specifically for calling "Unheathly" patients that
-## are OOB.
-##
-## Green line = The overall OOB error rate.
-##
-## Red line = The error rate specifically for calling "Healthy" patients 
-## that are OOB.
 
-
-## NOTE: After building a random forest with 500 tress, the graph does not make 
-## it clear that the OOB-error has settled on a value or, if we added more 
-## trees, it would continue to decrease.
-## So we do the whole thing again, but this time add more trees.
-
+#zweites Model mit 1000 Trees --> wird error weniger oder stagniert er? 
+##Modelgleichung: DV anpassen, data = .. anpassen
 model <- randomForest(Geschlecht ~ ., data=data_Geschlecht, ntree = 1000, proximity=TRUE, mtry = sqrt(229))
 model
 
@@ -140,27 +96,28 @@ ggsave("oob_error_rate_1000_trees_Geschlecht.pdf")
 
 model_Geschlecht_1000 <- model
 
-## After building a random forest with 1,000 trees, we get the same OOB-error
-## 16.5% and we can see convergence in the graph. So we could have gotten
-## away with only 500 trees, but we wouldn't have been sure that number
-## was enough.
+## Kommentieren: wie hat sich der Error verändert? Größer, kleiner, oder gleich? Sprich, war es notwendig mit 1000 Trees zu arbeiten?
+
+###ABWÄGEN: auch ausprobieren für andere Zahl von Trees notwendig, zb 500? (dann einfach Kopieren und ntree = 500 setzen) 
 
 
 
 
-## If we want to compare this random forest to others with different values for
-## mtry (to control how many variables are considered at each step)...
+# Prüfen: was ist das ideale mtry? 
+###Zeile 110: Modellgleichung anpassen wie davor; ntree wählen welches besser war (300 oder 1000 oder anderes)
 oob.values <- vector(length=10)
-for(i in 1:10) {
+for(i in 1:20) {
   temp.model <- randomForest(Geschlecht ~ ., data=data_Geschlecht, mtry=i, ntree=1000)
   oob.values[i] <- temp.model$err.rate[nrow(temp.model$err.rate),1]
 }
 oob.values
-## find the minimum error
+# find  minimum error
 min(oob.values)
-## find the optimal value for mtry...
+# find  optimal value for mtry
 which(oob.values == min(oob.values))
-## create a model for proximities using the best value for mtry
+
+# create a model for proximities using the best value for mtry
+###anpassen: DV, Data, ntree
 model <- randomForest(Geschlecht ~ ., 
                       data=data_Geschlecht,
                       ntree=1000, 
@@ -168,21 +125,20 @@ model <- randomForest(Geschlecht ~ .,
                       mtry=which(oob.values == min(oob.values)))
 model
 
-## Now let's create an MDS-plot to show how the samples are related to each 
-## other.
-##
-## Start by converting the proximity matrix into a distance matrix.
-distance.matrix <- as.dist(1-model$proximity)
 
+#Creating an MDS-plot
+#First: Converting  proximity matrix into distance matrix
+distance.matrix <- as.dist(1-model$proximity)
 
 mds.stuff <- cmdscale(distance.matrix, eig=TRUE, x.ret=TRUE)
 
 
-## calculate the percentage of variation that each MDS axis accounts for...
+#calculate the percentage of variation that each MDS axis accounts for:
 mds.var.per <- round(mds.stuff$eig/sum(mds.stuff$eig)*100, 1)
 
 
-## now make a fancy looking plot that shows the MDS axes and the variation:
+#Create actual MDS plot:
+###anpassen: Status --> datenset$DV
 mds.values <- mds.stuff$points
 mds.data <- data.frame(Sample=rownames(mds.values),
                        X=mds.values[,1],
@@ -197,6 +153,7 @@ ggplot(data=mds.data, aes(x=X, y=Y, label=Sample)) +
   ylab(paste("MDS2 - ", mds.var.per[2], "%", sep="")) +
   ggtitle("MDS plot using (1 - Random Forest Proximities)")
 
+###anpassen: Name (DV)
 ggsave(file="random_forest_mds_plot_Geschlecht.pdf")
 
 
