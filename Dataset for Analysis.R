@@ -10,6 +10,11 @@ library(ggplot2)
 library(scales)
 install.packages("naniar")
 library(naniar)
+install.packages("cowplot")
+library(cowplot)
+install.packages("randomForest")
+library(randomForest)
+
 
 #####
 #preparations
@@ -54,287 +59,287 @@ names(data)[names(data) == 'Q29'] <- 'DSGVO'
 names(data)[names(data) == 'Q3'] <- 'Alter'
 names(data)[names(data) == 'Q4'] <- 'Geschlecht'
 names(data)[names(data) == 'Q5'] <- 'PLZ'
-names(data)[names(data) == 'Q6'] <- 'Instagram Nutzer'
-names(data)[names(data) == 'Q7'] <- 'Instagram Nutzungshaeufigkeit'
-names(data)[names(data) == 'Q30_1'] <- 'Alman Memes'
-names(data)[names(data) == 'Q30_2'] <- 'Barbara Schoeneberger'
-names(data)[names(data) == 'Q30_3'] <- 'Berlin Tag und Nacht'
-names(data)[names(data) == 'Q30_4'] <- 'Brigitte Magazin'
-names(data)[names(data) == 'Q30_5'] <- 'Michael Bully Herbig'
-names(data)[names(data) == 'Q30_6'] <- 'Dein Beichtstuhl'
-names(data)[names(data) == 'Q30_7'] <- 'Dieter Nuhr'
+names(data)[names(data) == 'Q6'] <- 'Instagram_Nutzer'
+names(data)[names(data) == 'Q7'] <- 'Instagram_Nutzungshaeufigkeit'
+names(data)[names(data) == 'Q30_1'] <- 'Alman_Memes'
+names(data)[names(data) == 'Q30_2'] <- 'Barbara_Schoeneberger'
+names(data)[names(data) == 'Q30_3'] <- 'Berlin_Tag_und_Nacht'
+names(data)[names(data) == 'Q30_4'] <- 'Brigitte_Magazin'
+names(data)[names(data) == 'Q30_5'] <- 'Michael_Bully_Herbig'
+names(data)[names(data) == 'Q30_6'] <- 'Dein_Beichtstuhl'
+names(data)[names(data) == 'Q30_7'] <- 'Dieter_Nuhr'
 names(data)[names(data) == 'Q30_8'] <- 'Disney Deutschland'
-names(data)[names(data) == 'Q30_9'] <- 'Elyas M Barek'
+names(data)[names(data) == 'Q30_9'] <- 'Elyas_M_Barek'
 names(data)[names(data) == 'Q30_10'] <- 'Faktastisch'
-names(data)[names(data) == 'Q30_11'] <- 'Felix Lobrecht'
-names(data)[names(data) == 'Q30_12'] <- 'Germanys next Topmodel'
-names(data)[names(data) == 'Q30_13'] <- 'heute show'
-names(data)[names(data) == 'Q30_14'] <- 'Jan Josef Liefers'
-names(data)[names(data) == 'Q30_15'] <- 'Julien Bam'
-names(data)[names(data) == 'Q30_16'] <- 'Jens Knossalla'
-names(data)[names(data) == 'Q41_1'] <- 'Laser Luca'
-names(data)[names(data) == 'Q41_2'] <- 'Love Island'
-names(data)[names(data) == 'Q41_3'] <- 'Mario Barth'
-names(data)[names(data) == 'Q41_4'] <- 'Made My Day'
-names(data)[names(data) == 'Q41_5'] <- 'Netflix DE'
-names(data)[names(data) == 'Q41_6'] <- 'Nicholas Puschmann'
-names(data)[names(data) == 'Q41_7'] <- 'Joko Winterscheidt'
-names(data)[names(data) == 'Q41_8'] <- 'Oliver Pocher'
-names(data)[names(data) == 'Q41_9'] <- 'Palina Rojinski'
-names(data)[names(data) == 'Q41_10'] <- 'Playboy Germany'
+names(data)[names(data) == 'Q30_11'] <- 'Felix_Lobrecht'
+names(data)[names(data) == 'Q30_12'] <- 'Germanys_next_Topmodel'
+names(data)[names(data) == 'Q30_13'] <- 'heute_show'
+names(data)[names(data) == 'Q30_14'] <- 'Jan_Josef_Liefers'
+names(data)[names(data) == 'Q30_15'] <- 'Julien_Bam'
+names(data)[names(data) == 'Q30_16'] <- 'Jens_Knossalla'
+names(data)[names(data) == 'Q41_1'] <- 'Laser_Luca'
+names(data)[names(data) == 'Q41_2'] <- 'Love_Island'
+names(data)[names(data) == 'Q41_3'] <- 'Mario_Barth'
+names(data)[names(data) == 'Q41_4'] <- 'Made_My_Day'
+names(data)[names(data) == 'Q41_5'] <- 'Netflix_DE'
+names(data)[names(data) == 'Q41_6'] <- 'Nicholas_Puschmann'
+names(data)[names(data) == 'Q41_7'] <- 'Joko_Winterscheidt'
+names(data)[names(data) == 'Q41_8'] <- 'Oliver_Pocher'
+names(data)[names(data) == 'Q41_9'] <- 'Palina_Rojinski'
+names(data)[names(data) == 'Q41_10'] <- 'Playboy_Germany'
 names(data)[names(data) == 'Q41_11'] <- 'Promiflash'
-names(data)[names(data) == 'Q41_12'] <- 'Sebastian Fitzek'
-names(data)[names(data) == 'Q41_13'] <- 'Sophia Thomalla'
-names(data)[names(data) == 'Q41_14'] <- 'The Voice of Germany'
-names(data)[names(data) == 'Q41_15'] <- 'Wer weiss denn sowas'
-names(data)[names(data) == 'Q31_1'] <- 'Food Stories'
-names(data)[names(data) == 'Q31_2'] <- 'Aldi Nord'
-names(data)[names(data) == 'Q31_3'] <- 'Aldi Sued'
+names(data)[names(data) == 'Q41_12'] <- 'Sebastian_Fitzek'
+names(data)[names(data) == 'Q41_13'] <- 'Sophia_Thomalla'
+names(data)[names(data) == 'Q41_14'] <- 'The_Voice_of_Germany'
+names(data)[names(data) == 'Q41_15'] <- 'Wer_weiss_denn_sowas'
+names(data)[names(data) == 'Q31_1'] <- 'Food_Stories'
+names(data)[names(data) == 'Q31_2'] <- 'Aldi_Nord'
+names(data)[names(data) == 'Q31_3'] <- 'Aldi_Sued'
 names(data)[names(data) == 'Q31_4'] <- 'Astra'
-names(data)[names(data) == 'Q31_5'] <- 'Backen.de'
+names(data)[names(data) == 'Q31_5'] <- 'Backen_de'
 names(data)[names(data) == 'Q31_6'] <- 'BakeClub'
 names(data)[names(data) == 'Q31_7'] <- 'Chefkoch'
 names(data)[names(data) == 'Q31_8'] <- 'Edeka'
-names(data)[names(data) == 'Q31_9'] <- 'Einfach Tasty'
+names(data)[names(data) == 'Q31_9'] <- 'Einfach_Tasty'
 names(data)[names(data) == 'Q31_10'] <- 'Etepetete'
 names(data)[names(data) == 'Q31_11'] <- 'Foodist'
-names(data)[names(data) == 'Q31_12'] <- 'Fritz Kola'
+names(data)[names(data) == 'Q31_12'] <- 'Fritz_Kola'
 names(data)[names(data) == 'Q31_13'] <- 'Fruehlingszwiebel'
 names(data)[names(data) == 'Q31_14'] <- 'Haribo'
-names(data)[names(data) == 'Q31_15'] <- 'Hello Fresh'
-names(data)[names(data) == 'Q31_16'] <- 'Junk Food Guru'
-names(data)[names(data) == 'Q42_1'] <- 'Just Spices'
+names(data)[names(data) == 'Q31_15'] <- 'Hello_Fresh'
+names(data)[names(data) == 'Q31_16'] <- 'Junk_Food_Guru'
+names(data)[names(data) == 'Q42_1'] <- 'Just_Spices'
 names(data)[names(data) == 'Q42_2'] <- 'Kaufland'
 names(data)[names(data) == 'Q42_3'] <- 'Leckerschmecker'
-names(data)[names(data) == 'Q42_4'] <- 'McDonalds Deutschland'
-names(data)[names(data) == 'Q42_5'] <- 'Pam Goes Nuts'
-names(data)[names(data) == 'Q42_6'] <- 'Pflanzlich stark'
-names(data)[names(data) == 'Q42_7'] <- 'Plantbased Food and Travel'
-names(data)[names(data) == 'Q42_8'] <- 'Redbull Germany'
-names(data)[names(data) == 'Q42_9'] <- 'Sallys Welt'
+names(data)[names(data) == 'Q42_4'] <- 'McDonalds_Deutschland'
+names(data)[names(data) == 'Q42_5'] <- 'Pam_Goes_Nuts'
+names(data)[names(data) == 'Q42_6'] <- 'Pflanzlich_stark'
+names(data)[names(data) == 'Q42_7'] <- 'Plantbased_Food_and_Travel'
+names(data)[names(data) == 'Q42_8'] <- 'Redbull_Germany'
+names(data)[names(data) == 'Q42_9'] <- 'Sallys_Welt'
 names(data)[names(data) == 'Q42_10'] <- 'SimplyV'
-names(data)[names(data) == 'Q42_11'] <- 'Starbucks Deutschland'
-names(data)[names(data) == 'Q42_12'] <- 'Steffen Henssler'
-names(data)[names(data) == 'Q42_13'] <- 'Tim Maelzer'
-names(data)[names(data) == 'Q42_14'] <- 'True fruits'
+names(data)[names(data) == 'Q42_11'] <- 'Starbucks_Deutschland'
+names(data)[names(data) == 'Q42_12'] <- 'Steffen_Henssler'
+names(data)[names(data) == 'Q42_13'] <- 'Tim_Maelzer'
+names(data)[names(data) == 'Q42_14'] <- 'True_fruits'
 names(data)[names(data) == 'Q42_15'] <- 'Vapiano'
-names(data)[names(data) == 'Q42_16'] <- 'Weber Grill'
-names(data)[names(data) == 'Q32_1'] <- 'Animal Crossing'
-names(data)[names(data) == 'Q32_2'] <- 'Call of Duty'
-names(data)[names(data) == 'Q32_3'] <- 'EA Sports FIFA'
-names(data)[names(data) == 'Q32_4'] <- 'Felix von der Laden'
+names(data)[names(data) == 'Q42_16'] <- 'Weber_Grill'
+names(data)[names(data) == 'Q32_1'] <- 'Animal_Crossing'
+names(data)[names(data) == 'Q32_2'] <- 'Call_of_Duty'
+names(data)[names(data) == 'Q32_3'] <- 'EA_Sports_FIFA'
+names(data)[names(data) == 'Q32_4'] <- 'Felix_von_der_Laden'
 names(data)[names(data) == 'Q32_5'] <- 'Fortnite'
 names(data)[names(data) == 'Q32_6'] <- 'Gamingzelle'
-names(data)[names(data) == 'Q32_7'] <- 'Go Pro Deutschland'
-names(data)[names(data) == 'Q32_8'] <- 'Huawei Deutschland'
-names(data)[names(data) == 'Q32_9'] <- 'Microsoft Deutschland'
-names(data)[names(data) == 'Q32_10'] <- 'Mohammed Harkous'
-names(data)[names(data) == 'Q32_11'] <- 'Montana Black'
+names(data)[names(data) == 'Q32_7'] <- 'Go_Pro_Deutschland'
+names(data)[names(data) == 'Q32_8'] <- 'Huawei_Deutschland'
+names(data)[names(data) == 'Q32_9'] <- 'Microsoft_Deutschland'
+names(data)[names(data) == 'Q32_10'] <- 'Mohammed_Harkous'
+names(data)[names(data) == 'Q32_11'] <- 'Montana_Black'
 names(data)[names(data) == 'Q32_12'] <- 'Nintendo'
-names(data)[names(data) == 'Q32_13'] <- 'PlayStation DACH'
+names(data)[names(data) == 'Q32_13'] <- 'PlayStation_DACH'
 names(data)[names(data) == 'Q32_14'] <- 'Rewinside'
 names(data)[names(data) == 'Q32_15'] <- 'Reyst'
 names(data)[names(data) == 'Q32_16'] <- 'Rezo'
-names(data)[names(data) == 'Q32_17'] <- 'Ungespielt/Simon Unge'
-names(data)[names(data) == 'Q32_18'] <- 'Xbox DACH'
-names(data)[names(data) == 'Q33_1'] <- 'Apotheken Umschau'
+names(data)[names(data) == 'Q32_17'] <- 'Ungespielt_Simon_Unge'
+names(data)[names(data) == 'Q32_18'] <- 'Xbox_DACH'
+names(data)[names(data) == 'Q33_1'] <- 'Apotheken_Umschau'
 names(data)[names(data) == 'Q33_2'] <- 'ARTE'
-names(data)[names(data) == 'Q33_3'] <- 'BILD Zeitung'
-names(data)[names(data) == 'Q33_4'] <- 'Frankfurter Allgemeine Zeitung'
-names(data)[names(data) == 'Q33_5'] <- 'GEO Magazin'
+names(data)[names(data) == 'Q33_3'] <- 'BILD_Zeitung'
+names(data)[names(data) == 'Q33_4'] <- 'Frankfurter_Allgemeine_Zeitung'
+names(data)[names(data) == 'Q33_5'] <- 'GEO_Magazin'
 names(data)[names(data) == 'Q33_6'] <- 'Handelsblatt'
-names(data)[names(data) == 'Q33_7'] <- 'Quarks & Co.'
-names(data)[names(data) == 'Q33_8'] <- 'RTL Aktuell'
-names(data)[names(data) == 'Q33_9'] <- 'Der Spiegel'
+names(data)[names(data) == 'Q33_7'] <- 'Quarks_Co'
+names(data)[names(data) == 'Q33_8'] <- 'RTL_Aktuell'
+names(data)[names(data) == 'Q33_9'] <- 'Der_Spiegel'
 names(data)[names(data) == 'Q33_10'] <- 'Tagesschau'
 names(data)[names(data) == 'Q33_11'] <- 'taz'
 names(data)[names(data) == 'Q33_12'] <- 'ZEIT'
-names(data)[names(data) == 'Q34_1'] <- 'Andre Schiebler'
-names(data)[names(data) == 'Q34_2'] <- 'Anna Maria Damm'
+names(data)[names(data) == 'Q34_1'] <- 'Andre_Schiebler'
+names(data)[names(data) == 'Q34_2'] <- 'Anna_Maria_Damm'
 names(data)[names(data) == 'Q34_3'] <- 'bebe'
-names(data)[names(data) == 'Q34_4'] <- 'Bibis Beauty Palace'
-names(data)[names(data) == 'Q34_5'] <- 'Bonnie Strange'
-names(data)[names(data) == 'Q34_6'] <- 'Carmen Kroll'
-names(data)[names(data) == 'Q34_7'] <- 'Caro Daur'
+names(data)[names(data) == 'Q34_4'] <- 'Bibis_Beauty_Palace'
+names(data)[names(data) == 'Q34_5'] <- 'Bonnie_Strange'
+names(data)[names(data) == 'Q34_6'] <- 'Carmen_Kroll'
+names(data)[names(data) == 'Q34_7'] <- 'Caro_Daur'
 names(data)[names(data) == 'Q34_8'] <- 'DagiBee'
-names(data)[names(data) == 'Q34_9'] <- 'Daniele Katzenberger'
+names(data)[names(data) == 'Q34_9'] <- 'Daniela_Katzenberger'
 names(data)[names(data) == 'Q34_10'] <- 'Dilara'
 names(data)[names(data) == 'Q34_11'] <- 'dm'
 names(data)[names(data) == 'Q34_12'] <- 'Melike'
-names(data)[names(data) == 'Q34_13'] <- 'Die groesste Community fuer Muetter'
-names(data)[names(data) == 'Q34_14'] <- 'Guido Maria Kretschmer'
-names(data)[names(data) == 'Q34_15'] <- 'Ischtar Isik'
-names(data)[names(data) == 'Q34_16'] <- 'Julia Beautx'
-names(data)[names(data) == 'Q34_17'] <- 'Julien Co'
-names(data)[names(data) == 'Q34_18'] <- 'Kelly Misses Vlog'
-names(data)[names(data) == 'Q34_19'] <- 'Lena Gercke'
-names(data)[names(data) == 'Q34_21'] <- 'Leon Content'
-names(data)[names(data) == 'Q34_20'] <- 'Leonie Hanne'
+names(data)[names(data) == 'Q34_13'] <- 'Die_groesste_Community_fuer_Muetter'
+names(data)[names(data) == 'Q34_14'] <- 'Guido_Maria_Kretschmer'
+names(data)[names(data) == 'Q34_15'] <- 'Ischtar_Isik'
+names(data)[names(data) == 'Q34_16'] <- 'Julia_Beautx'
+names(data)[names(data) == 'Q34_17'] <- 'Julien_Co'
+names(data)[names(data) == 'Q34_18'] <- 'Kelly_Misses_Vlog'
+names(data)[names(data) == 'Q34_19'] <- 'Lena_Gercke'
+names(data)[names(data) == 'Q34_21'] <- 'Leon_Content'
+names(data)[names(data) == 'Q34_20'] <- 'Leonie_Hanne'
 names(data)[names(data) == 'Q43_1'] <- 'Lillydoo'
-names(data)[names(data) == 'Q43_2'] <- 'Lisa Marie Schiffner'
-names(data)[names(data) == 'Q43_3'] <- 'Alex Koch'
-names(data)[names(data) == 'Q43_4'] <- 'MAC Cosmetics'
-names(data)[names(data) == 'Q43_5'] <- 'Melina Sophie'
+names(data)[names(data) == 'Q43_2'] <- 'Lisa_Marie_Schiffner'
+names(data)[names(data) == 'Q43_3'] <- 'Alex_Koch'
+names(data)[names(data) == 'Q43_4'] <- 'MAC_Cosmetics'
+names(data)[names(data) == 'Q43_5'] <- 'Melina_Sophie'
 names(data)[names(data) == 'Q43_6'] <- 'Balea'
-names(data)[names(data) == 'Q43_7'] <- 'Naturkosmetik Muenchen'
-names(data)[names(data) == 'Q43_8'] <- 'NYX Professional Makeup'
-names(data)[names(data) == 'Q43_9'] <- 'Paola Maria'
-names(data)[names(data) == 'Q43_10'] <- 'Riccardo Simonetti'
-names(data)[names(data) == 'Q43_11'] <- 'Roman Lochmann'
-names(data)[names(data) == 'Q43_12'] <- 'Sarah Harrison'
-names(data)[names(data) == 'Q43_13'] <- 'Simon Desue'
-names(data)[names(data) == 'Q43_14'] <- 'Takko Fashion'
-names(data)[names(data) == 'Q43_15'] <- 'Team Harrison'
-names(data)[names(data) == 'Q43_16'] <- 'Vogue Germany'
+names(data)[names(data) == 'Q43_7'] <- 'Naturkosmetik_Muenchen'
+names(data)[names(data) == 'Q43_8'] <- 'NYX_Professional_Makeup'
+names(data)[names(data) == 'Q43_9'] <- 'Paola_Maria'
+names(data)[names(data) == 'Q43_10'] <- 'Riccardo_Simonetti'
+names(data)[names(data) == 'Q43_11'] <- 'Roman_Lochmann'
+names(data)[names(data) == 'Q43_12'] <- 'Sarah_Harrison'
+names(data)[names(data) == 'Q43_13'] <- 'Simon_Desue'
+names(data)[names(data) == 'Q43_14'] <- 'Takko_Fashion'
+names(data)[names(data) == 'Q43_15'] <- 'Team_Harrison'
+names(data)[names(data) == 'Q43_16'] <- 'Vogue_Germany'
 names(data)[names(data) == 'Q43_17'] <- 'Alverde'
-names(data)[names(data) == 'Q43_18'] <- 'Leon Skincare'
+names(data)[names(data) == 'Q43_18'] <- 'Leon_Skincare'
 names(data)[names(data) == 'Q43_19'] <- 'Westwing'
 names(data)[names(data) == 'Q43_20'] <- 'IKEA'
-names(data)[names(data) == 'Q35_1'] <- 'Andrea Berg'
+names(data)[names(data) == 'Q35_1'] <- 'Andrea_Berg'
 names(data)[names(data) == 'Q35_2'] <- 'Annenmaykantereit'
-names(data)[names(data) == 'Q35_3'] <- 'Berliner Philharmoniker'
-names(data)[names(data) == 'Q35_4'] <- 'Boehse Onkelz'
+names(data)[names(data) == 'Q35_3'] <- 'Berliner_Philharmoniker'
+names(data)[names(data) == 'Q35_4'] <- 'Boehse_Onkelz'
 names(data)[names(data) == 'Q35_5'] <- 'Bushido'
-names(data)[names(data) == 'Q35_6'] <- 'Capital Bra'
-names(data)[names(data) == 'Q35_7'] <- 'Die Toten Hosen'
-names(data)[names(data) == 'Q35_8'] <- 'Eurovision Song Contest'
-names(data)[names(data) == 'Q35_9'] <- 'Helene Fischer'
-names(data)[names(data) == 'Q35_10'] <- 'Lena Meyer-Landrut'
+names(data)[names(data) == 'Q35_6'] <- 'Capital_Bra'
+names(data)[names(data) == 'Q35_7'] <- 'Die_Toten_Hosen'
+names(data)[names(data) == 'Q35_8'] <- 'Eurovision_Song_Contest'
+names(data)[names(data) == 'Q35_9'] <- 'Helene_Fischer'
+names(data)[names(data) == 'Q35_10'] <- 'Lena_Meyer_Landrut'
 names(data)[names(data) == 'Q35_11'] <- 'LionTTV'
 names(data)[names(data) == 'Q35_12'] <- 'Mero'
 names(data)[names(data) == 'Q35_13'] <- 'Parookaville'
-names(data)[names(data) == 'Q35_14'] <- 'Pietro Lombardi'
-names(data)[names(data) == 'Q35_15'] <- 'Shirin David'
+names(data)[names(data) == 'Q35_14'] <- 'Pietro_Lombardi'
+names(data)[names(data) == 'Q35_15'] <- 'Shirin_David'
 names(data)[names(data) == 'Q35_16'] <- 'Silbermond'
-names(data)[names(data) == 'Q35_17'] <- 'The BossHoss'
-names(data)[names(data) == 'Q35_18'] <- 'Wacken Open Air'
-names(data)[names(data) == 'Q35_19'] <- 'Michael Wendler'
+names(data)[names(data) == 'Q35_17'] <- 'The_BossHoss'
+names(data)[names(data) == 'Q35_18'] <- 'Wacken_Open_Air'
+names(data)[names(data) == 'Q35_19'] <- 'Michael_Wendler'
 names(data)[names(data) == 'Q36_1'] <- 'AfD'
-names(data)[names(data) == 'Q36_2'] <- 'Alice Weidel'
+names(data)[names(data) == 'Q36_2'] <- 'Alice_Weidel'
 names(data)[names(data) == 'Q36_3'] <- 'Bundesgesundheitsministerium'
-names(data)[names(data) == 'Q36_4'] <- 'Angela Merkel'
+names(data)[names(data) == 'Q36_4'] <- 'Angela_Merkel'
 names(data)[names(data) == 'Q36_5'] <- 'Bundeswehr'
 names(data)[names(data) == 'Q36_6'] <- 'CDU'
-names(data)[names(data) == 'Q36_7'] <- 'Christian Lindner'
-names(data)[names(data) == 'Q36_8'] <- 'Buendnis 90/Die Gruenen'
-names(data)[names(data) == 'Q36_9'] <- 'Die Linke'
-names(data)[names(data) == 'Q36_10'] <- 'Die Partei'
-names(data)[names(data) == 'Q36_11'] <- 'Evangelisch.de'
+names(data)[names(data) == 'Q36_7'] <- 'Christian_Lindner'
+names(data)[names(data) == 'Q36_8'] <- 'Buendnis_90_Die_Gruenen'
+names(data)[names(data) == 'Q36_9'] <- 'Die_Linke'
+names(data)[names(data) == 'Q36_10'] <- 'Die_Partei'
+names(data)[names(data) == 'Q36_11'] <- 'Evangelisch_de'
 names(data)[names(data) == 'Q36_12'] <- 'FDP'
-names(data)[names(data) == 'Q36_13'] <- 'Fridays for Future'
+names(data)[names(data) == 'Q36_13'] <- 'Fridays_for_Future'
 names(data)[names(data) == 'Q44_1'] <- 'Islamfakten'
-names(data)[names(data) == 'Q44_2'] <- 'Jens Spahn'
-names(data)[names(data) == 'Q44_3'] <- 'katholisch.de'
-names(data)[names(data) == 'Q44_5'] <- 'Louisa Dellert'
-names(data)[names(data) == 'Q44_6'] <- 'Luisa Neubauer'
-names(data)[names(data) == 'Q44_7'] <- 'Heiko Maas'
-names(data)[names(data) == 'Q44_8'] <- 'PETA Deutschland'
+names(data)[names(data) == 'Q44_2'] <- 'Jens_Spahn'
+names(data)[names(data) == 'Q44_3'] <- 'katholisch_de'
+names(data)[names(data) == 'Q44_5'] <- 'Louisa_Dellert'
+names(data)[names(data) == 'Q44_6'] <- 'Luisa_Neubauer'
+names(data)[names(data) == 'Q44_7'] <- 'Heiko_Maas'
+names(data)[names(data) == 'Q44_8'] <- 'PETA_Deutschland'
 names(data)[names(data) == 'Q44_9'] <- 'Querdenken711'
-names(data)[names(data) == 'Q44_10'] <- 'Robert Habeck'
-names(data)[names(data) == 'Q44_11'] <- 'Sahra Wagenknecht'
+names(data)[names(data) == 'Q44_10'] <- 'Robert_Habeck'
+names(data)[names(data) == 'Q44_11'] <- 'Sahra_Wagenknecht'
 names(data)[names(data) == 'Q44_12'] <- 'SPD'
-names(data)[names(data) == 'Q37_1'] <- 'adidas Deutschland'
-names(data)[names(data) == 'Q37_2'] <- 'Alica Schmidt'
-names(data)[names(data) == 'Q37_3'] <- 'Borussia Dortmund'
+names(data)[names(data) == 'Q37_1'] <- 'adidas_Deutschland'
+names(data)[names(data) == 'Q37_2'] <- 'Alica_Schmidt'
+names(data)[names(data) == 'Q37_3'] <- 'Borussia_Dortmund'
 names(data)[names(data) == 'Q37_4'] <- 'DFB'
-names(data)[names(data) == 'Q37_5'] <- 'RB Leipzig'
-names(data)[names(data) == 'Q37_6'] <- 'FC Bayern Muenchen'
-names(data)[names(data) == 'Q37_7'] <- 'Felix Neureuther'
-names(data)[names(data) == 'Q37_8'] <- 'Felix Sturm'
-names(data)[names(data) == 'Q37_9'] <- 'Gina Lueckenkemper'
-names(data)[names(data) == 'Q37_10'] <- 'Christoph Icke Dommisch'
+names(data)[names(data) == 'Q37_5'] <- 'RB_Leipzig'
+names(data)[names(data) == 'Q37_6'] <- 'FC_Bayern_Muenchen'
+names(data)[names(data) == 'Q37_7'] <- 'Felix_Neureuther'
+names(data)[names(data) == 'Q37_8'] <- 'Felix_Sturm'
+names(data)[names(data) == 'Q37_9'] <- 'Gina_Lueckenkemper'
+names(data)[names(data) == 'Q37_10'] <- 'Christoph_Icke_Dommisch'
 names(data)[names(data) == 'Q37_11'] <- 'Inscope21'
 names(data)[names(data) == 'Q37_12'] <- 'kicker'
-names(data)[names(data) == 'Q37_13'] <- 'Lisa Mueller'
-names(data)[names(data) == 'Q45_1'] <- 'Mady Morrison'
-names(data)[names(data) == 'Q45_2'] <- 'Manuel Neuer'
-names(data)[names(data) == 'Q45_3'] <- 'Marco Reus'
+names(data)[names(data) == 'Q37_13'] <- 'Lisa_Mueller'
+names(data)[names(data) == 'Q45_1'] <- 'Mady_Morrison'
+names(data)[names(data) == 'Q45_2'] <- 'Manuel_Neuer'
+names(data)[names(data) == 'Q45_3'] <- 'Marco_Reus'
 names(data)[names(data) == 'Q45_4'] <- 'McFit'
-names(data)[names(data) == 'Q45_5'] <- 'Oceans Apart'
-names(data)[names(data) == 'Q45_6'] <- 'Pamela Reif'
-names(data)[names(data) == 'Q45_7'] <- 'Philipp Lahm'
-names(data)[names(data) == 'Q45_8'] <- 'Sophia Thiel'
-names(data)[names(data) == 'Q45_9'] <- 'FC Schalke 04'
-names(data)[names(data) == 'Q45_10'] <- 'Sky Sport'
+names(data)[names(data) == 'Q45_5'] <- 'Oceans_Apart'
+names(data)[names(data) == 'Q45_6'] <- 'Pamela_Reif'
+names(data)[names(data) == 'Q45_7'] <- 'Philipp_Lahm'
+names(data)[names(data) == 'Q45_8'] <- 'Sophia_Thiel'
+names(data)[names(data) == 'Q45_9'] <- 'FC_Schalke_04'
+names(data)[names(data) == 'Q45_10'] <- 'Sky_Sport'
 names(data)[names(data) == 'Q45_11'] <- 'Sport1'
-names(data)[names(data) == 'Q45_12'] <- 'Uwe Gensheimer'
-names(data)[names(data) == 'Q38_1'] <- 'Canon Deutschland'
-names(data)[names(data) == 'Q38_2'] <- 'Create! By Obi'
-names(data)[names(data) == 'Q38_3'] <- 'Deutsche Bahn'
-names(data)[names(data) == 'Q38_4'] <- 'Easy Alex'
+names(data)[names(data) == 'Q45_12'] <- 'Uwe_Gensheimer'
+names(data)[names(data) == 'Q38_1'] <- 'Canon_Deutschland'
+names(data)[names(data) == 'Q38_2'] <- 'Create_By_Obi'
+names(data)[names(data) == 'Q38_3'] <- 'Deutsche_Bahn'
+names(data)[names(data) == 'Q38_4'] <- 'Easy_Alex'
 names(data)[names(data) == 'Q38_5'] <- 'Flixbus'
-names(data)[names(data) == 'Q38_6'] <- 'Ford Deutschland'
+names(data)[names(data) == 'Q38_6'] <- 'Ford_Deutschland'
 names(data)[names(data) == 'Q38_7'] <- 'Germanroamers'
-names(data)[names(data) == 'Q38_8'] <- 'Hannes Becker'
-names(data)[names(data) == 'Q38_9'] <- 'Linda DIY'
-names(data)[names(data) == 'Q38_10'] <- 'Martin Ruetter'
-names(data)[names(data) == 'Q38_11'] <- 'Mercedes-Benz Deutschland'
-names(data)[names(data) == 'Q38_12'] <- 'Tiere suchen ein Zuhause'
+names(data)[names(data) == 'Q38_8'] <- 'Hannes_Becker'
+names(data)[names(data) == 'Q38_9'] <- 'Linda_DIY'
+names(data)[names(data) == 'Q38_10'] <- 'Martin_Ruetter'
+names(data)[names(data) == 'Q38_11'] <- 'Mercedes_Benz_Deutschland'
+names(data)[names(data) == 'Q38_12'] <- 'Tiere_suchen_ein_Zuhause'
 names(data)[names(data) == 'Q38_13'] <- 'Urlaubsguru'
 names(data)[names(data) == 'Q38_14'] <- 'Urlaubspiraten'
 names(data)[names(data) == 'Q38_15'] <- 'Xlaeta'
-names(data)[names(data) == 'Q38_16'] <- 'Yamaha Motor Deutschland'
-names(data)[names(data) == 'Q38_17'] <- 'Yvonne Pfeffer'
-names(data)[names(data) == 'Q47_1'] <- 'Ariana Grande'
+names(data)[names(data) == 'Q38_16'] <- 'Yamaha_Motor_Deutschland'
+names(data)[names(data) == 'Q38_17'] <- 'Yvonne_Pfeffer'
+names(data)[names(data) == 'Q47_1'] <- 'Ariana_Grande'
 names(data)[names(data) == 'Q47_2'] <- 'Beyonce'
-names(data)[names(data) == 'Q47_3'] <- 'Cristiano Ronaldo'
-names(data)[names(data) == 'Q47_9'] <- 'Dwayne Johnson'
-names(data)[names(data) == 'Q47_4'] <- 'Justin Bieber'
-names(data)[names(data) == 'Q47_5'] <- 'Kim Kardashian West'
-names(data)[names(data) == 'Q47_6'] <- 'Kylie Jenner'
-names(data)[names(data) == 'Q47_7'] <- 'Lionel Messi'
-names(data)[names(data) == 'Q47_12'] <- 'National Geographic'
-names(data)[names(data) == 'Q47_8'] <- 'Selena Gomez'
-names(data)[names(data) == 'Q8_1'] <- 'Extrovertiert/enthusiastisch'
-names(data)[names(data) == 'Q8_2'] <- 'Kritisch/konfliktfreudig'
-names(data)[names(data) == 'Q8_3'] <- 'Zuverlaessig/selbstdiszipliniert'
-names(data)[names(data) == 'Q8_4'] <- 'Aengstlich/leicht reizbar'
-names(data)[names(data) == 'Q8_5'] <- 'Offen fuer neue Erfahrungen/vielseitig'
-names(data)[names(data) == 'Q8_6'] <- 'Kontrollfrage Persoenlichkeit'
-names(data)[names(data) == 'Q8_7'] <- 'Zurueckhaltend/ruhig'
-names(data)[names(data) == 'Q8_8'] <- 'Sympathisch/warmherzig'
-names(data)[names(data) == 'Q8_9'] <- 'Unorganisiert/nachlaessig'
-names(data)[names(data) == 'Q8_10'] <- 'Ruhig/emotional stabil'
-names(data)[names(data) == 'Q8_11'] <- 'Konventionell/unkreativ'
-names(data)[names(data) == 'Q9'] <- 'Alkohol Konsum'
-names(data)[names(data) == 'Q10'] <- 'Zigaretten Konsum'
-names(data)[names(data) == 'Q11'] <- 'Drogen Konsum'
-names(data)[names(data) == 'Q12_1'] <- 'Gefuehl der Zugehoerigkeit'
+names(data)[names(data) == 'Q47_3'] <- 'Cristiano_Ronaldo'
+names(data)[names(data) == 'Q47_9'] <- 'Dwayne_Johnson'
+names(data)[names(data) == 'Q47_4'] <- 'Justin_Bieber'
+names(data)[names(data) == 'Q47_5'] <- 'Kim_Kardashian_West'
+names(data)[names(data) == 'Q47_6'] <- 'Kylie_Jenner'
+names(data)[names(data) == 'Q47_7'] <- 'Lionel_Messi'
+names(data)[names(data) == 'Q47_12'] <- 'National_Geographic'
+names(data)[names(data) == 'Q47_8'] <- 'Selena_Gomez'
+names(data)[names(data) == 'Q8_1'] <- 'Extrovertiert_enthusiastisch'
+names(data)[names(data) == 'Q8_2'] <- 'Kritisch_konfliktfreudig'
+names(data)[names(data) == 'Q8_3'] <- 'Zuverlaessig_selbstdiszipliniert'
+names(data)[names(data) == 'Q8_4'] <- 'Aengstlich_leicht_reizbar'
+names(data)[names(data) == 'Q8_5'] <- 'Offen_fuer_neue_Erfahrungen_vielseitig'
+names(data)[names(data) == 'Q8_6'] <- 'Kontrollfrage_Persoenlichkeit'
+names(data)[names(data) == 'Q8_7'] <- 'Zurueckhaltend_ruhig'
+names(data)[names(data) == 'Q8_8'] <- 'Sympathisch_warmherzig'
+names(data)[names(data) == 'Q8_9'] <- 'Unorganisiert_nachlaessig'
+names(data)[names(data) == 'Q8_10'] <- 'Ruhig_emotional_stabil'
+names(data)[names(data) == 'Q8_11'] <- 'Konventionell_unkreativ'
+names(data)[names(data) == 'Q9'] <- 'Alkohol_Konsum'
+names(data)[names(data) == 'Q10'] <- 'Zigaretten_Konsum'
+names(data)[names(data) == 'Q11'] <- 'Drogen_Konsum'
+names(data)[names(data) == 'Q12_1'] <- 'Gefuehl_der_Zugehoerigkeit'
 names(data)[names(data) == 'Q12_2'] <- 'Spannung'
-names(data)[names(data) == 'Q12_3'] <- 'Kontrollfrage Ziele im Leben'
-names(data)[names(data) == 'Q12_4'] <- 'Herzliche Beziehung zu anderen Menschen'
+names(data)[names(data) == 'Q12_3'] <- 'Kontrollfrage_Ziele_im_Leben'
+names(data)[names(data) == 'Q12_4'] <- 'Herzliche_Beziehung_zu_anderen_Menschen'
 names(data)[names(data) == 'Q12_5'] <- 'Selbstverwirklichung'
-names(data)[names(data) == 'Q12_6'] <- 'Respekt vor Anderen'
-names(data)[names(data) == 'Q12_7'] <- 'Spass und Freude am Leben'
+names(data)[names(data) == 'Q12_6'] <- 'Respekt_vor_Anderen'
+names(data)[names(data) == 'Q12_7'] <- 'Spass_und_Freude_am_Leben'
 names(data)[names(data) == 'Q12_8'] <- 'Sicherheit'
 names(data)[names(data) == 'Q12_9'] <- 'Selbstachtung'
-names(data)[names(data) == 'Q12_10'] <- 'Gefuehl von Erfolg'
-names(data)[names(data) == 'Q13'] <- 'Wahl Partei'
-names(data)[names(data) == 'Q13_8_TEXT'] <- 'Wahl Partei Sonstiges'
-names(data)[names(data) == 'Q14_1'] <- 'Corona-Massnahmen uebertrieben'
-names(data)[names(data) == 'Q14_2'] <- 'Corona-Massnahmen muessten haerter sein'
-names(data)[names(data) == 'Q14_3'] <- 'Corona ist harmlos, gleich Grippe'
-names(data)[names(data) == 'Q14_4'] <- 'Glaube nicht an Corona'
+names(data)[names(data) == 'Q12_10'] <- 'Gefuehl_von_Erfolg'
+names(data)[names(data) == 'Q13'] <- 'Wahl_Partei'
+names(data)[names(data) == 'Q13_8_TEXT'] <- 'Wahl_Partei_Sonstiges'
+names(data)[names(data) == 'Q14_1'] <- 'Corona_Massnahmen_uebertrieben'
+names(data)[names(data) == 'Q14_2'] <- 'Corona_Massnahmen_muessten_haerter_sein'
+names(data)[names(data) == 'Q14_3'] <- 'Corona_ist_harmlos_gleich_Grippe'
+names(data)[names(data) == 'Q14_4'] <- 'Glaube_nicht_an_Corona'
 names(data)[names(data) == 'Q15'] <- 'Nettoeinkommen'
-names(data)[names(data) == 'Q16_1'] <- 'Verwendete Produkte Umwelt nicht belasten'
-names(data)[names(data) == 'Q16_2'] <- 'Auswirkungen meiner Handlungen auf Umwelt'
-names(data)[names(data) == 'Q16_3'] <- 'Kaufgewohnheiten, Sorge um Umwelt'
-names(data)[names(data) == 'Q16_4'] <- 'Verschwendung Ressourcen'
-names(data)[names(data) == 'Q16_5'] <- 'Kontrollfrage Umwelt'
+names(data)[names(data) == 'Q16_1'] <- 'Verwendete_Produkte_Umwelt_nicht_belasten'
+names(data)[names(data) == 'Q16_2'] <- 'Auswirkungen_meiner_Handlungen_auf_Umwelt'
+names(data)[names(data) == 'Q16_3'] <- 'Kaufgewohnheiten_Sorge_um_Umwelt'
+names(data)[names(data) == 'Q16_4'] <- 'Verschwendung_Ressourcen'
+names(data)[names(data) == 'Q16_5'] <- 'Kontrollfrage_Umwelt'
 names(data)[names(data) == 'Q16_6'] <- 'Umweltverantwortlich'
-names(data)[names(data) == 'Q16_7'] <- 'Unannehmlichkeiten fuer Umwelt'
+names(data)[names(data) == 'Q16_7'] <- 'Unannehmlichkeiten_fuer_Umwelt'
 names(data)[names(data) == 'Q17'] <- 'Beschaeftigung'
 names(data)[names(data) == 'Q18'] <- 'Bildungsabschluss'
 names(data)[names(data) == 'Q19'] <- 'Religion'
-names(data)[names(data) == 'Q19_5_TEXT'] <- 'Religion Sonstiges'
+names(data)[names(data) == 'Q19_5_TEXT'] <- 'Religion_Sonstiges'
 names(data)[names(data) == 'Q20'] <- 'Migrationshintergrund'
-names(data)[names(data) == 'Q21'] <- 'Woher Vorfahren'
-names(data)[names(data) == 'Q22'] <- 'Sexuelle Orientierung'
-names(data)[names(data) == 'Q22_4_TEXT'] <- 'Sexuelle Orientierung Sonstiges'
+names(data)[names(data) == 'Q21'] <- 'Woher_Vorfahren'
+names(data)[names(data) == 'Q22'] <- 'Sexuelle_Orientierung'
+names(data)[names(data) == 'Q22_4_TEXT'] <- 'Sexuelle_Orientierung_Sonstiges'
 names(data)[names(data) == 'Q23'] <- 'Beziehungsstatus'
 names(data)[names(data) == 'Q24'] <- 'Kinder'
-names(data)[names(data) == 'Q26'] <- 'Anzahl Kinder'
-names(data)[names(data) == 'Q40'] <- 'Instagram Name'
+names(data)[names(data) == 'Q26'] <- 'Anzahl_Kinder'
+names(data)[names(data) == 'Q40'] <- 'Instagram_Name'
 
 text_full <- data
 
@@ -345,287 +350,287 @@ names(data)[names(data) == 'Q29'] <- 'DSGVO'
 names(data)[names(data) == 'Q3'] <- 'Alter'
 names(data)[names(data) == 'Q4'] <- 'Geschlecht'
 names(data)[names(data) == 'Q5'] <- 'PLZ'
-names(data)[names(data) == 'Q6'] <- 'Instagram Nutzer'
-names(data)[names(data) == 'Q7'] <- 'Instagram Nutzungshaeufigkeit'
-names(data)[names(data) == 'Q30_1'] <- 'Alman Memes'
-names(data)[names(data) == 'Q30_2'] <- 'Barbara Schoeneberger'
-names(data)[names(data) == 'Q30_3'] <- 'Berlin Tag und Nacht'
-names(data)[names(data) == 'Q30_4'] <- 'Brigitte Magazin'
-names(data)[names(data) == 'Q30_5'] <- 'Michael Bully Herbig'
-names(data)[names(data) == 'Q30_6'] <- 'Dein Beichtstuhl'
-names(data)[names(data) == 'Q30_7'] <- 'Dieter Nuhr'
+names(data)[names(data) == 'Q6'] <- 'Instagram_Nutzer'
+names(data)[names(data) == 'Q7'] <- 'Instagram_Nutzungshaeufigkeit'
+names(data)[names(data) == 'Q30_1'] <- 'Alman_Memes'
+names(data)[names(data) == 'Q30_2'] <- 'Barbara_Schoeneberger'
+names(data)[names(data) == 'Q30_3'] <- 'Berlin_Tag_und_Nacht'
+names(data)[names(data) == 'Q30_4'] <- 'Brigitte_Magazin'
+names(data)[names(data) == 'Q30_5'] <- 'Michael_Bully_Herbig'
+names(data)[names(data) == 'Q30_6'] <- 'Dein_Beichtstuhl'
+names(data)[names(data) == 'Q30_7'] <- 'Dieter_Nuhr'
 names(data)[names(data) == 'Q30_8'] <- 'Disney Deutschland'
-names(data)[names(data) == 'Q30_9'] <- 'Elyas M Barek'
+names(data)[names(data) == 'Q30_9'] <- 'Elyas_M_Barek'
 names(data)[names(data) == 'Q30_10'] <- 'Faktastisch'
-names(data)[names(data) == 'Q30_11'] <- 'Felix Lobrecht'
-names(data)[names(data) == 'Q30_12'] <- 'Germanys next Topmodel'
-names(data)[names(data) == 'Q30_13'] <- 'heute show'
-names(data)[names(data) == 'Q30_14'] <- 'Jan Josef Liefers'
-names(data)[names(data) == 'Q30_15'] <- 'Julien Bam'
-names(data)[names(data) == 'Q30_16'] <- 'Jens Knossalla'
-names(data)[names(data) == 'Q41_1'] <- 'Laser Luca'
-names(data)[names(data) == 'Q41_2'] <- 'Love Island'
-names(data)[names(data) == 'Q41_3'] <- 'Mario Barth'
-names(data)[names(data) == 'Q41_4'] <- 'Made My Day'
-names(data)[names(data) == 'Q41_5'] <- 'Netflix DE'
-names(data)[names(data) == 'Q41_6'] <- 'Nicholas Puschmann'
-names(data)[names(data) == 'Q41_7'] <- 'Joko Winterscheidt'
-names(data)[names(data) == 'Q41_8'] <- 'Oliver Pocher'
-names(data)[names(data) == 'Q41_9'] <- 'Palina Rojinski'
-names(data)[names(data) == 'Q41_10'] <- 'Playboy Germany'
+names(data)[names(data) == 'Q30_11'] <- 'Felix_Lobrecht'
+names(data)[names(data) == 'Q30_12'] <- 'Germanys_next_Topmodel'
+names(data)[names(data) == 'Q30_13'] <- 'heute_show'
+names(data)[names(data) == 'Q30_14'] <- 'Jan_Josef_Liefers'
+names(data)[names(data) == 'Q30_15'] <- 'Julien_Bam'
+names(data)[names(data) == 'Q30_16'] <- 'Jens_Knossalla'
+names(data)[names(data) == 'Q41_1'] <- 'Laser_Luca'
+names(data)[names(data) == 'Q41_2'] <- 'Love_Island'
+names(data)[names(data) == 'Q41_3'] <- 'Mario_Barth'
+names(data)[names(data) == 'Q41_4'] <- 'Made_My_Day'
+names(data)[names(data) == 'Q41_5'] <- 'Netflix_DE'
+names(data)[names(data) == 'Q41_6'] <- 'Nicholas_Puschmann'
+names(data)[names(data) == 'Q41_7'] <- 'Joko_Winterscheidt'
+names(data)[names(data) == 'Q41_8'] <- 'Oliver_Pocher'
+names(data)[names(data) == 'Q41_9'] <- 'Palina_Rojinski'
+names(data)[names(data) == 'Q41_10'] <- 'Playboy_Germany'
 names(data)[names(data) == 'Q41_11'] <- 'Promiflash'
-names(data)[names(data) == 'Q41_12'] <- 'Sebastian Fitzek'
-names(data)[names(data) == 'Q41_13'] <- 'Sophia Thomalla'
-names(data)[names(data) == 'Q41_14'] <- 'The Voice of Germany'
-names(data)[names(data) == 'Q41_15'] <- 'Wer weiss denn sowas'
-names(data)[names(data) == 'Q31_1'] <- 'Food Stories'
-names(data)[names(data) == 'Q31_2'] <- 'Aldi Nord'
-names(data)[names(data) == 'Q31_3'] <- 'Aldi Sued'
+names(data)[names(data) == 'Q41_12'] <- 'Sebastian_Fitzek'
+names(data)[names(data) == 'Q41_13'] <- 'Sophia_Thomalla'
+names(data)[names(data) == 'Q41_14'] <- 'The_Voice_of_Germany'
+names(data)[names(data) == 'Q41_15'] <- 'Wer_weiss_denn_sowas'
+names(data)[names(data) == 'Q31_1'] <- 'Food_Stories'
+names(data)[names(data) == 'Q31_2'] <- 'Aldi_Nord'
+names(data)[names(data) == 'Q31_3'] <- 'Aldi_Sued'
 names(data)[names(data) == 'Q31_4'] <- 'Astra'
-names(data)[names(data) == 'Q31_5'] <- 'Backen.de'
+names(data)[names(data) == 'Q31_5'] <- 'Backen_de'
 names(data)[names(data) == 'Q31_6'] <- 'BakeClub'
 names(data)[names(data) == 'Q31_7'] <- 'Chefkoch'
 names(data)[names(data) == 'Q31_8'] <- 'Edeka'
-names(data)[names(data) == 'Q31_9'] <- 'Einfach Tasty'
+names(data)[names(data) == 'Q31_9'] <- 'Einfach_Tasty'
 names(data)[names(data) == 'Q31_10'] <- 'Etepetete'
 names(data)[names(data) == 'Q31_11'] <- 'Foodist'
-names(data)[names(data) == 'Q31_12'] <- 'Fritz Kola'
+names(data)[names(data) == 'Q31_12'] <- 'Fritz_Kola'
 names(data)[names(data) == 'Q31_13'] <- 'Fruehlingszwiebel'
 names(data)[names(data) == 'Q31_14'] <- 'Haribo'
-names(data)[names(data) == 'Q31_15'] <- 'Hello Fresh'
-names(data)[names(data) == 'Q31_16'] <- 'Junk Food Guru'
-names(data)[names(data) == 'Q42_1'] <- 'Just Spices'
+names(data)[names(data) == 'Q31_15'] <- 'Hello_Fresh'
+names(data)[names(data) == 'Q31_16'] <- 'Junk_Food_Guru'
+names(data)[names(data) == 'Q42_1'] <- 'Just_Spices'
 names(data)[names(data) == 'Q42_2'] <- 'Kaufland'
 names(data)[names(data) == 'Q42_3'] <- 'Leckerschmecker'
-names(data)[names(data) == 'Q42_4'] <- 'McDonalds Deutschland'
-names(data)[names(data) == 'Q42_5'] <- 'Pam Goes Nuts'
-names(data)[names(data) == 'Q42_6'] <- 'Pflanzlich stark'
-names(data)[names(data) == 'Q42_7'] <- 'Plantbased Food and Travel'
-names(data)[names(data) == 'Q42_8'] <- 'Redbull Germany'
-names(data)[names(data) == 'Q42_9'] <- 'Sallys Welt'
+names(data)[names(data) == 'Q42_4'] <- 'McDonalds_Deutschland'
+names(data)[names(data) == 'Q42_5'] <- 'Pam_Goes_Nuts'
+names(data)[names(data) == 'Q42_6'] <- 'Pflanzlich_stark'
+names(data)[names(data) == 'Q42_7'] <- 'Plantbased_Food_and_Travel'
+names(data)[names(data) == 'Q42_8'] <- 'Redbull_Germany'
+names(data)[names(data) == 'Q42_9'] <- 'Sallys_Welt'
 names(data)[names(data) == 'Q42_10'] <- 'SimplyV'
-names(data)[names(data) == 'Q42_11'] <- 'Starbucks Deutschland'
-names(data)[names(data) == 'Q42_12'] <- 'Steffen Henssler'
-names(data)[names(data) == 'Q42_13'] <- 'Tim Maelzer'
-names(data)[names(data) == 'Q42_14'] <- 'True fruits'
+names(data)[names(data) == 'Q42_11'] <- 'Starbucks_Deutschland'
+names(data)[names(data) == 'Q42_12'] <- 'Steffen_Henssler'
+names(data)[names(data) == 'Q42_13'] <- 'Tim_Maelzer'
+names(data)[names(data) == 'Q42_14'] <- 'True_fruits'
 names(data)[names(data) == 'Q42_15'] <- 'Vapiano'
-names(data)[names(data) == 'Q42_16'] <- 'Weber Grill'
-names(data)[names(data) == 'Q32_1'] <- 'Animal Crossing'
-names(data)[names(data) == 'Q32_2'] <- 'Call of Duty'
-names(data)[names(data) == 'Q32_3'] <- 'EA Sports FIFA'
-names(data)[names(data) == 'Q32_4'] <- 'Felix von der Laden'
+names(data)[names(data) == 'Q42_16'] <- 'Weber_Grill'
+names(data)[names(data) == 'Q32_1'] <- 'Animal_Crossing'
+names(data)[names(data) == 'Q32_2'] <- 'Call_of_Duty'
+names(data)[names(data) == 'Q32_3'] <- 'EA_Sports_FIFA'
+names(data)[names(data) == 'Q32_4'] <- 'Felix_von_der_Laden'
 names(data)[names(data) == 'Q32_5'] <- 'Fortnite'
 names(data)[names(data) == 'Q32_6'] <- 'Gamingzelle'
-names(data)[names(data) == 'Q32_7'] <- 'Go Pro Deutschland'
-names(data)[names(data) == 'Q32_8'] <- 'Huawei Deutschland'
-names(data)[names(data) == 'Q32_9'] <- 'Microsoft Deutschland'
-names(data)[names(data) == 'Q32_10'] <- 'Mohammed Harkous'
-names(data)[names(data) == 'Q32_11'] <- 'Montana Black'
+names(data)[names(data) == 'Q32_7'] <- 'Go_Pro_Deutschland'
+names(data)[names(data) == 'Q32_8'] <- 'Huawei_Deutschland'
+names(data)[names(data) == 'Q32_9'] <- 'Microsoft_Deutschland'
+names(data)[names(data) == 'Q32_10'] <- 'Mohammed_Harkous'
+names(data)[names(data) == 'Q32_11'] <- 'Montana_Black'
 names(data)[names(data) == 'Q32_12'] <- 'Nintendo'
-names(data)[names(data) == 'Q32_13'] <- 'PlayStation DACH'
+names(data)[names(data) == 'Q32_13'] <- 'PlayStation_DACH'
 names(data)[names(data) == 'Q32_14'] <- 'Rewinside'
 names(data)[names(data) == 'Q32_15'] <- 'Reyst'
 names(data)[names(data) == 'Q32_16'] <- 'Rezo'
-names(data)[names(data) == 'Q32_17'] <- 'Ungespielt/Simon Unge'
-names(data)[names(data) == 'Q32_18'] <- 'Xbox DACH'
-names(data)[names(data) == 'Q33_1'] <- 'Apotheken Umschau'
+names(data)[names(data) == 'Q32_17'] <- 'Ungespielt_Simon_Unge'
+names(data)[names(data) == 'Q32_18'] <- 'Xbox_DACH'
+names(data)[names(data) == 'Q33_1'] <- 'Apotheken_Umschau'
 names(data)[names(data) == 'Q33_2'] <- 'ARTE'
-names(data)[names(data) == 'Q33_3'] <- 'BILD Zeitung'
-names(data)[names(data) == 'Q33_4'] <- 'Frankfurter Allgemeine Zeitung'
-names(data)[names(data) == 'Q33_5'] <- 'GEO Magazin'
+names(data)[names(data) == 'Q33_3'] <- 'BILD_Zeitung'
+names(data)[names(data) == 'Q33_4'] <- 'Frankfurter_Allgemeine_Zeitung'
+names(data)[names(data) == 'Q33_5'] <- 'GEO_Magazin'
 names(data)[names(data) == 'Q33_6'] <- 'Handelsblatt'
-names(data)[names(data) == 'Q33_7'] <- 'Quarks & Co.'
-names(data)[names(data) == 'Q33_8'] <- 'RTL Aktuell'
-names(data)[names(data) == 'Q33_9'] <- 'Der Spiegel'
+names(data)[names(data) == 'Q33_7'] <- 'Quarks_Co'
+names(data)[names(data) == 'Q33_8'] <- 'RTL_Aktuell'
+names(data)[names(data) == 'Q33_9'] <- 'Der_Spiegel'
 names(data)[names(data) == 'Q33_10'] <- 'Tagesschau'
 names(data)[names(data) == 'Q33_11'] <- 'taz'
 names(data)[names(data) == 'Q33_12'] <- 'ZEIT'
-names(data)[names(data) == 'Q34_1'] <- 'Andre Schiebler'
-names(data)[names(data) == 'Q34_2'] <- 'Anna Maria Damm'
+names(data)[names(data) == 'Q34_1'] <- 'Andre_Schiebler'
+names(data)[names(data) == 'Q34_2'] <- 'Anna_Maria_Damm'
 names(data)[names(data) == 'Q34_3'] <- 'bebe'
-names(data)[names(data) == 'Q34_4'] <- 'Bibis Beauty Palace'
-names(data)[names(data) == 'Q34_5'] <- 'Bonnie Strange'
-names(data)[names(data) == 'Q34_6'] <- 'Carmen Kroll'
-names(data)[names(data) == 'Q34_7'] <- 'Caro Daur'
+names(data)[names(data) == 'Q34_4'] <- 'Bibis_Beauty_Palace'
+names(data)[names(data) == 'Q34_5'] <- 'Bonnie_Strange'
+names(data)[names(data) == 'Q34_6'] <- 'Carmen_Kroll'
+names(data)[names(data) == 'Q34_7'] <- 'Caro_Daur'
 names(data)[names(data) == 'Q34_8'] <- 'DagiBee'
-names(data)[names(data) == 'Q34_9'] <- 'Daniele Katzenberger'
+names(data)[names(data) == 'Q34_9'] <- 'Daniela_Katzenberger'
 names(data)[names(data) == 'Q34_10'] <- 'Dilara'
 names(data)[names(data) == 'Q34_11'] <- 'dm'
 names(data)[names(data) == 'Q34_12'] <- 'Melike'
-names(data)[names(data) == 'Q34_13'] <- 'Die groesste Community fuer Muetter'
-names(data)[names(data) == 'Q34_14'] <- 'Guido Maria Kretschmer'
-names(data)[names(data) == 'Q34_15'] <- 'Ischtar Isik'
-names(data)[names(data) == 'Q34_16'] <- 'Julia Beautx'
-names(data)[names(data) == 'Q34_17'] <- 'Julien Co'
-names(data)[names(data) == 'Q34_18'] <- 'Kelly Misses Vlog'
-names(data)[names(data) == 'Q34_19'] <- 'Lena Gercke'
-names(data)[names(data) == 'Q34_21'] <- 'Leon Content'
-names(data)[names(data) == 'Q34_20'] <- 'Leonie Hanne'
+names(data)[names(data) == 'Q34_13'] <- 'Die_groesste_Community_fuer_Muetter'
+names(data)[names(data) == 'Q34_14'] <- 'Guido_Maria_Kretschmer'
+names(data)[names(data) == 'Q34_15'] <- 'Ischtar_Isik'
+names(data)[names(data) == 'Q34_16'] <- 'Julia_Beautx'
+names(data)[names(data) == 'Q34_17'] <- 'Julien_Co'
+names(data)[names(data) == 'Q34_18'] <- 'Kelly_Misses_Vlog'
+names(data)[names(data) == 'Q34_19'] <- 'Lena_Gercke'
+names(data)[names(data) == 'Q34_21'] <- 'Leon_Content'
+names(data)[names(data) == 'Q34_20'] <- 'Leonie_Hanne'
 names(data)[names(data) == 'Q43_1'] <- 'Lillydoo'
-names(data)[names(data) == 'Q43_2'] <- 'Lisa Marie Schiffner'
-names(data)[names(data) == 'Q43_3'] <- 'Alex Koch'
-names(data)[names(data) == 'Q43_4'] <- 'MAC Cosmetics'
-names(data)[names(data) == 'Q43_5'] <- 'Melina Sophie'
+names(data)[names(data) == 'Q43_2'] <- 'Lisa_Marie_Schiffner'
+names(data)[names(data) == 'Q43_3'] <- 'Alex_Koch'
+names(data)[names(data) == 'Q43_4'] <- 'MAC_Cosmetics'
+names(data)[names(data) == 'Q43_5'] <- 'Melina_Sophie'
 names(data)[names(data) == 'Q43_6'] <- 'Balea'
-names(data)[names(data) == 'Q43_7'] <- 'Naturkosmetik Muenchen'
-names(data)[names(data) == 'Q43_8'] <- 'NYX Professional Makeup'
-names(data)[names(data) == 'Q43_9'] <- 'Paola Maria'
-names(data)[names(data) == 'Q43_10'] <- 'Riccardo Simonetti'
-names(data)[names(data) == 'Q43_11'] <- 'Roman Lochmann'
-names(data)[names(data) == 'Q43_12'] <- 'Sarah Harrison'
-names(data)[names(data) == 'Q43_13'] <- 'Simon Desue'
-names(data)[names(data) == 'Q43_14'] <- 'Takko Fashion'
-names(data)[names(data) == 'Q43_15'] <- 'Team Harrison'
-names(data)[names(data) == 'Q43_16'] <- 'Vogue Germany'
+names(data)[names(data) == 'Q43_7'] <- 'Naturkosmetik_Muenchen'
+names(data)[names(data) == 'Q43_8'] <- 'NYX_Professional_Makeup'
+names(data)[names(data) == 'Q43_9'] <- 'Paola_Maria'
+names(data)[names(data) == 'Q43_10'] <- 'Riccardo_Simonetti'
+names(data)[names(data) == 'Q43_11'] <- 'Roman_Lochmann'
+names(data)[names(data) == 'Q43_12'] <- 'Sarah_Harrison'
+names(data)[names(data) == 'Q43_13'] <- 'Simon_Desue'
+names(data)[names(data) == 'Q43_14'] <- 'Takko_Fashion'
+names(data)[names(data) == 'Q43_15'] <- 'Team_Harrison'
+names(data)[names(data) == 'Q43_16'] <- 'Vogue_Germany'
 names(data)[names(data) == 'Q43_17'] <- 'Alverde'
-names(data)[names(data) == 'Q43_18'] <- 'Leon Skincare'
+names(data)[names(data) == 'Q43_18'] <- 'Leon_Skincare'
 names(data)[names(data) == 'Q43_19'] <- 'Westwing'
 names(data)[names(data) == 'Q43_20'] <- 'IKEA'
-names(data)[names(data) == 'Q35_1'] <- 'Andrea Berg'
+names(data)[names(data) == 'Q35_1'] <- 'Andrea_Berg'
 names(data)[names(data) == 'Q35_2'] <- 'Annenmaykantereit'
-names(data)[names(data) == 'Q35_3'] <- 'Berliner Philharmoniker'
-names(data)[names(data) == 'Q35_4'] <- 'Boehse Onkelz'
+names(data)[names(data) == 'Q35_3'] <- 'Berliner_Philharmoniker'
+names(data)[names(data) == 'Q35_4'] <- 'Boehse_Onkelz'
 names(data)[names(data) == 'Q35_5'] <- 'Bushido'
-names(data)[names(data) == 'Q35_6'] <- 'Capital Bra'
-names(data)[names(data) == 'Q35_7'] <- 'Die Toten Hosen'
-names(data)[names(data) == 'Q35_8'] <- 'Eurovision Song Contest'
-names(data)[names(data) == 'Q35_9'] <- 'Helene Fischer'
-names(data)[names(data) == 'Q35_10'] <- 'Lena Meyer-Landrut'
+names(data)[names(data) == 'Q35_6'] <- 'Capital_Bra'
+names(data)[names(data) == 'Q35_7'] <- 'Die_Toten_Hosen'
+names(data)[names(data) == 'Q35_8'] <- 'Eurovision_Song_Contest'
+names(data)[names(data) == 'Q35_9'] <- 'Helene_Fischer'
+names(data)[names(data) == 'Q35_10'] <- 'Lena_Meyer_Landrut'
 names(data)[names(data) == 'Q35_11'] <- 'LionTTV'
 names(data)[names(data) == 'Q35_12'] <- 'Mero'
 names(data)[names(data) == 'Q35_13'] <- 'Parookaville'
-names(data)[names(data) == 'Q35_14'] <- 'Pietro Lombardi'
-names(data)[names(data) == 'Q35_15'] <- 'Shirin David'
+names(data)[names(data) == 'Q35_14'] <- 'Pietro_Lombardi'
+names(data)[names(data) == 'Q35_15'] <- 'Shirin_David'
 names(data)[names(data) == 'Q35_16'] <- 'Silbermond'
-names(data)[names(data) == 'Q35_17'] <- 'The BossHoss'
-names(data)[names(data) == 'Q35_18'] <- 'Wacken Open Air'
-names(data)[names(data) == 'Q35_19'] <- 'Michael Wendler'
+names(data)[names(data) == 'Q35_17'] <- 'The_BossHoss'
+names(data)[names(data) == 'Q35_18'] <- 'Wacken_Open_Air'
+names(data)[names(data) == 'Q35_19'] <- 'Michael_Wendler'
 names(data)[names(data) == 'Q36_1'] <- 'AfD'
-names(data)[names(data) == 'Q36_2'] <- 'Alice Weidel'
+names(data)[names(data) == 'Q36_2'] <- 'Alice_Weidel'
 names(data)[names(data) == 'Q36_3'] <- 'Bundesgesundheitsministerium'
-names(data)[names(data) == 'Q36_4'] <- 'Angela Merkel'
+names(data)[names(data) == 'Q36_4'] <- 'Angela_Merkel'
 names(data)[names(data) == 'Q36_5'] <- 'Bundeswehr'
 names(data)[names(data) == 'Q36_6'] <- 'CDU'
-names(data)[names(data) == 'Q36_7'] <- 'Christian Lindner'
-names(data)[names(data) == 'Q36_8'] <- 'Buendnis 90/Die Gruenen'
-names(data)[names(data) == 'Q36_9'] <- 'Die Linke'
-names(data)[names(data) == 'Q36_10'] <- 'Die Partei'
-names(data)[names(data) == 'Q36_11'] <- 'Evangelisch.de'
+names(data)[names(data) == 'Q36_7'] <- 'Christian_Lindner'
+names(data)[names(data) == 'Q36_8'] <- 'Buendnis_90_Die_Gruenen'
+names(data)[names(data) == 'Q36_9'] <- 'Die_Linke'
+names(data)[names(data) == 'Q36_10'] <- 'Die_Partei'
+names(data)[names(data) == 'Q36_11'] <- 'Evangelisch_de'
 names(data)[names(data) == 'Q36_12'] <- 'FDP'
-names(data)[names(data) == 'Q36_13'] <- 'Fridays for Future'
+names(data)[names(data) == 'Q36_13'] <- 'Fridays_for_Future'
 names(data)[names(data) == 'Q44_1'] <- 'Islamfakten'
-names(data)[names(data) == 'Q44_2'] <- 'Jens Spahn'
-names(data)[names(data) == 'Q44_3'] <- 'katholisch.de'
-names(data)[names(data) == 'Q44_5'] <- 'Louisa Dellert'
-names(data)[names(data) == 'Q44_6'] <- 'Luisa Neubauer'
-names(data)[names(data) == 'Q44_7'] <- 'Heiko Maas'
-names(data)[names(data) == 'Q44_8'] <- 'PETA Deutschland'
+names(data)[names(data) == 'Q44_2'] <- 'Jens_Spahn'
+names(data)[names(data) == 'Q44_3'] <- 'katholisch_de'
+names(data)[names(data) == 'Q44_5'] <- 'Louisa_Dellert'
+names(data)[names(data) == 'Q44_6'] <- 'Luisa_Neubauer'
+names(data)[names(data) == 'Q44_7'] <- 'Heiko_Maas'
+names(data)[names(data) == 'Q44_8'] <- 'PETA_Deutschland'
 names(data)[names(data) == 'Q44_9'] <- 'Querdenken711'
-names(data)[names(data) == 'Q44_10'] <- 'Robert Habeck'
-names(data)[names(data) == 'Q44_11'] <- 'Sahra Wagenknecht'
+names(data)[names(data) == 'Q44_10'] <- 'Robert_Habeck'
+names(data)[names(data) == 'Q44_11'] <- 'Sahra_Wagenknecht'
 names(data)[names(data) == 'Q44_12'] <- 'SPD'
-names(data)[names(data) == 'Q37_1'] <- 'adidas Deutschland'
-names(data)[names(data) == 'Q37_2'] <- 'Alica Schmidt'
-names(data)[names(data) == 'Q37_3'] <- 'Borussia Dortmund'
+names(data)[names(data) == 'Q37_1'] <- 'adidas_Deutschland'
+names(data)[names(data) == 'Q37_2'] <- 'Alica_Schmidt'
+names(data)[names(data) == 'Q37_3'] <- 'Borussia_Dortmund'
 names(data)[names(data) == 'Q37_4'] <- 'DFB'
-names(data)[names(data) == 'Q37_5'] <- 'RB Leipzig'
-names(data)[names(data) == 'Q37_6'] <- 'FC Bayern Muenchen'
-names(data)[names(data) == 'Q37_7'] <- 'Felix Neureuther'
-names(data)[names(data) == 'Q37_8'] <- 'Felix Sturm'
-names(data)[names(data) == 'Q37_9'] <- 'Gina Lueckenkemper'
-names(data)[names(data) == 'Q37_10'] <- 'Christoph Icke Dommisch'
+names(data)[names(data) == 'Q37_5'] <- 'RB_Leipzig'
+names(data)[names(data) == 'Q37_6'] <- 'FC_Bayern_Muenchen'
+names(data)[names(data) == 'Q37_7'] <- 'Felix_Neureuther'
+names(data)[names(data) == 'Q37_8'] <- 'Felix_Sturm'
+names(data)[names(data) == 'Q37_9'] <- 'Gina_Lueckenkemper'
+names(data)[names(data) == 'Q37_10'] <- 'Christoph_Icke_Dommisch'
 names(data)[names(data) == 'Q37_11'] <- 'Inscope21'
 names(data)[names(data) == 'Q37_12'] <- 'kicker'
-names(data)[names(data) == 'Q37_13'] <- 'Lisa Mueller'
-names(data)[names(data) == 'Q45_1'] <- 'Mady Morrison'
-names(data)[names(data) == 'Q45_2'] <- 'Manuel Neuer'
-names(data)[names(data) == 'Q45_3'] <- 'Marco Reus'
+names(data)[names(data) == 'Q37_13'] <- 'Lisa_Mueller'
+names(data)[names(data) == 'Q45_1'] <- 'Mady_Morrison'
+names(data)[names(data) == 'Q45_2'] <- 'Manuel_Neuer'
+names(data)[names(data) == 'Q45_3'] <- 'Marco_Reus'
 names(data)[names(data) == 'Q45_4'] <- 'McFit'
-names(data)[names(data) == 'Q45_5'] <- 'Oceans Apart'
-names(data)[names(data) == 'Q45_6'] <- 'Pamela Reif'
-names(data)[names(data) == 'Q45_7'] <- 'Philipp Lahm'
-names(data)[names(data) == 'Q45_8'] <- 'Sophia Thiel'
-names(data)[names(data) == 'Q45_9'] <- 'FC Schalke 04'
-names(data)[names(data) == 'Q45_10'] <- 'Sky Sport'
+names(data)[names(data) == 'Q45_5'] <- 'Oceans_Apart'
+names(data)[names(data) == 'Q45_6'] <- 'Pamela_Reif'
+names(data)[names(data) == 'Q45_7'] <- 'Philipp_Lahm'
+names(data)[names(data) == 'Q45_8'] <- 'Sophia_Thiel'
+names(data)[names(data) == 'Q45_9'] <- 'FC_Schalke_04'
+names(data)[names(data) == 'Q45_10'] <- 'Sky_Sport'
 names(data)[names(data) == 'Q45_11'] <- 'Sport1'
-names(data)[names(data) == 'Q45_12'] <- 'Uwe Gensheimer'
-names(data)[names(data) == 'Q38_1'] <- 'Canon Deutschland'
-names(data)[names(data) == 'Q38_2'] <- 'Create! By Obi'
-names(data)[names(data) == 'Q38_3'] <- 'Deutsche Bahn'
-names(data)[names(data) == 'Q38_4'] <- 'Easy Alex'
+names(data)[names(data) == 'Q45_12'] <- 'Uwe_Gensheimer'
+names(data)[names(data) == 'Q38_1'] <- 'Canon_Deutschland'
+names(data)[names(data) == 'Q38_2'] <- 'Create_By_Obi'
+names(data)[names(data) == 'Q38_3'] <- 'Deutsche_Bahn'
+names(data)[names(data) == 'Q38_4'] <- 'Easy_Alex'
 names(data)[names(data) == 'Q38_5'] <- 'Flixbus'
-names(data)[names(data) == 'Q38_6'] <- 'Ford Deutschland'
+names(data)[names(data) == 'Q38_6'] <- 'Ford_Deutschland'
 names(data)[names(data) == 'Q38_7'] <- 'Germanroamers'
-names(data)[names(data) == 'Q38_8'] <- 'Hannes Becker'
-names(data)[names(data) == 'Q38_9'] <- 'Linda DIY'
-names(data)[names(data) == 'Q38_10'] <- 'Martin Ruetter'
-names(data)[names(data) == 'Q38_11'] <- 'Mercedes-Benz Deutschland'
-names(data)[names(data) == 'Q38_12'] <- 'Tiere suchen ein Zuhause'
+names(data)[names(data) == 'Q38_8'] <- 'Hannes_Becker'
+names(data)[names(data) == 'Q38_9'] <- 'Linda_DIY'
+names(data)[names(data) == 'Q38_10'] <- 'Martin_Ruetter'
+names(data)[names(data) == 'Q38_11'] <- 'Mercedes_Benz_Deutschland'
+names(data)[names(data) == 'Q38_12'] <- 'Tiere_suchen_ein_Zuhause'
 names(data)[names(data) == 'Q38_13'] <- 'Urlaubsguru'
 names(data)[names(data) == 'Q38_14'] <- 'Urlaubspiraten'
 names(data)[names(data) == 'Q38_15'] <- 'Xlaeta'
-names(data)[names(data) == 'Q38_16'] <- 'Yamaha Motor Deutschland'
-names(data)[names(data) == 'Q38_17'] <- 'Yvonne Pfeffer'
-names(data)[names(data) == 'Q47_1'] <- 'Ariana Grande'
+names(data)[names(data) == 'Q38_16'] <- 'Yamaha_Motor_Deutschland'
+names(data)[names(data) == 'Q38_17'] <- 'Yvonne_Pfeffer'
+names(data)[names(data) == 'Q47_1'] <- 'Ariana_Grande'
 names(data)[names(data) == 'Q47_2'] <- 'Beyonce'
-names(data)[names(data) == 'Q47_3'] <- 'Cristiano Ronaldo'
-names(data)[names(data) == 'Q47_9'] <- 'Dwayne Johnson'
-names(data)[names(data) == 'Q47_4'] <- 'Justin Bieber'
-names(data)[names(data) == 'Q47_5'] <- 'Kim Kardashian West'
-names(data)[names(data) == 'Q47_6'] <- 'Kylie Jenner'
-names(data)[names(data) == 'Q47_7'] <- 'Lionel Messi'
-names(data)[names(data) == 'Q47_12'] <- 'National Geographic'
-names(data)[names(data) == 'Q47_8'] <- 'Selena Gomez'
-names(data)[names(data) == 'Q8_1'] <- 'Extrovertiert/enthusiastisch'
-names(data)[names(data) == 'Q8_2'] <- 'Kritisch/konfliktfreudig'
-names(data)[names(data) == 'Q8_3'] <- 'Zuverlaessig/selbstdiszipliniert'
-names(data)[names(data) == 'Q8_4'] <- 'Aengstlich/leicht reizbar'
-names(data)[names(data) == 'Q8_5'] <- 'Offen fuer neue Erfahrungen/vielseitig'
-names(data)[names(data) == 'Q8_6'] <- 'Kontrollfrage Persoenlichkeit'
-names(data)[names(data) == 'Q8_7'] <- 'Zurueckhaltend/ruhig'
-names(data)[names(data) == 'Q8_8'] <- 'Sympathisch/warmherzig'
-names(data)[names(data) == 'Q8_9'] <- 'Unorganisiert/nachlaessig'
-names(data)[names(data) == 'Q8_10'] <- 'Ruhig/emotional stabil'
-names(data)[names(data) == 'Q8_11'] <- 'Konventionell/unkreativ'
-names(data)[names(data) == 'Q9'] <- 'Alkohol Konsum'
-names(data)[names(data) == 'Q10'] <- 'Zigaretten Konsum'
-names(data)[names(data) == 'Q11'] <- 'Drogen Konsum'
-names(data)[names(data) == 'Q12_1'] <- 'Gefuehl der Zugehoerigkeit'
+names(data)[names(data) == 'Q47_3'] <- 'Cristiano_Ronaldo'
+names(data)[names(data) == 'Q47_9'] <- 'Dwayne_Johnson'
+names(data)[names(data) == 'Q47_4'] <- 'Justin_Bieber'
+names(data)[names(data) == 'Q47_5'] <- 'Kim_Kardashian_West'
+names(data)[names(data) == 'Q47_6'] <- 'Kylie_Jenner'
+names(data)[names(data) == 'Q47_7'] <- 'Lionel_Messi'
+names(data)[names(data) == 'Q47_12'] <- 'National_Geographic'
+names(data)[names(data) == 'Q47_8'] <- 'Selena_Gomez'
+names(data)[names(data) == 'Q8_1'] <- 'Extrovertiert_enthusiastisch'
+names(data)[names(data) == 'Q8_2'] <- 'Kritisch_konfliktfreudig'
+names(data)[names(data) == 'Q8_3'] <- 'Zuverlaessig_selbstdiszipliniert'
+names(data)[names(data) == 'Q8_4'] <- 'Aengstlich_leicht_reizbar'
+names(data)[names(data) == 'Q8_5'] <- 'Offen_fuer_neue_Erfahrungen_vielseitig'
+names(data)[names(data) == 'Q8_6'] <- 'Kontrollfrage_Persoenlichkeit'
+names(data)[names(data) == 'Q8_7'] <- 'Zurueckhaltend_ruhig'
+names(data)[names(data) == 'Q8_8'] <- 'Sympathisch_warmherzig'
+names(data)[names(data) == 'Q8_9'] <- 'Unorganisiert_nachlaessig'
+names(data)[names(data) == 'Q8_10'] <- 'Ruhig_emotional_stabil'
+names(data)[names(data) == 'Q8_11'] <- 'Konventionell_unkreativ'
+names(data)[names(data) == 'Q9'] <- 'Alkohol_Konsum'
+names(data)[names(data) == 'Q10'] <- 'Zigaretten_Konsum'
+names(data)[names(data) == 'Q11'] <- 'Drogen_Konsum'
+names(data)[names(data) == 'Q12_1'] <- 'Gefuehl_der_Zugehoerigkeit'
 names(data)[names(data) == 'Q12_2'] <- 'Spannung'
-names(data)[names(data) == 'Q12_3'] <- 'Kontrollfrage Ziele im Leben'
-names(data)[names(data) == 'Q12_4'] <- 'Herzliche Beziehung zu anderen Menschen'
+names(data)[names(data) == 'Q12_3'] <- 'Kontrollfrage_Ziele_im_Leben'
+names(data)[names(data) == 'Q12_4'] <- 'Herzliche_Beziehung_zu_anderen_Menschen'
 names(data)[names(data) == 'Q12_5'] <- 'Selbstverwirklichung'
-names(data)[names(data) == 'Q12_6'] <- 'Respekt vor Anderen'
-names(data)[names(data) == 'Q12_7'] <- 'Spass und Freude am Leben'
+names(data)[names(data) == 'Q12_6'] <- 'Respekt_vor_Anderen'
+names(data)[names(data) == 'Q12_7'] <- 'Spass_und_Freude_am_Leben'
 names(data)[names(data) == 'Q12_8'] <- 'Sicherheit'
 names(data)[names(data) == 'Q12_9'] <- 'Selbstachtung'
-names(data)[names(data) == 'Q12_10'] <- 'Gefuehl von Erfolg'
-names(data)[names(data) == 'Q13'] <- 'Wahl Partei'
-names(data)[names(data) == 'Q13_8_TEXT'] <- 'Wahl Partei Sonstiges'
-names(data)[names(data) == 'Q14_1'] <- 'Corona-Massnahmen uebertrieben'
-names(data)[names(data) == 'Q14_2'] <- 'Corona-Massnahmen muessten haerter sein'
-names(data)[names(data) == 'Q14_3'] <- 'Corona ist harmlos, gleich Grippe'
-names(data)[names(data) == 'Q14_4'] <- 'Glaube nicht an Corona'
+names(data)[names(data) == 'Q12_10'] <- 'Gefuehl_von_Erfolg'
+names(data)[names(data) == 'Q13'] <- 'Wahl_Partei'
+names(data)[names(data) == 'Q13_8_TEXT'] <- 'Wahl_Partei_Sonstiges'
+names(data)[names(data) == 'Q14_1'] <- 'Corona_Massnahmen_uebertrieben'
+names(data)[names(data) == 'Q14_2'] <- 'Corona_Massnahmen_muessten_haerter_sein'
+names(data)[names(data) == 'Q14_3'] <- 'Corona_ist_harmlos_gleich_Grippe'
+names(data)[names(data) == 'Q14_4'] <- 'Glaube_nicht_an_Corona'
 names(data)[names(data) == 'Q15'] <- 'Nettoeinkommen'
-names(data)[names(data) == 'Q16_1'] <- 'Verwendete Produkte Umwelt nicht belasten'
-names(data)[names(data) == 'Q16_2'] <- 'Auswirkungen meiner Handlungen auf Umwelt'
-names(data)[names(data) == 'Q16_3'] <- 'Kaufgewohnheiten, Sorge um Umwelt'
-names(data)[names(data) == 'Q16_4'] <- 'Verschwendung Ressourcen'
-names(data)[names(data) == 'Q16_5'] <- 'Kontrollfrage Umwelt'
+names(data)[names(data) == 'Q16_1'] <- 'Verwendete_Produkte_Umwelt_nicht_belasten'
+names(data)[names(data) == 'Q16_2'] <- 'Auswirkungen_meiner_Handlungen_auf_Umwelt'
+names(data)[names(data) == 'Q16_3'] <- 'Kaufgewohnheiten_Sorge_um_Umwelt'
+names(data)[names(data) == 'Q16_4'] <- 'Verschwendung_Ressourcen'
+names(data)[names(data) == 'Q16_5'] <- 'Kontrollfrage_Umwelt'
 names(data)[names(data) == 'Q16_6'] <- 'Umweltverantwortlich'
-names(data)[names(data) == 'Q16_7'] <- 'Unannehmlichkeiten fuer Umwelt'
+names(data)[names(data) == 'Q16_7'] <- 'Unannehmlichkeiten_fuer_Umwelt'
 names(data)[names(data) == 'Q17'] <- 'Beschaeftigung'
 names(data)[names(data) == 'Q18'] <- 'Bildungsabschluss'
 names(data)[names(data) == 'Q19'] <- 'Religion'
-names(data)[names(data) == 'Q19_5_TEXT'] <- 'Religion Sonstiges'
+names(data)[names(data) == 'Q19_5_TEXT'] <- 'Religion_Sonstiges'
 names(data)[names(data) == 'Q20'] <- 'Migrationshintergrund'
-names(data)[names(data) == 'Q21'] <- 'Woher Vorfahren'
-names(data)[names(data) == 'Q22'] <- 'Sexuelle Orientierung'
-names(data)[names(data) == 'Q22_4_TEXT'] <- 'Sexuelle Orientierung Sonstiges'
+names(data)[names(data) == 'Q21'] <- 'Woher_Vorfahren'
+names(data)[names(data) == 'Q22'] <- 'Sexuelle_Orientierung'
+names(data)[names(data) == 'Q22_4_TEXT'] <- 'Sexuelle_Orientierung_Sonstiges'
 names(data)[names(data) == 'Q23'] <- 'Beziehungsstatus'
 names(data)[names(data) == 'Q24'] <- 'Kinder'
-names(data)[names(data) == 'Q26'] <- 'Anzahl Kinder'
-names(data)[names(data) == 'Q40'] <- 'Instagram Name'
+names(data)[names(data) == 'Q26'] <- 'Anzahl_Kinder'
+names(data)[names(data) == 'Q40'] <- 'Instagram_Name'
 
 num_full <- data
 
@@ -652,15 +657,15 @@ data <- subset(data, Kinder != "NA")
 
 #make sure that control questions were answered correctly
 
-data <- data[(data$`Kontrollfrage Persoenlichkeit`== 6),] #xx respondents remain
-data <- data[(data$`Kontrollfrage Ziele im Leben`== 7),] #xx respondents remain
-data <- data[(data$`Kontrollfrage Umwelt`== 6),] #xx respondents remain
+data <- data[(data$Kontrollfrage_Persoenlichkeit == 6),] #xx respondents remain
+data <- data[(data$Kontrollfrage_Ziele_im_Leben == 7),] #xx respondents remain
+data <- data[(data$Kontrollfrage_Umwelt == 6),] #xx respondents remain
 
 #check that all bad respondents were eliminated
 table(data$Finished) #20 respondents still are not marked as finished; however those are respondents who answered all questions but then did not press "continue" to end the questionnaire; we can still include them in the analysis
-table(data$`Kontrollfrage Persoenlichkeit`)
-table(data$`Kontrollfrage Ziele im Leben`)
-table(data$`Kontrollfrage Umwelt`) #all okay
+table(data$Kontrollfrage_Persoenlichkeit)
+table(data$Kontrollfrage_Ziele_im_Leben)
+table(data$Kontrollfrage_Umwelt) #all okay
 
 #check how long the respondents needed: are there speeders left?
 table(data$`Duration (in seconds)`) #exclude all who finished too fast; what is too fast?
@@ -670,13 +675,6 @@ duration_smaller_300 <- data %>% subset(data$`Duration (in seconds)` < 300)
 duration_smaller_180 <- data %>% subset(data$`Duration (in seconds)` < 180) 
 
 
-
-
-#save combined datasets as CSV and R Document
-write.csv(data, "/Users/Miriam/Documents/Uni/Master/3. Semester/Seminar SRA/datasets/neu/datasets_combined.csv")
-save(data, file = 'datasets_combined.RData')
-
-load("datasets_combined.RData")
 
 #####
 #add or redefine variables: scales, re-coding, new info
@@ -690,11 +688,11 @@ data <- data %>% replace_with_na_all(condition = ~.x == "Keine Angabe")
 #TIPI Personality
 
 #transform reserve-coded items: Q8_2, Q8_4, Q8_7, Q8_9, Q8_11
-'Kritisch/konfliktfreudig_nichtR' <- transmute(data, `Kritisch/konfliktfreudig` = 8 - (`Kritisch/konfliktfreudig`))
-'Aengstlich/leicht reizbar_nichtR' <- transmute(data, `Aengstlich/leicht reizbar` = 8 - (`Aengstlich/leicht reizbar`))
-'Zurueckhaltend/ruhig_nichtR' <- transmute(data, `Zurueckhaltend/ruhig` = 8 - (`Zurueckhaltend/ruhig`))
-'Unorganisiert/nachlaessig_nichtR' <- transmute(data, `Unorganisiert/nachlaessig` = 8 - (`Unorganisiert/nachlaessig`))
-'Konventionell/unkreativ_nichtR' <- transmute(data, `Konventionell/unkreativ` = 8 - (`Konventionell/unkreativ`))
+'Kritisch/konfliktfreudig_nichtR' <- transmute(data, Kritisch_konfliktfreudig = 8 - (Kritisch_konfliktfreudig))
+'Aengstlich/leicht reizbar_nichtR' <- transmute(data, Aengstlich_leicht_reizbar = 8 - (Aengstlich_leicht_reizbar))
+'Zurueckhaltend/ruhig_nichtR' <- transmute(data, Zurueckhaltend_ruhig = 8 - (Zurueckhaltend_ruhig))
+'Unorganisiert/nachlaessig_nichtR' <- transmute(data, Unorganisiert_nachlaessig = 8 - (Unorganisiert_nachlaessig))
+'Konventionell/unkreativ_nichtR' <- transmute(data, Konventionell_unkreativ = 8 - (Konventionell_unkreativ))
 
 nichtR <- bind_cols(`Kritisch/konfliktfreudig_nichtR`, `Aengstlich/leicht reizbar_nichtR`, `Zurueckhaltend/ruhig_nichtR`, `Unorganisiert/nachlaessig_nichtR`, `Konventionell/unkreativ_nichtR`)
 colnames(nichtR) <- c("Kritisch/konfliktfreudig_nichtR", "Aengstlich/leicht reizbar_nichtR", "Zurueckhaltend/ruhig_nichtR", "Unorganisiert/nachlaessig_nichtR", "Konventionell/unkreativ_nichtR")
@@ -703,31 +701,31 @@ data <- bind_cols(data, nichtR)
 #extraversion: Q8_1 and Q8_7
 data <- data %>%
   rowwise() %>%
-  mutate(Extraversion = mean(c(`Extrovertiert/enthusiastisch`, `Zurueckhaltend/ruhig_nichtR`)))
+  mutate(Extraversion = mean(c(`Extrovertiert_enthusiastisch`, `Zurueckhaltend/ruhig_nichtR`)))
 
 
 #Agreeableness: 2R + 8
 data <- data %>%
   rowwise() %>%
-  mutate(Agreeableness = mean(c(`Kritisch/konfliktfreudig_nichtR`, `Sympathisch/warmherzig`)))
+  mutate(Agreeableness = mean(c(`Kritisch/konfliktfreudig_nichtR`, `Sympathisch_warmherzig`)))
 
 
 #Conscientiousness: 3 + 9R
 data <- data %>%
   rowwise() %>%
-  mutate(Conscientiousness = mean(c(`Zuverlaessig/selbstdiszipliniert`, `Unorganisiert/nachlaessig_nichtR`)))
+  mutate(Conscientiousness = mean(c(`Zuverlaessig_selbstdiszipliniert`, `Unorganisiert/nachlaessig_nichtR`)))
 
 
 #Emotional stability: 4R + 10
 data <- data %>%
   rowwise() %>%
-  mutate(Emotional_stablity = mean(c(`Aengstlich/leicht reizbar_nichtR`, `Ruhig/emotional stabil`)))
+  mutate(Emotional_stablity = mean(c(`Aengstlich/leicht reizbar_nichtR`, `Ruhig_emotional_stabil`)))
 
 
 #Openness to Experiences: 5R + 11
 data <- data %>%
   rowwise() %>%
-  mutate(Openness_to_Experiences = mean(c(`Offen fuer neue Erfahrungen/vielseitig`, `Konventionell/unkreativ_nichtR`)))
+  mutate(Openness_to_Experiences = mean(c(`Offen_fuer_neue_Erfahrungen_vielseitig`, `Konventionell/unkreativ_nichtR`)))
 
 
 
@@ -735,29 +733,28 @@ data <- data %>%
 #Green Values
 data <- data %>%
   rowwise() %>%
-  mutate(Green_Values = mean(c(`Verwendete Produkte Umwelt nicht belasten`, `Auswirkungen meiner Handlungen auf Umwelt`, `Kaufgewohnheiten, Sorge um Umwelt`, `Verschwendung Ressourcen`, Umweltverantwortlich, `Unannehmlichkeiten fuer Umwelt`)))
+  mutate(Green_Values = mean(c(Verwendete_Produkte_Umwelt_nicht_belasten, Auswirkungen_meiner_Handlungen_auf_Umwelt, Kaufgewohnheiten_Sorge_um_Umwelt, Verschwendung_Ressourcen, Umweltverantwortlich, Unannehmlichkeiten_fuer_Umwelt)))
 
 
 #####
 #Corona
 #checking: how to define?
-table(data$`Corona-Massnahmen uebertrieben`)
-table(data$`Corona-Massnahmen muessten haerter sein`)
-table(data$`Corona ist harmlos, gleich Grippe`)
-table(data$`Glaube nicht an Corona`)
-table(data$`Corona ist harmlos, gleich Grippe`, data$`Glaube nicht an Corona`)
+table(data$Corona_Massnahmen_uebertrieben)
+table(data$Corona_Massnahmen_muessten_haerter_sein)
+table(data$Corona_ist_harmlos_gleich_Grippe)
+table(data$Glaube_nicht_an_Corona)
 
 #define new variable Corona_Attitude: Accept vs. Reject
-data <- data %>% mutate(Corona_Hardliner = ifelse((`Corona-Massnahmen muessten haerter sein` == 6 | `Corona-Massnahmen muessten haerter sein` == 7), yes = 1, no = 0))
-data <- data %>% mutate(Corona_Softliner = ifelse((`Corona-Massnahmen uebertrieben` == 6 | `Corona-Massnahmen uebertrieben` == 7), yes = 1, no = 0))
-data <- data %>% mutate(Corona_Skeptiker = ifelse((`Corona ist harmlos, gleich Grippe` == 5 | `Corona ist harmlos, gleich Grippe` == 6 | `Corona ist harmlos, gleich Grippe` == 7), yes = 1, no = 0))
-data <- data %>% mutate(Corona_Leugner = ifelse((`Glaube nicht an Corona` == 5 | `Glaube nicht an Corona` == 6 | `Glaube nicht an Corona` == 7), yes = 1, no = 0))
+data <- data %>% mutate(Corona_Hardliner = ifelse((`Corona_Massnahmen_muessten_haerter_sein` == 6 | `Corona_Massnahmen_muessten_haerter_sein` == 7), yes = 1, no = 0))
+data <- data %>% mutate(Corona_Softliner = ifelse((`Corona_Massnahmen_uebertrieben` == 6 | `Corona_Massnahmen_uebertrieben` == 7), yes = 1, no = 0))
+data <- data %>% mutate(Corona_Skeptiker = ifelse((`Corona_ist_harmlos_gleich_Grippe` == 5 | `Corona_ist_harmlos_gleich_Grippe` == 6 | `Corona_ist_harmlos_gleich_Grippe` == 7), yes = 1, no = 0))
+data <- data %>% mutate(Corona_Leugner = ifelse((`Glaube_nicht_an_Corona` == 5 | `Glaube_nicht_an_Corona` == 6 | `Glaube_nicht_an_Corona` == 7), yes = 1, no = 0))
 
 #überprüfen ob erfolgreich: 
-table(data$`Corona-Massnahmen muessten haerter sein`, data$Corona_Hardliner)
-table(data$`Corona-Massnahmen uebertrieben`, data$Corona_Softliner)
-table(data$`Corona ist harmlos, gleich Grippe`, data$Corona_skeptiker)
-table(data$`Glaube nicht an Corona`, data$Corona_Leugner)
+table(data$Corona_Massnahmen_muessten_haerter_sein, data$Corona_Hardliner)
+table(data$Corona_Massnahmen_uebertrieben, data$Corona_Softliner)
+table(data$Corona_ist_harmlos_gleich_Grippe, data$Corona_Skeptiker)
+table(data$Glaube_nicht_an_Corona, data$Corona_Leugner)
 
 #####
 #recoding for analysis
@@ -797,28 +794,28 @@ data <- data %>% mutate(Allein_vs_Beziehung = case_when(Beziehungsstatus == "Sin
 
 
 #Alkohol Konsum: nie, selten, häufig
-data <- data %>% mutate(Alkoholgruppe = case_when(`Alkohol Konsum` == "Nein" ~ 'kein Konsum',
-                                                          `Alkohol Konsum` == "Ja, mindestens einmal im Jahr" ~ 'niedriger Konsum',
-                                                          `Alkohol Konsum` == "Ja, mindestens einmal im Monat" ~ 'niedriger Konsum',
-                                                          `Alkohol Konsum` == "Ja, mindestens einmal pro Woche" ~ 'hoher Konsum',
-                                                          `Alkohol Konsum` == "Ja, mehrmals pro Woche" ~ 'hoher Konsum',
-                                                          `Alkohol Konsum` == "Ja, täglich" ~ 'hoher Konsum'))
+data <- data %>% mutate(Alkoholgruppe = case_when(`Alkohol_Konsum` == "Nein" ~ 'kein Konsum',
+                                                          `Alkohol_Konsum` == "Ja, mindestens einmal im Jahr" ~ 'niedriger Konsum',
+                                                          `Alkohol_Konsum` == "Ja, mindestens einmal im Monat" ~ 'niedriger Konsum',
+                                                          `Alkohol_Konsum` == "Ja, mindestens einmal pro Woche" ~ 'hoher Konsum',
+                                                          `Alkohol_Konsum` == "Ja, mehrmals pro Woche" ~ 'hoher Konsum',
+                                                          `Alkohol_Konsum` == "Ja, täglich" ~ 'hoher Konsum'))
 
 #Zigaretten Konsum: nie, selten, häufig
-data <- data %>% mutate(Zigarettengruppe = case_when(`Zigaretten Konsum` == "Nein" ~ 'kein Konsum',
-                                                                `Zigaretten Konsum` == "Ja, mindestens einmal im Jahr" ~ 'niedriger Konsum',
-                                                                `Zigaretten Konsum` == "Ja, mindestens einmal im Monat" ~ 'niedriger Konsum',
-                                                                `Zigaretten Konsum` == "Ja, mindestens einmal pro Woche" ~ 'hoher Konsum',
-                                                                `Zigaretten Konsum` == "Ja, mehrmals pro Woche" ~ 'hoher Konsum',
-                                                                `Zigaretten Konsum` == "Ja, täglich" ~ 'hoher Konsum'))
+data <- data %>% mutate(Zigarettengruppe = case_when(`Zigaretten_Konsum` == "Nein" ~ 'kein Konsum',
+                                                                `Zigaretten_Konsum` == "Ja, mindestens einmal im Jahr" ~ 'niedriger Konsum',
+                                                                `Zigaretten_Konsum` == "Ja, mindestens einmal im Monat" ~ 'niedriger Konsum',
+                                                                `Zigaretten_Konsum` == "Ja, mindestens einmal pro Woche" ~ 'hoher Konsum',
+                                                                `Zigaretten_Konsum` == "Ja, mehrmals pro Woche" ~ 'hoher Konsum',
+                                                                `Zigaretten_Konsum` == "Ja, täglich" ~ 'hoher Konsum'))
 
 #Drogen Konsum: nie, selten, häufig
-data <- data %>% mutate(Drogengruppe = case_when(`Drogen Konsum` == "Nein" ~ 'kein Konsum',
-                                                        `Drogen Konsum` == "Ja, mindestens einmal im Jahr" ~ 'niedriger Konsum',
-                                                        `Drogen Konsum` == "Ja, mindestens einmal im Monat" ~ 'niedriger Konsum',
-                                                        `Drogen Konsum` == "Ja, mindestens einmal pro Woche" ~ 'hoher Konsum',
-                                                        `Drogen Konsum` == "Ja, mehrmals pro Woche" ~ 'hoher Konsum',
-                                                        `Drogen Konsum` == "Ja, täglich" ~ 'hoher Konsum'))
+data <- data %>% mutate(Drogengruppe = case_when(`Drogen_Konsum` == "Nein" ~ 'kein Konsum',
+                                                        `Drogen_Konsum` == "Ja, mindestens einmal im Jahr" ~ 'niedriger Konsum',
+                                                        `Drogen_Konsum` == "Ja, mindestens einmal im Monat" ~ 'niedriger Konsum',
+                                                        `Drogen_Konsum` == "Ja, mindestens einmal pro Woche" ~ 'hoher Konsum',
+                                                        `Drogen_Konsum` == "Ja, mehrmals pro Woche" ~ 'hoher Konsum',
+                                                        `Drogen_Konsum` == "Ja, täglich" ~ 'hoher Konsum'))
 
 
 #####
@@ -828,9 +825,9 @@ data <- data %>% mutate(Drogengruppe = case_when(`Drogen Konsum` == "Nein" ~ 'ke
 data$Index <- c(1:2047)
 
 #wie vielen Accounts folgt jeder der Befragten?
-Accounts <- data %>% select(`Alman Memes` : `Selena Gomez`)
+Accounts <- data %>% select(`Alman_Memes` : `Selena_Gomez`)
 Account_names <- names(Accounts)
-#Account_names <- names(data %>% select(`Alman Memes` : `Selena Gomez`))
+
 data[c(Account_names)] <- sapply(data[c(Account_names)], as.numeric)
 data$Accounts_followed <- rowSums(data[ ,c(Account_names)], na.rm = TRUE)
 
@@ -848,32 +845,261 @@ ggplot(data, aes(Accounts_followed))+
 
 
 
-
-
-#save full dataset as CSV and R Document
-write.csv(data, "/Users/Miriam/Documents/Uni/Master/3. Semester/Seminar SRA/datasets/neu/data_all_var.csv")
-save(data, file = 'data_all_var.RData')
-
-
-
 #####
-#check descriptives and get to know the data
+#check descriptives and get to know the data and respondents
 
 #####
 #Descriptives for Respondents
-
-
-
 #decide: are there respondents (outliers) to get rid of? 
+
+
+#Descriptives of the Respondents
+
+#Instagram usage: how often and how many accounts
+#Frequency
+table(data$`Instagram_Nutzungshaeufigkeit`) #exclude 9 people with "Once Per Week" usage?
+usage <- as.data.frame(table(data$`Instagram_Nutzungshaeufigkeit`))
+usage_order <- c("Täglich", "4- bis 6-mal pro Woche", "2- bis 3-mal pro Woche", "Einmal pro Woche")
+
+ggplot(usage, aes(factor(Var1, levels = usage_order), Freq))+
+  geom_col()+
+  geom_text(aes(label = Freq), vjust = -1)+
+  labs(x = "Usage", y = "", title = "Count")+
+  ylim(0,1700)
+
+#how many accounts?
+table(data$Accounts_followed) #exclude people with too many or too little accounts followed?
+ggplot(data, aes(Accounts_followed))+
+  geom_histogram(binwidth = 1)
+
+#Accounts per Frequency --> is there a connection?
+Nutzungshaeufigkeit <- data$`Instagram_Nutzungshaeufigkeit`
+ggplot(data, aes(x = Accounts_followed, y = factor(Nutzungshaeufigkeit, levels = usage_order)))+
+  geom_boxplot()
+
+#is there a significant difference between usage groups and how many accounts are followed?
+anova_usage <- aov(Accounts_followed ~ `Instagram_Nutzungshaeufigkeit`, data = data)
+summary(anova_usage)
+#yes, there seems to be!
+
+
+#gender #1=female, 2=male, 3=diverse
+
+table(data$Geschlecht) 
+round(table(data$Geschlecht)/sum(table(data$Geschlecht)),2) #relative spread: 61% female, 39% male, diverse almost 0
+
+
+#age
+
+summary(data$Alter)
+ggplot(data, aes(x = Alter))+
+  geom_density()
+ggplot(data, aes(x = Alter))+
+  geom_histogram()
+
+#Age range
+
+table(data$Age_Range)
+Ordered_ranges <- c('niedriges Alter', 'mittleres Alter', 'hohes Alter')
+
+ggplot(data, aes(x = factor(Age_Range, levels = Ordered_ranges)))+
+  geom_bar()+
+  geom_text(stat = "count", aes(label =..count..), vjust = -1)+
+  labs(x = "Age Ranges", y = "Count", title = "Abs. Count per Age Range")+
+  ylim(0,1200)
+
+
+
+#PLZ --> Münster Region dominiert
+table(data$PLZ)
+ggplot(data, aes(x = PLZ))+
+  geom_bar()+
+  geom_text(stat = "count", aes(label =..count..), vjust = -1)+
+  labs(x = "PLZ", y = "Count", title = "Abs. Count per PLZ")+
+  ylim(0,200)
+
+#PLZ zusammengefasst in Ost/West
+table(data$Ost_West) #passt zum Deutschlandweiten Verhältnis von ca. 1:5
+
+#Beziehungsstatus
+table(data$Beziehungsstatus)
+#zusammengefasst:
+table(data$Allein_vs_Beziehung)
+
+
+#sexuelle Orientierung
+table(data$`Sexuelle_Orientierung`)
+#sonstiges ist nicht weiter relevant für uns (nur n = 6)
+
+#Children
+table(data$`Anzahl_Kinder`) #most people without children
+#wir wissen, dass einer unserer Privatkontakte sich verklickt hat und statt 20 Kindern 0 eingeben wollte --> Korrektur hierfür, um Datensatz nicht aussortieren zu müssen:
+data$`Anzahl_Kinder`[data$`Anzahl_Kinder` == 20] <- 0
+###necessary to clean 3 respondents with >10 children?
+many_children <- data %>% subset(data$`Anzahl_Kinder` > 10) #prüfen ob sonstige Antworten Sinn ergeben --> keine Auffälligkeiten, daher kein Ausschluss notwendig
+
+table(data$`Anzahl_Kinder`) #weiter zusammenfassen für Analyse notwendig, z.B. mehr als 3 Kinder als eine Gruppe?
+
+
+#Education
+table(data$Bildungsabschluss)
+#zusammengefasst:
+table(data$Bildungsgruppe)
+
+
+
+#Beschäftigung
+table(data$Beschaeftigung)
+
+
+#Migrationshintergrund
+table(data$Migrationshintergrund)
+round(table(data$Migrationshintergrund)/sum(table(data$Migrationshintergrund)), 2) #17% mit Migrationshintergrund
+
+#woher Migration
+table(data$`Woher_Vorfahren`) #Hintergrund vorwiegend aus Europa und Asien --> vermutlich viele Europäer und Türken
+
+
+#Religion
+table(data$Religion)
+
+#auch offene Nennungen beachten?
+table(data$`Religion_Sonstiges`) #keine Religion oft genug erwähnt, um sie nachträglich mit aufzunehmen (max. 3x)
+
+#Personality
+#Extraversion
+summary(data$Extraversion)
+
+ggplot(data, aes(Extraversion))+
+  geom_density()
+ggplot(data, aes(Extraversion))+
+  geom_histogram(binwidth = 0.5)
+
+#Agreeableness
+summary(data$Agreeableness)
+
+ggplot(data, aes(Agreeableness))+
+  geom_density()
+ggplot(data, aes(Agreeableness))+
+  geom_histogram(binwidth = 0.5)
+
+#Conscientiousness
+summary(data$Conscientiousness)
+
+ggplot(data, aes(Conscientiousness))+
+  geom_density()
+ggplot(data, aes(Conscientiousness))+
+  geom_histogram(binwidth = 0.5)
+
+#Emotional stability
+summary(data$Emotional_stablity)
+
+ggplot(data, aes(Emotional_stablity))+
+  geom_density()
+ggplot(data, aes(Emotional_stablity))+
+  geom_histogram(binwidth = 0.5)
+
+#Openness to Experiences
+summary(data$Openness_to_Experiences)
+
+ggplot(data, aes(Openness_to_Experiences))+
+  geom_density()
+ggplot(data, aes(Openness_to_Experiences))+
+  geom_histogram(binwidth = 0.5)
+
+##gute Verteilung, auch wenn jeweils öfter eher hohe Werte (>4) angegeben sind
+#weiter zusammenfassen notwendig; nur Extremwerte beachten?
+
+
+#Green Values
+table(data$Green_Values)
+summary(data$Green_Values)
+
+ggplot(data, aes(Green_Values))+
+  geom_density()
+ggplot(data, aes(Green_Values))+
+  geom_histogram(binwidth = 0.33)
+
+##most respondents do care about the environment (rating between 5 and 6), but also some people below and 51 people with highest score of 7
+#necessary to set thresholds and make pro and con green value division?
+
+#General Goals in Life
+table(data$Gefuehl_der_Zugehoerigkeit)
+table(data$Spannung)
+table(data$Herzliche_Beziehung_zu_anderen_Menschen)
+table(data$Selbstverwirklichung)
+table(data$Respekt_vor_Anderen)
+table(data$Spass_und_Freude_am_Leben)
+table(data$Sicherheit)
+table(data$Selbstachtung)
+table(data$Gefuehl_von_Erfolg)
+#important for most people: Spaß, Herzliche Beziehungen
+#no controverse goals, usually majority >5
+
+
+#Parteien
+round(table(data$`Wahl_Partei`)/sum(table(data$`Wahl_Partei`)), 2) #relative shares of voters in our dataset
+#differs a bit from actual German voting data/ forecasts; mainly more Grüne and less CDU and SPD
+
+#Parteien Sonstige - was tun?
+table(data$`Wahl_Partei_Sonstiges`)
+#Offene Nennungen Parteien: Aufnahme von "Die Partei"
+data$`Wahl_Partei_Sonstiges` <- tolower(data$`Wahl_Partei_Sonstiges`)
+data$`Wahl_Partei` <- ifelse(data$`Wahl_Partei_Sonstiges` %in% "die partei", "Die Partei", data$`Wahl_Partei`)
+
+Partei <- as.data.frame(table(data$`Wahl_Partei`)/sum(table(data$`Wahl_Partei`)))
+
+Partei_Order <- c("CDU/CSU", "SPD", "Bündnis 90/Die Grünen", "AfD", "Die Linke", "FDP", "Die Partei", "Sonstige:", "Ich würde nicht wählen gehen")
+ggplot(Partei, aes(factor(Var1, levels = Partei_Order), Freq))+
+  geom_col()+
+  geom_text(aes(label = percent(Freq)), vjust = -1)+
+  labs(x = "Parties", y = "", title = "Voters per Party")+
+  ylim(0,0.3)
+
+
+
+#Corona: 4 Gruppen eingeteilt: Hardliner, Softliner, Skeptiker, Leugner
+table(data$Corona_Hardliner) #582 Hardliner: Wollen härtere Maßnahmen
+table(data$Corona_Softliner) #246 Softliner: Wollen softere Maßnahmen
+table(data$Corona_Skeptiker) #279 Skeptiker: Bezweifeln Gefährlichkeit des Virus
+table(data$Corona_Leugner) #118 Leugner: Glauben nicht an Virus
+
+
+
+#Alkohol, Zigaretten, Drogen
+table(data$Alkohol_Konsum)
+table(data$Zigaretten_Konsum)
+table(data$Drogen_Konsum)
+#zusammengefasst:
+table(data$Alkoholgruppe)
+table(data$Zigarettengruppe) #1250 Nichtraucher
+table(data$Drogengruppe) #"nur" 64 mit hohem Konsum
+
+
+
+#prüfen: gibt es Zusammenhänge zwischen den variablen?
+#Alter <-> Accounts_followed
+
+
+#Green Values zu Partei
+ggplot(data, aes(Green_Values, fill = Wahl_Partei))+
+  geom_dotplot(binwidth = 0.1)
+
+ggplot(data, aes(Green_Values, y = factor(Wahl_Partei)))+
+  geom_boxplot()
+
+#weitere?
+#...
+
+
+#Korrelationen zwischen Accounts?
+cor_accounts_df <- as.data.frame(cor(Accounts))
+ggplot(cor_accounts_df, aes(Tagesschau))+
+  geom_density()
 
 
 #####
 #Descriptives for Variables
-
-
-
-
-
 #decide: are there variables which have too little variety?
 
 
@@ -881,7 +1107,7 @@ save(data, file = 'data_all_var.RData')
 #Descriptives Accounts
 
 #Followers per Account
-Accounts <- data %>% select(`Alman Memes` : `Selena Gomez`)
+Accounts <- data %>% select(Alman_Memes : Selena_Gomez)
 Followers_Accounts <- as.data.frame(colSums(Accounts, na.rm = TRUE))
 colnames(Followers_Accounts) <- "Followers"
 
@@ -893,6 +1119,10 @@ keep <-Followers_Accounts %>% filter(Followers > a)
 #but: keep in sample nonetheless, just be aware!
 
 
+#save dataset
+write.csv(data, "/Users/Miriam/Documents/Uni/Master/3. Semester/Seminar SRA/datasets/neu/data_for_analysis.csv")
+save(data, file = 'data_for_analysis.RData')
+
 
 ######
 #define different datasets for analysis: with and without outliers
@@ -901,6 +1131,17 @@ full <- data
 reduced_set <- data %>% subset(data$`Duration (in seconds)` > 300 & data$Accounts_followed < 150)
 #ACHTUNG noch festlegen und abändern!
 
+#save different datasets as CSV and R Document
+#full set
+write.csv(full, "/Users/Miriam/Documents/Uni/Master/3. Semester/Seminar SRA/datasets/neu/data_full.csv")
+save(full, file = 'data_full.RData')
+
+#reduced set
+write.csv(reduced_set, "/Users/Miriam/Documents/Uni/Master/3. Semester/Seminar SRA/datasets/neu/data_reduced.csv")
+save(reduced_set, file = 'data_reduced.RData')
+
+
+load("data_for_analysis.RData")
 
 #####
 #Analysis
