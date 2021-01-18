@@ -166,7 +166,7 @@ model <- randomForest(Geschlecht ~ .,
                       ntree=1000, 
                       proximity=TRUE, 
                       mtry=which(oob.values == min(oob.values)))
-
+model
 
 ## Now let's create an MDS-plot to show how the samples are related to each 
 ## other.
@@ -197,6 +197,6 @@ ggplot(data=mds.data, aes(x=X, y=Y, label=Sample)) +
   ylab(paste("MDS2 - ", mds.var.per[2], "%", sep="")) +
   ggtitle("MDS plot using (1 - Random Forest Proximities)")
 
-ggsave(file="random_forest_mds_plot.pdf")
+ggsave(file="random_forest_mds_plot_Geschlecht.pdf")
 
 
