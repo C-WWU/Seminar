@@ -164,4 +164,4 @@ str(roc.info_Geschlecht)
 # Legend creates a legend on the ROC plot giving your models names and different colors 
 
 # legend("bottomright", legend=c("Logisitic Regression", "Random Forest"), col=c("#377eb8", "#4daf4a"), lwd=4)
-
+#hallo
