@@ -12,7 +12,12 @@ install.packages("randomForest")
 library(randomForest)
 install.packages("pROC")
 library(pROC)
-
+install.packages("readr")
+library(readr)
+install.packages("caret")
+library(caret)
+install.packages("e1071")
+library(e1071)
 
 #load data
 load("data_for_analysis.RData")
@@ -40,6 +45,16 @@ data_Geschlecht$Geschlecht <- as.factor(data_Geschlecht$Geschlecht)
 #Training und Test Dataset
 set.seed(400)
 
+# Partitioning of the data: Create index matrix of selected values
+
+# Create index matrix 
+index <- createDataPartition(data_Geschlecht$Geschlecht, p=.8, list= FALSE, times= 1)
+
+# Create train_dfGeschlecht & test_dfGeschlecht
+
+train_dfGeschlecht <- data_Geschlecht[index,]
+test_dfGeschlecht <- data_Geschlecht[-index,]
+
 ###falls es NAs gibt (nur bei wenigen Daten) --> Zeile 41 Raute weg und Namen von Dataset anpassen
 #DATASET <- rfImpute(DATASET ~ ., data = data, iter=6)
 
@@ -48,7 +63,7 @@ set.seed(400)
 ###mtry: wenn numerisch, dann default = sqrt(229); wenn continuous, dann default = 229/3
 ### generates 300 tress by default, können wir so lassen
 ###anpassen: IV, data = neues Dataset; mtry anpassen zu entweder sqrt(229) oder 229/3
-model <- randomForest(Geschlecht ~ ., data=data_Geschlecht, proximity=TRUE, mtry = sqrt(229))
+model <- randomForest(Geschlecht ~ ., data=train_dfGeschlecht, proximity=TRUE, mtry = sqrt(229))
 
 #Modell prüfen
 model 
@@ -79,7 +94,7 @@ model_Geschlecht_500 <- model
 
 #zweites Model mit 1000 Trees --> wird error weniger oder stagniert er? 
 ##Modelgleichung: DV anpassen, data = .. anpassen
-model <- randomForest(Geschlecht ~ ., data=data_Geschlecht, ntree = 1000, proximity=TRUE, mtry = sqrt(229))
+model <- randomForest(Geschlecht ~ ., data=traindf_Geschlecht, ntree = 1000, proximity=TRUE, mtry = sqrt(229))
 model
 
 
@@ -110,7 +125,7 @@ model_Geschlecht_1000 <- model
 ###Zeile 110: Modellgleichung anpassen wie davor; ntree wählen welches besser war (300 oder 1000 oder anderes)
 oob.values <- vector(length=20)
 for(i in 1:20) {
-  temp.model <- randomForest(Geschlecht ~ ., data=data_Geschlecht, mtry=i, ntree=1000)
+  temp.model <- randomForest(Geschlecht ~ ., data=traindf_Geschlecht, mtry=i, ntree=1000)
   oob.values[i] <- temp.model$err.rate[nrow(temp.model$err.rate),1]
 }
 oob.values
@@ -122,7 +137,7 @@ which(oob.values == min(oob.values))
 # create a model for proximities using the best value for mtry and check for most important variables
 ###anpassen: DV, Data, ntree
 model <- randomForest(Geschlecht ~ ., 
-                      data=data_Geschlecht,
+                      data=train_dfGeschlecht,
                       ntree=1000, 
                       proximity=TRUE, 
                       mtry=which(oob.values == min(oob.values)), 
@@ -132,6 +147,7 @@ model
 #evaluate variable importance
 
 importance(model)
+varImp(model)
 varImpPlot(model)
 
 # Mean Decrease Gini - Measure of variable importance based on the Gini impurity index used for the calculation of splits in trees.
@@ -146,7 +162,7 @@ par(pty = "s") ## pty sets the aspect ratio of the plot region. Two options:
 ### Hier wieder DV und dataset austauschen, ledacy.axes = TRUE heißt er beschreibt 1- Specificity auf der x-axes, renamed the x and y axes added color and more width with col and lwd
 ### DV musste hier komischwerweise nochmal definiert werden, sonst wird sie in dem code darunter nicht gefunden
 
-Geschlecht <- data_Geschlecht$Geschlecht
+Geschlecht <- traindf_Geschlecht$Geschlecht
 model_Geschlecht_ROC <- roc(Geschlecht, model$votes[,1], plot=TRUE, ledacy.axes=TRUE, percent=TRUE, xlab="False Positive Percentage", ylab="True Positive Percentage", col="#4daf4a", lwd=4, print.auc=TRUE)
 
 # If we want to find out the optimal threshold we can store the 
@@ -164,4 +180,16 @@ str(roc.info_Geschlecht)
 # Legend creates a legend on the ROC plot giving your models names and different colors 
 
 # legend("bottomright", legend=c("Logisitic Regression", "Random Forest"), col=c("#377eb8", "#4daf4a"), lwd=4)
-#hallo
+
+
+
+# Apply model to test_df --> test_dfGeschlecht
+
+# predict outcome using model from train_df applied to the test_df
+
+### hier auch einmal nach dem testdf der DV umbenennen
+
+predictions <- predict(model, newdata=test_dfGeschlecht)
+
+# Create confusion matrix
+confusionMatrix(data=predictions, test_dfGeschlecht$Geschlecht)
