@@ -10,6 +10,9 @@ install.packages("cowplot")
 library(cowplot)
 install.packages("randomForest")
 library(randomForest)
+install.packages("pROC")
+library(pROC)
+
 
 #load data
 load("data_for_analysis.RData")
@@ -105,7 +108,7 @@ model_Geschlecht_1000 <- model
 
 # Prüfen: was ist das ideale mtry? 
 ###Zeile 110: Modellgleichung anpassen wie davor; ntree wählen welches besser war (300 oder 1000 oder anderes)
-oob.values <- vector(length=10)
+oob.values <- vector(length=20)
 for(i in 1:20) {
   temp.model <- randomForest(Geschlecht ~ ., data=data_Geschlecht, mtry=i, ntree=1000)
   oob.values[i] <- temp.model$err.rate[nrow(temp.model$err.rate),1]
@@ -116,17 +119,56 @@ min(oob.values)
 # find  optimal value for mtry
 which(oob.values == min(oob.values))
 
-# create a model for proximities using the best value for mtry
+# create a model for proximities using the best value for mtry and check for most important variables
 ###anpassen: DV, Data, ntree
 model <- randomForest(Geschlecht ~ ., 
                       data=data_Geschlecht,
                       ntree=1000, 
                       proximity=TRUE, 
-                      mtry=which(oob.values == min(oob.values)))
+                      mtry=which(oob.values == min(oob.values)), 
+                      Importance=TRUE)
 model
+
+#evaluate variable importance
+
+importance(model)
+varImpPlot(model)
+
+# Mean Decrease Gini - Measure of variable importance based on the Gini impurity index used for the calculation of splits in trees.
+
+
+#Drawing ROC and AUC using pROC and the final model--> the ROC Graph summarizes all of the confusion matrices that each threshold produced. The AUC makes it easy to compare 1 ROC curve to another. This is a measure to compare performance of different models having a BINARY DV! 
+
+par(pty = "s") ## pty sets the aspect ratio of the plot region. Two options:
+##                "s" - creates a square plotting region
+##                "m" - (the default) creates a maximal plotting region
+
+### Hier wieder DV und dataset austauschen, ledacy.axes = TRUE heißt er beschreibt 1- Specificity auf der x-axes, renamed the x and y axes added color and more width with col and lwd
+### DV musste hier komischwerweise nochmal definiert werden, sonst wird sie in dem code darunter nicht gefunden
+
+Geschlecht <- data_Geschlecht$Geschlecht
+model_Geschlecht_ROC <- roc(Geschlecht, model$votes[,1], plot=TRUE, ledacy.axes=TRUE, percent=TRUE, xlab="False Positive Percentage", ylab="True Positive Percentage", col="#4daf4a", lwd=4, print.auc=TRUE)
+
+# If we want to find out the optimal threshold we can store the 
+# data used to make the ROC graph in a variable...
+roc.info_Geschlecht <- roc(Geschlecht, model$votes[,1], legacy.axes=TRUE)
+str(roc.info_Geschlecht)
+
+# Code wenn wir zwei Modelle vergleichen wollen
+##
+#######################################
+# roc(Geschlecht, model$data_Geschlecht, plot=TRUE, ledacy.axes=TRUE, percent=TRUE, xlab="False Positive Percentage", ylab="True Positive Percentage", col="#4daf4a", lwd=4, print.auc=TRUE)
+
+# plot.roc(Geschlecht, model$votes[,1], percent=TRUE, col="#4daf4a", lwd=4, print.auc=TRUE, add=TRUE, print.auc.y=40)
+
+# Legend creates a legend on the ROC plot giving your models names and different colors 
+
+# legend("bottomright", legend=c("Logisitic Regression", "Random Forest"), col=c("#377eb8", "#4daf4a"), lwd=4)
 
 
 #Creating an MDS-plot
+
+### the MDS (Multi-Dimensional Scaling) Plot tells us how the samples are related to each other
 #First: Converting  proximity matrix into distance matrix
 distance.matrix <- as.dist(1-model$proximity)
 
@@ -155,5 +197,4 @@ ggplot(data=mds.data, aes(x=X, y=Y, label=Sample)) +
 
 ###anpassen: Name (DV)
 ggsave(file="random_forest_mds_plot_Geschlecht.pdf")
-
 
