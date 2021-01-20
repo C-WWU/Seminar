@@ -41,6 +41,11 @@ data_Geschlecht <- data[,c(25, 27:255)]
 cols_Geschlecht <- names(data_Geschlecht)
 data_Geschlecht$Geschlecht <- as.factor(data_Geschlecht$Geschlecht)
 
+#Gibt es NAs in der DV?
+sum(is.na(data_Geschlecht$Geschlecht)) #keine NAs
+###folgende Kommentierung und Code nur drin lassen und anpassen, wenn es NAs gibt --> bitte prüfen, dass der Code auch das richtige macht :)
+#Respondents mit NAs für diese Variable löschen (NAs stehen nur, wenn Respondent "Keine Angabe" gemacht hat, daher bedeutet löschen keinen Informationsverlust)
+data_Geschlecht <- data_Geschlecht %>% filter(Geschlecht != "NA")
 
 #Training und Test Dataset
 set.seed(400)
