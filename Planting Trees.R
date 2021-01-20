@@ -159,7 +159,7 @@ par(pty = "s") ## pty sets the aspect ratio of the plot region. Two options:
 ##                "s" - creates a square plotting region
 ##                "m" - (the default) creates a maximal plotting region
 
-### Hier wieder DV und dataset austauschen, ledacy.axes = TRUE heißt er beschreibt 1- Specificity auf der x-axes, renamed the x and y axes added color and more width with col and lwd
+### Hier wieder DV und dataset austauschen, legacy.axes = TRUE heißt er beschreibt 1- Specificity auf der x-axes, renamed the x and y axes added color and more width with col and lwd
 ### DV musste hier komischwerweise nochmal definiert werden, sonst wird sie in dem code darunter nicht gefunden
 
 Geschlecht <- traindf_Geschlecht$Geschlecht
