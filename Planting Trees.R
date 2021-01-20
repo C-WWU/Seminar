@@ -165,36 +165,3 @@ str(roc.info_Geschlecht)
 
 # legend("bottomright", legend=c("Logisitic Regression", "Random Forest"), col=c("#377eb8", "#4daf4a"), lwd=4)
 
-
-#Creating an MDS-plot
-
-### the MDS (Multi-Dimensional Scaling) Plot tells us how the samples are related to each other
-#First: Converting  proximity matrix into distance matrix
-distance.matrix <- as.dist(1-model$proximity)
-
-mds.stuff <- cmdscale(distance.matrix, eig=TRUE, x.ret=TRUE)
-
-
-#calculate the percentage of variation that each MDS axis accounts for:
-mds.var.per <- round(mds.stuff$eig/sum(mds.stuff$eig)*100, 1)
-
-
-#Create actual MDS plot:
-###anpassen: Status --> datenset$DV
-mds.values <- mds.stuff$points
-mds.data <- data.frame(Sample=rownames(mds.values),
-                       X=mds.values[,1],
-                       Y=mds.values[,2],
-                       Status=data_Geschlecht$Geschlecht)
-
-
-ggplot(data=mds.data, aes(x=X, y=Y, label=Sample)) + 
-  geom_text(aes(color=Status)) +
-  theme_bw() +
-  xlab(paste("MDS1 - ", mds.var.per[1], "%", sep="")) +
-  ylab(paste("MDS2 - ", mds.var.per[2], "%", sep="")) +
-  ggtitle("MDS plot using (1 - Random Forest Proximities)")
-
-###anpassen: Name (DV)
-ggsave(file="random_forest_mds_plot_Geschlecht.pdf")
-
