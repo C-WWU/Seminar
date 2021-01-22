@@ -18,6 +18,8 @@ install.packages("caret")
 library(caret)
 install.packages("e1071")
 library(e1071)
+install.packages("pdp")
+library(pdp)
 
 #load data
 load("data_for_analysis.RData")
@@ -41,6 +43,11 @@ data_Geschlecht <- data[,c(25, 27:255)]
 cols_Geschlecht <- names(data_Geschlecht)
 data_Geschlecht$Geschlecht <- as.factor(data_Geschlecht$Geschlecht)
 
+#Gibt es NAs in der DV?
+sum(is.na(data_Geschlecht$Geschlecht)) #keine NAs
+###folgende Kommentierung und Code nur drin lassen und anpassen, wenn es NAs gibt --> bitte prüfen, dass der Code auch das richtige macht :)
+#Respondents mit NAs für diese Variable löschen (NAs stehen nur, wenn Respondent "Keine Angabe" gemacht hat, daher bedeutet löschen keinen Informationsverlust)
+data_Geschlecht <- data_Geschlecht %>% filter(Geschlecht != "NA")
 
 #Training und Test Dataset
 set.seed(400)
@@ -54,9 +61,6 @@ index <- createDataPartition(data_Geschlecht$Geschlecht, p=.8, list= FALSE, time
 
 train_dfGeschlecht <- data_Geschlecht[index,]
 test_dfGeschlecht <- data_Geschlecht[-index,]
-
-###falls es NAs gibt (nur bei wenigen Daten) --> Zeile 41 Raute weg und Namen von Dataset anpassen
-#DATASET <- rfImpute(DATASET ~ ., data = data, iter=6)
 
 # Modell erstellen: 300 trees (default)
 
@@ -94,7 +98,7 @@ model_Geschlecht_500 <- model
 
 #zweites Model mit 1000 Trees --> wird error weniger oder stagniert er? 
 ##Modelgleichung: DV anpassen, data = .. anpassen
-model <- randomForest(Geschlecht ~ ., data=traindf_Geschlecht, ntree = 1000, proximity=TRUE, mtry = sqrt(229))
+model <- randomForest(Geschlecht ~ ., data=train_dfGeschlecht, ntree = 1000, proximity=TRUE, mtry = sqrt(229))
 model
 
 
@@ -125,7 +129,7 @@ model_Geschlecht_1000 <- model
 ###Zeile 110: Modellgleichung anpassen wie davor; ntree wählen welches besser war (300 oder 1000 oder anderes)
 oob.values <- vector(length=20)
 for(i in 1:20) {
-  temp.model <- randomForest(Geschlecht ~ ., data=traindf_Geschlecht, mtry=i, ntree=1000)
+  temp.model <- randomForest(Geschlecht ~ ., data=train_dfGeschlecht, mtry=i, ntree=1000)
   oob.values[i] <- temp.model$err.rate[nrow(temp.model$err.rate),1]
 }
 oob.values
@@ -152,6 +156,18 @@ varImpPlot(model)
 
 # Mean Decrease Gini - Measure of variable importance based on the Gini impurity index used for the calculation of splits in trees.
 
+#checking direction of the 10 most important variables
+###anpassen: name vom dataset
+imp <- importance(model)
+impvar <- rownames(imp)[order(imp[, 1], decreasing=TRUE)]
+impvar <- impvar[1:10]
+op <- par(mfrow=c(2, 5))
+for (i in seq_along(impvar)) {
+  partialPlot(model, pred.data = as.data.frame(train_dfGeschlecht), x.var = impvar[i], xlab=impvar[i],
+              main=paste("Partial Dependence on", impvar[i]))
+}
+par(op)
+
 
 #Drawing ROC and AUC using pROC and the final model--> the ROC Graph summarizes all of the confusion matrices that each threshold produced. The AUC makes it easy to compare 1 ROC curve to another. This is a measure to compare performance of different models having a BINARY DV! 
 
@@ -162,7 +178,7 @@ par(pty = "s") ## pty sets the aspect ratio of the plot region. Two options:
 ### Hier wieder DV und dataset austauschen, legacy.axes = TRUE heißt er beschreibt 1- Specificity auf der x-axes, renamed the x and y axes added color and more width with col and lwd
 ### DV musste hier komischwerweise nochmal definiert werden, sonst wird sie in dem code darunter nicht gefunden
 
-Geschlecht <- traindf_Geschlecht$Geschlecht
+Geschlecht <- train_dfGeschlecht$Geschlecht
 model_Geschlecht_ROC <- roc(Geschlecht, model$votes[,1], plot=TRUE, ledacy.axes=TRUE, percent=TRUE, xlab="False Positive Percentage", ylab="True Positive Percentage", col="#4daf4a", lwd=4, print.auc=TRUE)
 
 # If we want to find out the optimal threshold we can store the 

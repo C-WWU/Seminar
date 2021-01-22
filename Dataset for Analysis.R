@@ -2,6 +2,7 @@
 
 #####
 #load and install packages
+install.packages("readr")
 library(readr)
 library(plyr)
 library(dplyr)
@@ -14,6 +15,12 @@ install.packages("cowplot")
 library(cowplot)
 install.packages("randomForest")
 library(randomForest)
+install.packages("pROC")
+library(pROC)
+install.packages("caret")
+library(caret)
+install.packages("e1071")
+library(e1071)
 
 
 #####
@@ -646,6 +653,8 @@ data <- cbind(text_full[, cols_text], num_full[, cols_num])
 
 #make sure all columns have the right specifications: as of now, everything is character
 data[c(cols_num)] <- sapply(data[c(cols_num)], as.numeric)
+
+str(data) #alles wie gewollt
   
 #change NAs to 0 when applicable: for Accounts, no of children
 change_to_zero <- cols_names[c(24:252, 301)]
@@ -727,6 +736,18 @@ data <- data %>%
   rowwise() %>%
   mutate(Openness_to_Experiences = mean(c(`Offen_fuer_neue_Erfahrungen_vielseitig`, `Konventionell/unkreativ_nichtR`)))
 
+#Version 2: Persönlichkeit mit je nur 2 Ausgängen coden: <4 oder >4; 4 = NA
+data <- data %>% mutate(Extraversion2 = case_when(Extraversion < 4 ~ 'Introvertiert',
+                                                                Extraversion > 4 ~ 'Extrovertiert'))
+data <- data %>% mutate(Agreeableness2 = case_when(Agreeableness < 4 ~ 'Not Agreeable',
+                                                                Agreeableness > 4 ~ 'Agreeable'))
+data <- data %>% mutate(Conscientiousness2 = case_when(Conscientiousness < 4 ~ 'Not Conscientious',
+                                                            Agreeableness > 4 ~ 'Conscientious'))
+data <- data %>% mutate(Emotional_stablity2 = case_when(Emotional_stablity < 4 ~ 'Unstable',
+                                                            Agreeableness > 4 ~ 'Stable'))
+data <- data %>% mutate(Openness_Experiences2 = case_when(Agreeableness < 4 ~ 'Closed',
+                                                            Agreeableness > 4 ~ 'Open'))
+
 
 
 #####
@@ -734,6 +755,11 @@ data <- data %>%
 data <- data %>%
   rowwise() %>%
   mutate(Green_Values = mean(c(Verwendete_Produkte_Umwelt_nicht_belasten, Auswirkungen_meiner_Handlungen_auf_Umwelt, Kaufgewohnheiten_Sorge_um_Umwelt, Verschwendung_Ressourcen, Umweltverantwortlich, Unannehmlichkeiten_fuer_Umwelt)))
+
+
+#Version 2: mit je nur 2 Ausgängen coden: <4 oder >4; 4 = NA
+data <- data %>% mutate(Green2 = case_when(Green_Values < 4 ~ 'No',
+                                            Green_Values > 4 ~ 'Yes'))
 
 
 #####
@@ -770,6 +796,11 @@ data <- data %>% mutate(Age_Range = case_when(Alter >= 45 ~ 'hohes Alter',
                                                       Alter >= 30  & Alter <= 44 ~ 'mittleres Alter',
                                                       Alter <= 29 ~ 'niedriges Alter'))
 
+#Geschlecht: nur weiblich und männlich
+data <- data %>% mutate(weiblich_maennlich = case_when(Geschlecht == 1 ~ 'weiblich',
+                                                      Geschlecht == 2 ~ 'männlich'))
+
+
 #Bildung: niedrig, mittel, hoch
 data <- data %>% mutate(Bildungsgruppe = case_when(Bildungsabschluss == "(Noch) kein Abschluss" ~ 'niedrige Bildung',
                                                            Bildungsabschluss == "Hauptschulabschluss" ~ 'niedrige Bildung',
@@ -792,8 +823,17 @@ data <- data %>% mutate(Allein_vs_Beziehung = case_when(Beziehungsstatus == "Sin
                                                     Beziehungsstatus == "In einer Beziehung" ~ 'Beziehung',
                                                     Beziehungsstatus == "Verheiratet" ~ 'Beziehung'))
 
+#Beschäftigung: arbeitend oder nicht arbeitend
+data <- data %>% mutate(Arbeitend_oder_nicht = case_when(Beschaeftigung == "Arbeitslos/-suchend" ~ 'Nein',
+                                                         Beschaeftigung == "Auszubildende/r" ~ 'Ja',
+                                                         Beschaeftigung == "Berufstätige/r" ~ 'Ja',
+                                                         Beschaeftigung == "Hausfrau/-mann" ~ 'Nein',
+                                                         Beschaeftigung == "Rentner/in" ~ 'Nein',
+                                                         Beschaeftigung == "Schüler/in" ~ 'Nein',
+                                                         Beschaeftigung == "Student/in" ~ 'Nein'))
 
-#Alkohol Konsum: nie, selten, häufig
+
+#Alkohol Konsum: nie, selten, häufig (3 Ausprägungen) oder Konsum ja nein (2 Ausprägungen)
 data <- data %>% mutate(Alkoholgruppe = case_when(`Alkohol_Konsum` == "Nein" ~ 'kein Konsum',
                                                           `Alkohol_Konsum` == "Ja, mindestens einmal im Jahr" ~ 'niedriger Konsum',
                                                           `Alkohol_Konsum` == "Ja, mindestens einmal im Monat" ~ 'niedriger Konsum',
@@ -801,7 +841,9 @@ data <- data %>% mutate(Alkoholgruppe = case_when(`Alkohol_Konsum` == "Nein" ~ '
                                                           `Alkohol_Konsum` == "Ja, mehrmals pro Woche" ~ 'hoher Konsum',
                                                           `Alkohol_Konsum` == "Ja, täglich" ~ 'hoher Konsum'))
 
-#Zigaretten Konsum: nie, selten, häufig
+data <- data %>% mutate(Alkohol_ja_nein = ifelse(Alkohol_Konsum == "Nein", "Nein", "Ja"))
+
+#Zigaretten Konsum: nie, selten, häufig (3 Ausprägungen) oder Konsum ja nein (2 Ausprägungen)
 data <- data %>% mutate(Zigarettengruppe = case_when(`Zigaretten_Konsum` == "Nein" ~ 'kein Konsum',
                                                                 `Zigaretten_Konsum` == "Ja, mindestens einmal im Jahr" ~ 'niedriger Konsum',
                                                                 `Zigaretten_Konsum` == "Ja, mindestens einmal im Monat" ~ 'niedriger Konsum',
@@ -809,7 +851,10 @@ data <- data %>% mutate(Zigarettengruppe = case_when(`Zigaretten_Konsum` == "Nei
                                                                 `Zigaretten_Konsum` == "Ja, mehrmals pro Woche" ~ 'hoher Konsum',
                                                                 `Zigaretten_Konsum` == "Ja, täglich" ~ 'hoher Konsum'))
 
-#Drogen Konsum: nie, selten, häufig
+data <- data %>% mutate(Zigaretten_ja_nein = ifelse(Zigaretten_Konsum == "Nein", "Nein", "Ja"))
+
+
+#Drogen Konsum: nie, selten, häufig (3 Ausprägungen) oder Konsum ja nein (2 Ausprägungen)
 data <- data %>% mutate(Drogengruppe = case_when(`Drogen_Konsum` == "Nein" ~ 'kein Konsum',
                                                         `Drogen_Konsum` == "Ja, mindestens einmal im Jahr" ~ 'niedriger Konsum',
                                                         `Drogen_Konsum` == "Ja, mindestens einmal im Monat" ~ 'niedriger Konsum',
@@ -817,12 +862,65 @@ data <- data %>% mutate(Drogengruppe = case_when(`Drogen_Konsum` == "Nein" ~ 'ke
                                                         `Drogen_Konsum` == "Ja, mehrmals pro Woche" ~ 'hoher Konsum',
                                                         `Drogen_Konsum` == "Ja, täglich" ~ 'hoher Konsum'))
 
+data <- data %>% mutate(Drogen_ja_nein = ifelse(Drogen_Konsum == "Nein", "Nein", "Ja"))
+
+
+#Ziele im Leben: Ziel wichtig (5 oder mehr) oder nicht?
+data <- data %>% mutate(Zugehoerigkeit_wichtig = case_when(Gefuehl_der_Zugehoerigkeit <=4 ~ 'Nein',
+                                                            Gefuehl_der_Zugehoerigkeit >4 ~ 'Ja'))
+data <- data %>% mutate(Spannung_wichtig = case_when(Spannung <=4 ~ 'Nein',
+                                                      Spannung >4 ~ 'Ja'))
+data <- data %>% mutate(Herzliche_Beziehung_wichtig = case_when(Herzliche_Beziehung_zu_anderen_Menschen <=4 ~ 'Nein',
+                                                           Herzliche_Beziehung_zu_anderen_Menschen >4 ~ 'Ja'))
+data <- data %>% mutate(Selbstverwirklichung_wichtig = case_when(Selbstverwirklichung <=4 ~ 'Nein',
+                                                           Selbstverwirklichung >4 ~ 'Ja'))
+data <- data %>% mutate(Respekt_wichtig = case_when(Respekt_vor_Anderen <=4 ~ 'Nein',
+                                                    Respekt_vor_Anderen >4 ~ 'Ja'))
+data <- data %>% mutate(Spass_Freude_wichtig = case_when(Spass_und_Freude_am_Leben <=4 ~ 'Nein',
+                                                           Spass_und_Freude_am_Leben >4 ~ 'Ja'))
+data <- data %>% mutate(Sicherheit_wichtig = case_when(Sicherheit <=4 ~ 'Nein',
+                                                        Sicherheit >4 ~ 'Ja'))
+data <- data %>% mutate(Selbstachtung_wichtig = case_when(Selbstachtung <=4 ~ 'Nein',
+                                                           Selbstachtung >4 ~ 'Ja'))
+data <- data %>% mutate(Erfolg_wichtig = case_when(Gefuehl_von_Erfolg <=4 ~ 'Nein',
+                                                           Gefuehl_von_Erfolg >4 ~ 'Ja'))
+
+#Religion: Religiös ja nein und Islam vs. Christemtum
+data <- data %>% mutate(Religioes = case_when(Religion == "Christentum" ~ 'Ja',
+                                              Religion == "Islam" ~ 'Ja',
+                                              Religion == "Judentum" ~ 'Ja',
+                                              Religion == "Ich fühle mich keiner Religion zugehörig" ~ 'Nein'))
+
+data <- data %>% mutate(Islam_oder_Christ = case_when(Religion == "Christentum" ~ 'Christentum',
+                                                      Religion == "Islam" ~ 'Islam'))
+
+#sexuelle Orientierung: Heterosexuell ja oder nein?
+data <- data %>% mutate(Heterosexuell = case_when(Sexuelle_Orientierung == "Heterosexuell" ~ 'Ja',
+                                                  Sexuelle_Orientierung == "Homosexuell" ~ 'Nein',
+                                                  Sexuelle_Orientierung == "Bisexuell" ~ 'Nein'))
+
+#Anzahl Kinder
+#wir wissen, dass einer unserer Privatkontakte sich verklickt hat und statt 20 Kindern 0 eingeben wollte --> Korrektur hierfür, um Datensatz nicht aussortieren zu müssen:
+data$`Anzahl_Kinder`[data$`Anzahl_Kinder` == 20] <- 0
+
+#weiter zusammenfassen: 0 Kinder, 1 Kind, 2 Kinder, 3+ Kinder
+data <- data %>% mutate(Anzahl_Kinder_grob = case_when(Anzahl_Kinder == 0 ~ "0",
+                                                       Anzahl_Kinder == 1 ~ "1",
+                                                       Anzahl_Kinder == 2 ~ "2",
+                                                       Anzahl_Kinder >2 ~ "3 oder mehr"))
+
+#Wahl Partei: zu nur zwei Ausgängen formulieren, z.B.: CDU ja oder nein
+data <- data %>% mutate(CDU_CSU_Waehler = ifelse(Wahl_Partei == "CDU/CSU", "ja", "nein"))
+data <- data %>% mutate(SPD_Waehler = ifelse(Wahl_Partei == "SPD", "ja", "nein"))
+data <- data %>% mutate(Gruene_Waehler = ifelse(Wahl_Partei == "Bündnis 90/Die Grünen", "ja", "nein"))
+data <- data %>% mutate(FDP_Waehler = ifelse(Wahl_Partei == "FDP", "ja", "nein"))
+data <- data %>% mutate(AfD_Waehler = ifelse(Wahl_Partei == "AfD", "ja", "nein"))
+data <- data %>% mutate(Linke_Waehler = ifelse(Wahl_Partei == "Die Linke", "ja", "nein"))
+data <- data %>% mutate(Nichtwahler = ifelse(Wahl_Partei == "Ich würde nicht wählen gehen", "ja", "nein"))
+
 
 #####
 #new info
-
-#laufender Zähler einfügen
-data$Index <- c(1:2047)
 
 #wie vielen Accounts folgt jeder der Befragten?
 Accounts <- data %>% select(`Alman_Memes` : `Selena_Gomez`)
@@ -849,7 +947,7 @@ ggplot(data, aes(Accounts_followed))+
 #check descriptives and get to know the data and respondents
 
 #####
-#Descriptives for Respondents
+#Descriptives for Variables and Respondents
 #decide: are there respondents (outliers) to get rid of? 
 
 
@@ -887,7 +985,6 @@ summary(anova_usage)
 
 table(data$Geschlecht) 
 round(table(data$Geschlecht)/sum(table(data$Geschlecht)),2) #relative spread: 61% female, 39% male, diverse almost 0
-
 
 #age
 
@@ -933,12 +1030,11 @@ table(data$`Sexuelle_Orientierung`)
 
 #Children
 table(data$`Anzahl_Kinder`) #most people without children
-#wir wissen, dass einer unserer Privatkontakte sich verklickt hat und statt 20 Kindern 0 eingeben wollte --> Korrektur hierfür, um Datensatz nicht aussortieren zu müssen:
-data$`Anzahl_Kinder`[data$`Anzahl_Kinder` == 20] <- 0
 ###necessary to clean 3 respondents with >10 children?
 many_children <- data %>% subset(data$`Anzahl_Kinder` > 10) #prüfen ob sonstige Antworten Sinn ergeben --> keine Auffälligkeiten, daher kein Ausschluss notwendig
 
-table(data$`Anzahl_Kinder`) #weiter zusammenfassen für Analyse notwendig, z.B. mehr als 3 Kinder als eine Gruppe?
+table(data$`Anzahl_Kinder`) #Alternative 1
+table(data$Anzahl_Kinder_grob) #Alternative 2
 
 
 #Education
@@ -950,7 +1046,8 @@ table(data$Bildungsgruppe)
 
 #Beschäftigung
 table(data$Beschaeftigung)
-
+#zusammengefasst:
+table(data$Arbeitend_oder_nicht)
 
 #Migrationshintergrund
 table(data$Migrationshintergrund)
@@ -965,6 +1062,11 @@ table(data$Religion)
 
 #auch offene Nennungen beachten?
 table(data$`Religion_Sonstiges`) #keine Religion oft genug erwähnt, um sie nachträglich mit aufzunehmen (max. 3x)
+
+#Religiösität
+table(data$Religioes) #2/3 sind religiös nach eigener Angabe
+#Islam vs. Christen
+table(data$Islam_oder_Christ) #deutlich mehr Christen
 
 #Personality
 #Extraversion
@@ -1007,8 +1109,12 @@ ggplot(data, aes(Openness_to_Experiences))+
 ggplot(data, aes(Openness_to_Experiences))+
   geom_histogram(binwidth = 0.5)
 
-##gute Verteilung, auch wenn jeweils öfter eher hohe Werte (>4) angegeben sind
-#weiter zusammenfassen notwendig; nur Extremwerte beachten?
+#Variablen: Extraversion2, Agreeableness2 usw. teilen in zwei Gruppen auf:
+table(data$Extraversion2)/sum(table(data$Extraversion2)) #51% Introvertiert
+table(data$Agreeableness2)/sum(table(data$Agreeableness2)) #83% Agreeable
+table(data$Conscientiousness2)/sum(table(data$Conscientiousness2)) #89% Conscentious
+table(data$Emotional_stablity2)/sum(table(data$Emotional_stablity2)) #69% Emotionally Stable
+table(data$Openness_Experiences2)/sum(table(data$Openness_Experiences2)) #83% open to new experiences
 
 
 #Green Values
@@ -1021,7 +1127,10 @@ ggplot(data, aes(Green_Values))+
   geom_histogram(binwidth = 0.33)
 
 ##most respondents do care about the environment (rating between 5 and 6), but also some people below and 51 people with highest score of 7
-#necessary to set thresholds and make pro and con green value division?
+
+#zusammengefasste Variable: Green Values ja oder nein
+table(data$Green2)/sum(table(data$Green2)) #84% mit eher grünen Werten
+
 
 #General Goals in Life
 table(data$Gefuehl_der_Zugehoerigkeit)
@@ -1036,6 +1145,16 @@ table(data$Gefuehl_von_Erfolg)
 #important for most people: Spaß, Herzliche Beziehungen
 #no controverse goals, usually majority >5
 
+#Zusammengefasst: Variablen zu Wichtigkeit des Ziels
+table(data$Zugehoerigkeit_wichtig) #für 1625 wichtig
+table(data$Spannung_wichtig) #für 1088 wichtig
+table(data$Herzliche_Beziehung_wichtig) #für 1788 wichtig
+table(data$Selbstverwirklichung_wichtig) #für 1658 wichtig
+table(data$Respekt_wichtig) #für 1734 wichtig
+table(data$Spass_Freude_wichtig) #für 1849 wichtig
+table(data$Sicherheit_wichtig) #für 1779 wichtig
+table(data$Selbstachtung_wichtig) #für 1764 wichtig
+table(data$Erfolg_wichtig) #für 1637 wichtig
 
 #Parteien
 round(table(data$`Wahl_Partei`)/sum(table(data$`Wahl_Partei`)), 2) #relative shares of voters in our dataset
@@ -1046,6 +1165,10 @@ table(data$`Wahl_Partei_Sonstiges`)
 #Offene Nennungen Parteien: Aufnahme von "Die Partei"
 data$`Wahl_Partei_Sonstiges` <- tolower(data$`Wahl_Partei_Sonstiges`)
 data$`Wahl_Partei` <- ifelse(data$`Wahl_Partei_Sonstiges` %in% "die partei", "Die Partei", data$`Wahl_Partei`)
+
+#auch für Die Partei Wähler Variable erstellen
+data <- data %>% mutate(Die_Partei_Waehler = ifelse(Wahl_Partei == "Die Partei", "ja", "nein"))
+
 
 Partei <- as.data.frame(table(data$`Wahl_Partei`)/sum(table(data$`Wahl_Partei`)))
 
@@ -1070,11 +1193,14 @@ table(data$Corona_Leugner) #118 Leugner: Glauben nicht an Virus
 table(data$Alkohol_Konsum)
 table(data$Zigaretten_Konsum)
 table(data$Drogen_Konsum)
-#zusammengefasst:
+#zusammengefasst: V1 mit 3 Ausprägungen
 table(data$Alkoholgruppe)
 table(data$Zigarettengruppe) #1250 Nichtraucher
 table(data$Drogengruppe) #"nur" 64 mit hohem Konsum
-
+#zusammengefasst: V2 mit 2 Ausprägungen
+table(data$Alkohol_ja_nein)
+table(data$Zigaretten_ja_nein)
+table(data$Drogen_ja_nein)
 
 
 #prüfen: gibt es Zusammenhänge zwischen den variablen?
@@ -1099,11 +1225,6 @@ ggplot(cor_accounts_df, aes(Tagesschau))+
 
 
 #####
-#Descriptives for Variables
-#decide: are there variables which have too little variety?
-
-
-#####
 #Descriptives Accounts
 
 #Followers per Account
@@ -1118,6 +1239,12 @@ delete <- Followers_Accounts %>% filter(Followers < a)
 keep <-Followers_Accounts %>% filter(Followers > a) 
 #but: keep in sample nonetheless, just be aware!
 
+
+#final check:
+summary(data)
+str(data)
+head(data)
+#the dataset looks to be ready for analysis!
 
 #save dataset
 write.csv(data, "/Users/Miriam/Documents/Uni/Master/3. Semester/Seminar SRA/datasets/neu/data_for_analysis.csv")
