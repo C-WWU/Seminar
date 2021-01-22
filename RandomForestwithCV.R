@@ -18,12 +18,20 @@ install.packages("caret")
 library(caret)
 install.packages("e1071")
 library(e1071)
+install.packages("dplyr")
+library(dplyr)
 
 #load data
 load("data_for_analysis.RData")
 
 cols_names <- names(data)  
 cols_names
+
+#Gibt es NAs in der DV?
+sum(is.na(data_Geschlecht$weiblich_maennlich)) #keine NAs
+###folgende Kommentierung und Code nur drin lassen und anpassen, wenn es NAs gibt --> bitte prüfen, dass der Code auch das richtige macht :)
+#Respondents mit NAs für diese Variable löschen (NAs stehen nur, wenn Respondent "Keine Angabe" gemacht hat, daher bedeutet löschen keinen Informationsverlust)
+data_Geschlecht <- data_Geschlecht %>% filter(weiblich_maennlich != "NA")
 
 
 ###Erklärung:
@@ -36,11 +44,17 @@ cols_names
 ###(Name der DV die wir untersuchen austauschen)
 
 ###hier: Zeilen anpassen, die wir auswählen, und Dateienname ändern zu jew. Variable
-data_Geschlecht <- data[,c(28, 30:258)]
+data_Geschlecht <- data[,c(313, 27:255)]
 
 cols_Geschlecht <- names(data_Geschlecht)
-data_Geschlecht$Geschlecht <- as.factor(data_Geschlecht$Geschlecht)
+data_Geschlecht$weiblich_maennlich <- as.factor(data_Geschlecht$weiblich_maennlich)
 
+
+### hier das dataset, DV und Ausprägungen anpassen
+
+data_Geschlecht$weiblich_maennlich = as.character(data_Geschlecht$weiblich_maennlich)
+data_Geschlecht$weiblich_maennlich[data_Geschlecht$weiblich_maennlich == "männlich"] = "maennlich"
+data_Geschlecht$weiblich_maennlich = as.factor(data_Geschlecht$weiblich_maennlich)
 
 #Training und Test Dataset
 set.seed(400)
@@ -48,12 +62,22 @@ set.seed(400)
 # Partitioning of the data: Create index matrix of selected values
 
 # Create index matrix 
-index <- createDataPartition(data_Geschlecht$Geschlecht, p=.8, list= FALSE, times= 1)
+index <- createDataPartition(data_Geschlecht$weiblich_maennlich, p=.8, list= FALSE, times= 1)
 
 # Create train_dfGeschlecht & test_dfGeschlecht
 
 train_dfGeschlecht <- data_Geschlecht[index,]
 test_dfGeschlecht <- data_Geschlecht[-index,]
+
+### hier das dataset, DV und Ausprägungen anpassen
+
+#train_dfGeschlecht$Geschlecht[train_dfGeschlecht$Geschlecht == 1] <- "weiblich"
+#train_dfGeschlecht$Geschlecht[train_dfGeschlecht$Geschlecht == 2] <- "männlich"
+#train_dfGeschlecht$Geschlecht[train_dfGeschlecht$Geschlecht == 3] <- "divers"
+
+#train_dfGeschlecht$Geschlecht <- as.factor(train_dfGeschlecht$Geschlecht)
+#test_dfGeschlecht$Geschlecht <- as.factor(test_dfGeschlecht$Geschlecht)
+
 
 # Specify the type of training method used & number of folds --> bei uns 10-fold Cross-Validation
 
@@ -81,11 +105,19 @@ set.seed(400)
 ### generates 300 tress by default, können wir so lassen
 ###anpassen: IV, data = neues Dataset; mtry anpassen zu entweder sqrt(229) oder 229/3
 
-modelGeschlechtRF <- train(Geschlecht ~ ., 
+modelGeschlechtRF <- train(weiblich_maennlich ~ ., 
                            data=train_dfGeschlecht, 
                            method="rf", metric= "ROC", 
+                           na.action = na.pass,
                            trControl = myControl,
                            importance = TRUE)
+
+modelGeschlechtRF <- train(weiblich_maennlich ~ ., 
+                           data=train_dfGeschlecht, 
+                           method="ranger", metric= "ROC", 
+                           na.action = na.omit,
+                           trControl = myControl)
+
 
 # print model
 
@@ -93,22 +125,23 @@ print(modelGeschlechtRF)
 
 # test of the ideal mtry
 
-myGrid = expand.grid(mtry = c(1,2,3,4,5,6,10,20),
+myGrid = expand.grid(mtry = c(1:20),
                      splitrule = "extratrees", # What does this mean? Theres also "gini" --> the gini tells you which variables were the most important for building the trees 
-                     min.node.size = c(5,10))
+                     min.node.size = c(5,10,15))
 
 
-modelGeschlechtRF <- train(Geschlecht ~ ., 
+modelGeschlechtRF <- train(weiblich_maennlich ~ ., 
                            data=train_dfGeschlecht,
                            tuneGrid = myGrid,
-                           method="rf", 
-                           metric= "ROC", 
-                           trControl = myControl, 
-                           importance = TRUE)
+                           method="ranger", 
+                           metric= "ROC", # hier bei metric kann man sich auch die Accuracy ausgeben lassen
+                           na.action = na.omit,
+                           trControl = myControl)
 
 # Print model to console
-model
-plot(model)
+
+modelGeschlechtRF
+plot(modelGeschlechtRF)
 
 #save the best mtry 
 
@@ -128,35 +161,38 @@ bestmtry <- modelGeschlechtRF$bestTune$mtry
 
 #save the best mtry 
 
-bestmtry <- rf_mtry$bestTune$mtry
+#bestmtry <- rf_mtry$bestTune$mtry
 
 # use it in Random Forest Model
 
 set.seed(400)
-myGrid <- expand.grid(.mtry = bestmtry)
-modelGeschlechtRF <- train(Geschlecht ~ ., 
+myGrid <- expand.grid(mtry = bestmtry, splitrule ="extratrees", min.node.size = 15)
+modelGeschlechtRF <- train(weiblich_maennlich ~ ., 
                            data=train_dfGeschlecht, 
-                           method="rf", metric= "Accuracy", 
+                           method="ranger", metric= "ROC", # hier bei metric kann man sich auch die Accuracy ausgeben lassen
                            tuneGrid = myGrid,
-                           trControl = myControl,
-                           importance = TRUE)
+                           na.action = na.omit,
+                           trControl = myControl)
 
 # search for the best ntrees
 
 store_maxtrees <- list()
 for (ntree in c(300, 350, 400, 450, 500, 550, 600, 800, 1000)) {
   set.seed(400)
-  rf_maxtrees <- train(Geschlecht~.,
+  rf_maxtrees <- train(weiblich_maennlich~.,
                        data = train_dfGeschlecht,
-                       method = "rf",
-                       metric = "Accuracy",
+                       method = "ranger",
+                       metric = "ROC", # hier bei metric kann man sich auch die Accuracy ausgeben lassen
                        tuneGrid = myGrid,
                        trControl = myControl,
-                       importance = TRUE,
+                       na.action = na.omit,
                        ntree = ntree)
   key <- toString(ntree)
   store_maxtrees[[key]] <- rf_maxtrees
 }
+
+summary(rf_maxtrees)
+
 results_tree <- resamples(store_maxtrees)
 summary(results_tree)
 
