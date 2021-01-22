@@ -65,9 +65,6 @@ trControl <- trainControl(method = "cv",
                           number=10,
                           search="grid")
 
-###falls es NAs gibt (nur bei wenigen Daten) --> Zeile 41 Raute weg und Namen von Dataset anpassen
-#DATASET <- rfImpute(DATASET ~ ., data = data, iter=6)
-
 
 #set random seed again 
 
