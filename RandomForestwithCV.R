@@ -57,13 +57,18 @@ test_dfGeschlecht <- data_Geschlecht[-index,]
 
 # Specify the type of training method used & number of folds --> bei uns 10-fold Cross-Validation
 
-#crtlspecs <- trainControl(method="cv", number=10, 
-                          #savePredictions="all",
-                          #classProbs = TRUE)
 
-trControl <- trainControl(method = "cv", 
-                          number=10,
-                          search="grid")
+myControl = trainControl(
+  method = "repeatedcv",
+  repeats=3,
+  number = 10, 
+  verboseIter = TRUE,
+  summaryFunction = twoClassSummary, #Wenn das benutzt wird, auch ClassProbs = True setzen!; Nimmt in kombin 
+  classProbs = TRUE,
+  allowParallel=TRUE,
+  #sampling = "smote",
+  search = "random",
+)
 
 ###falls es NAs gibt (nur bei wenigen Daten) --> Zeile 41 Raute weg und Namen von Dataset anpassen
 #DATASET <- rfImpute(DATASET ~ ., data = data, iter=6)
@@ -81,8 +86,9 @@ set.seed(400)
 
 modelGeschlechtRF <- train(Geschlecht ~ ., 
                            data=train_dfGeschlecht, 
-                           method="rf", metric= "Accuracy", 
-                           trControl = trControl)
+                           method="rf", metric= "ROC", 
+                           trControl = myControl,
+                           importance = TRUE)
 
 # print model
 
@@ -90,16 +96,38 @@ print(modelGeschlechtRF)
 
 # test of the ideal mtry
 
-set.seed(400)
-tuneGrid <- expand.grid(.mtry = c(1: 20))
-rf_mtry <- train(Geschlecht ~ ., 
-                 data=train_dfGeschlecht, 
-                 method="rf", metric= "Accuracy", 
-                 tuneGrid = tuneGrid,
-                 trControl = trControl,
-                 importance = TRUE,)
+myGrid = expand.grid(mtry = c(1,2,3,4,5,6,10,20),
+                     splitrule = "extratrees", # What does this mean? Theres also "gini" --> the gini tells you which variables were the most important for building the trees 
+                     min.node.size = c(5,10))
 
-print(rf_mtry)
+
+modelGeschlechtRF <- train(Geschlecht ~ ., 
+                           data=train_dfGeschlecht,
+                           tuneGrid = myGrid,
+                           method="rf", 
+                           metric= "ROC", 
+                           trControl = myControl, 
+                           importance = TRUE)
+
+# Print model to console
+model
+plot(model)
+
+#save the best mtry 
+
+bestmtry <- modelGeschlechtRF$bestTune$mtry
+
+
+#set.seed(400)
+#tuneGrid <- expand.grid(.mtry = c(1: 20))
+#rf_mtry <- train(Geschlecht ~ ., 
+                 #data=train_dfGeschlecht, 
+                 #method="rf", metric= "Accuracy", 
+                # tuneGrid = tuneGrid,
+                 #trControl = trControl,
+                 #importance = TRUE,)
+
+#print(rf_mtry)
 
 #save the best mtry 
 
@@ -108,12 +136,12 @@ bestmtry <- rf_mtry$bestTune$mtry
 # use it in Random Forest Model
 
 set.seed(400)
-tuneGrid <- expand.grid(.mtry = bestmtry)
+myGrid <- expand.grid(.mtry = bestmtry)
 modelGeschlechtRF <- train(Geschlecht ~ ., 
                            data=train_dfGeschlecht, 
                            method="rf", metric= "Accuracy", 
-                           tuneGrid = tuneGrid,
-                           trControl = trControl,
+                           tuneGrid = myGrid,
+                           trControl = myControl,
                            importance = TRUE)
 
 # search for the best ntrees
@@ -125,8 +153,8 @@ for (ntree in c(300, 350, 400, 450, 500, 550, 600, 800, 1000)) {
                        data = train_dfGeschlecht,
                        method = "rf",
                        metric = "Accuracy",
-                       tuneGrid = tuneGrid,
-                       trControl = trControl,
+                       tuneGrid = myGrid,
+                       trControl = myControl,
                        importance = TRUE,
                        ntree = ntree)
   key <- toString(ntree)
