@@ -49,6 +49,11 @@ sum(is.na(data_Geschlecht$Geschlecht)) #keine NAs
 #Respondents mit NAs für diese Variable löschen (NAs stehen nur, wenn Respondent "Keine Angabe" gemacht hat, daher bedeutet löschen keinen Informationsverlust)
 data_Geschlecht <- data_Geschlecht %>% filter(Geschlecht != "NA")
 
+#-----------------------------------------------------------------------------------------------------------------
+
+### ACHTUNG DAS DATA SET NUR SPLITTEN WENN NOCH NICHT VORHER FÜR DIE DV GEMACHT. ANSONSTEN STEP ÜBERSPRINGEN
+
+
 #Training und Test Dataset
 set.seed(400)
 
@@ -62,7 +67,11 @@ index <- createDataPartition(data_Geschlecht$Geschlecht, p=.8, list= FALSE, time
 train_dfGeschlecht <- data_Geschlecht[index,]
 test_dfGeschlecht <- data_Geschlecht[-index,]
 
-# Modell erstellen: 300 trees (default)
+
+
+#----------------------------------------BUILDING AND TRAINING THE MODEL---------------------------------------------
+
+
 
 ###mtry: wenn numerisch, dann default = sqrt(229); wenn continuous, dann default = 229/3
 ### generates 300 tress by default, können wir so lassen
@@ -72,6 +81,7 @@ model <- randomForest(Geschlecht ~ ., data=train_dfGeschlecht, proximity=TRUE, m
 #Modell prüfen
 model 
 
+print(model)
 
 #grafische Darstellung des OOB samples:
 
@@ -90,11 +100,35 @@ ggplot(data=oob.error.data, aes(x=Trees, y=Error)) +
 
 #Plot und Modell speichern
 ###NAmen anpassen zu richtiger Variable!
-ggsave("oob_error_rate_500_trees_Geschlecht.pdf")
+ggsave("oob_error_rate_300_trees_Geschlecht.pdf")
 
 ###Model abspeichern: Variablenname anpassen
+model_Geschlecht_300 <- model
+
+
+#zweites Model mit 500 Trees --> wird error weniger oder stagniert er? 
+##Modelgleichung: DV anpassen, data = .. anpassen
+model <- randomForest(Geschlecht ~ ., data=train_dfGeschlecht, ntree = 500, proximity=TRUE, mtry = sqrt(229))
+model
+
+
+oob.error.data <- data.frame(
+  Trees=rep(1:nrow(model$err.rate), times=4),
+  Type=rep(c("OOB", "1", "2", "3"), each=nrow(model$err.rate)),
+  Error=c(model$err.rate[,"OOB"], 
+          model$err.rate[,"1"], 
+          model$err.rate[,"2"],
+          model$err.rate[,"3"]))
+
+
+ggplot(data=oob.error.data, aes(x=Trees, y=Error)) +
+  geom_line(aes(color=Type))
+
+ggsave("oob_error_rate_500_trees_Geschlecht.pdf")
+
 model_Geschlecht_500 <- model
 
+## Kommentieren: wie hat sich der Error verändert? Größer, kleiner, oder gleich? Sprich, war es notwendig mit 1000 Trees zu arbeiten?
 
 #zweites Model mit 1000 Trees --> wird error weniger oder stagniert er? 
 ##Modelgleichung: DV anpassen, data = .. anpassen
@@ -120,9 +154,8 @@ model_Geschlecht_1000 <- model
 
 ## Kommentieren: wie hat sich der Error verändert? Größer, kleiner, oder gleich? Sprich, war es notwendig mit 1000 Trees zu arbeiten?
 
+
 ###ABWÄGEN: auch ausprobieren für andere Zahl von Trees notwendig, zb 500? (dann einfach Kopieren und ntree = 500 setzen) 
-
-
 
 
 # Prüfen: was ist das ideale mtry? 
@@ -142,16 +175,17 @@ which(oob.values == min(oob.values))
 ###anpassen: DV, Data, ntree
 model <- randomForest(Geschlecht ~ ., 
                       data=train_dfGeschlecht,
-                      ntree=1000, 
+                      ntree=500, 
                       proximity=TRUE, 
                       mtry=which(oob.values == min(oob.values)), 
                       Importance=TRUE)
+
+# print model
 model
 
 #evaluate variable importance
 
 importance(model)
-varImp(model)
 varImpPlot(model)
 
 # Mean Decrease Gini - Measure of variable importance based on the Gini impurity index used for the calculation of splits in trees.
@@ -167,6 +201,16 @@ for (i in seq_along(impvar)) {
               main=paste("Partial Dependence on", impvar[i]))
 }
 par(op)
+
+#------------------------------------------test for multicollinearity----------------------------
+
+install.packages("car")
+library(car)
+
+vif(model)
+
+
+#----------------------------------------FIND BEST THRESHOLD WITH ROC----------------------------------------
 
 
 #Drawing ROC and AUC using pROC and the final model--> the ROC Graph summarizes all of the confusion matrices that each threshold produced. The AUC makes it easy to compare 1 ROC curve to another. This is a measure to compare performance of different models having a BINARY DV! 
@@ -186,9 +230,13 @@ model_Geschlecht_ROC <- roc(Geschlecht, model$votes[,1], plot=TRUE, ledacy.axes=
 roc.info_Geschlecht <- roc(Geschlecht, model$votes[,1], legacy.axes=TRUE)
 str(roc.info_Geschlecht)
 
+
+# ------------------------------------------------MODEL COMPARISON------------------------------------------------
+
+
 # Code wenn wir zwei Modelle vergleichen wollen
 ##
-#######################################
+
 # roc(Geschlecht, model$data_Geschlecht, plot=TRUE, ledacy.axes=TRUE, percent=TRUE, xlab="False Positive Percentage", ylab="True Positive Percentage", col="#4daf4a", lwd=4, print.auc=TRUE)
 
 # plot.roc(Geschlecht, model$votes[,1], percent=TRUE, col="#4daf4a", lwd=4, print.auc=TRUE, add=TRUE, print.auc.y=40)
@@ -197,6 +245,8 @@ str(roc.info_Geschlecht)
 
 # legend("bottomright", legend=c("Logisitic Regression", "Random Forest"), col=c("#377eb8", "#4daf4a"), lwd=4)
 
+
+# ----------------------------------------------MODEL EVALUATION-------------------------------------------------
 
 
 # Apply model to test_df --> test_dfGeschlecht
@@ -209,3 +259,16 @@ predictions <- predict(model, newdata=test_dfGeschlecht)
 
 # Create confusion matrix
 confusionMatrix(data=predictions, test_dfGeschlecht$Geschlecht)
+
+
+#--------------------------------------------WHEN BEST MODEL IS FOUND-----------------------------------------------------
+
+#save model to disk 
+
+final_model <- model
+saveRDS(final_model, "./final_model.rds")
+
+#load the model
+
+super_model <- readRDS("./final_model.rds")
+print(super_model)

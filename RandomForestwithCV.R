@@ -56,6 +56,11 @@ data_Geschlecht$weiblich_maennlich = as.character(data_Geschlecht$weiblich_maenn
 data_Geschlecht$weiblich_maennlich[data_Geschlecht$weiblich_maennlich == "männlich"] = "maennlich"
 data_Geschlecht$weiblich_maennlich = as.factor(data_Geschlecht$weiblich_maennlich)
 
+#-----------------------------------------------------------------------------------------------------------------
+
+### ACHTUNG DAS DATA SET NUR SPLITTEN WENN NOCH NICHT VORHER FÜR DIE DV GEMACHT. ANSONSTEN STEP ÜBERSPRINGEN
+
+
 #Training und Test Dataset
 set.seed(400)
 
@@ -77,6 +82,10 @@ test_dfGeschlecht <- data_Geschlecht[-index,]
 
 #train_dfGeschlecht$Geschlecht <- as.factor(train_dfGeschlecht$Geschlecht)
 #test_dfGeschlecht$Geschlecht <- as.factor(test_dfGeschlecht$Geschlecht)
+
+
+
+#----------------------------------------BUILDING AND TRAINING THE MODEL---------------------------------------------
 
 
 # Specify the type of training method used & number of folds --> bei uns 10-fold Cross-Validation
@@ -101,16 +110,6 @@ set.seed(400)
 
 # train model with: 300 trees (default)
 
-###mtry: wenn numerisch, dann default = sqrt(229); wenn continuous, dann default = 229/3
-### generates 300 tress by default, können wir so lassen
-###anpassen: IV, data = neues Dataset; mtry anpassen zu entweder sqrt(229) oder 229/3
-
-modelGeschlechtRF <- train(weiblich_maennlich ~ ., 
-                           data=train_dfGeschlecht, 
-                           method="rf", metric= "ROC", 
-                           na.action = na.pass,
-                           trControl = myControl,
-                           importance = TRUE)
 
 modelGeschlechtRF <- train(weiblich_maennlich ~ ., 
                            data=train_dfGeschlecht, 
@@ -141,6 +140,7 @@ modelGeschlechtRF <- train(weiblich_maennlich ~ .,
 # Print model to console
 
 modelGeschlechtRF
+summary(modelGeschlechtRF)
 plot(modelGeschlechtRF)
 
 #save the best mtry 
@@ -148,25 +148,10 @@ plot(modelGeschlechtRF)
 bestmtry <- modelGeschlechtRF$bestTune$mtry
 
 
-#set.seed(400)
-#tuneGrid <- expand.grid(.mtry = c(1: 20))
-#rf_mtry <- train(Geschlecht ~ ., 
-                 #data=train_dfGeschlecht, 
-                 #method="rf", metric= "Accuracy", 
-                # tuneGrid = tuneGrid,
-                 #trControl = trControl,
-                 #importance = TRUE,)
-
-#print(rf_mtry)
-
-#save the best mtry 
-
-#bestmtry <- rf_mtry$bestTune$mtry
-
 # use it in Random Forest Model
 
 set.seed(400)
-myGrid <- expand.grid(mtry = bestmtry, splitrule ="extratrees", min.node.size = 15)
+myGrid <- expand.grid(mtry = bestmtry, splitrule ="extratrees", min.node.size = 5)
 modelGeschlechtRF <- train(weiblich_maennlich ~ ., 
                            data=train_dfGeschlecht, 
                            method="ranger", metric= "ROC", # hier bei metric kann man sich auch die Accuracy ausgeben lassen
@@ -176,29 +161,38 @@ modelGeschlechtRF <- train(weiblich_maennlich ~ .,
 
 # search for the best ntrees
 
-store_maxtrees <- list()
-for (ntree in c(300, 350, 400, 450, 500, 550, 600, 800, 1000)) {
-  set.seed(400)
-  rf_maxtrees <- train(weiblich_maennlich~.,
-                       data = train_dfGeschlecht,
-                       method = "ranger",
-                       metric = "ROC", # hier bei metric kann man sich auch die Accuracy ausgeben lassen
-                       tuneGrid = myGrid,
-                       trControl = myControl,
-                       na.action = na.omit,
-                       ntree = ntree)
-  key <- toString(ntree)
-  store_maxtrees[[key]] <- rf_maxtrees
-}
+set.seed(400)
+myGrid <- expand.grid(mtry = bestmtry, splitrule ="extratrees", min.node.size = 5)
+modelGeschlechtRF <- train(weiblich_maennlich ~ ., 
+                           data=train_dfGeschlecht, 
+                           method="ranger", metric= "ROC", # hier bei metric kann man sich auch die Accuracy ausgeben lassen
+                           tuneGrid = myGrid,
+                           na.action = na.omit,
+                           ntree = 500,
+                           trControl = myControl)
 
-summary(rf_maxtrees)
+set.seed(400)
+myGrid <- expand.grid(mtry = bestmtry, splitrule ="extratrees", min.node.size = 5)
+modelGeschlechtRF <- train(weiblich_maennlich ~ ., 
+                           data=train_dfGeschlecht, 
+                           method="ranger", metric= "ROC", # hier bei metric kann man sich auch die Accuracy ausgeben lassen
+                           tuneGrid = myGrid,
+                           na.action = na.omit,
+                           ntree = 1000,
+                           trControl = myControl)
 
-results_tree <- resamples(store_maxtrees)
-summary(results_tree)
+### hier das finale model mit n trees, bestmtry und node size einfügen 
 
-### hier das finale model mit n trees und bestmtry einfügen 
-
-
+set.seed(400)
+myGrid <- expand.grid(mtry = bestmtry, splitrule ="extratrees", min.node.size = 5)
+modelGeschlechtRF <- train(weiblich_maennlich ~ ., 
+                           data=train_dfGeschlecht, 
+                           method="ranger", metric= "ROC", # hier bei metric kann man sich auch die Accuracy ausgeben lassen
+                           tuneGrid = myGrid,
+                           na.action = na.omit,
+                           ntree = 500,
+                           trControl = myControl,
+                           importance = TRUE)
 
 # Print model
 ### hier den Model namen ändern
@@ -212,8 +206,30 @@ summary(modelGeschlechtRF)
 ### hier auch den model namen ändern
 
 importance(modelGeschlechtRF)
-varImp(modelGeschlechtRF)
 varImpPlot(modelGeschlechtRF)
+
+#checking direction of the 10 most important variables
+###anpassen: name vom dataset
+imp <- importance(model)
+impvar <- rownames(imp)[order(imp[, 1], decreasing=TRUE)]
+impvar <- impvar[1:10]
+op <- par(mfrow=c(2, 5))
+for (i in seq_along(impvar)) {
+  partialPlot(model, pred.data = as.data.frame(train_dfGeschlecht), x.var = impvar[i], xlab=impvar[i],
+              main=paste("Partial Dependence on", impvar[i]))
+}
+par(op)
+
+
+#------------------------------------------test for multicollinearity----------------------------
+
+install.packages("car")
+library(car)
+
+vif(model)
+
+#----------------------------------------FIND BEST THRESHOLD WITH ROC----------------------------------------
+
 
 #Drawing ROC and AUC using pROC and the final model--> the ROC Graph summarizes all of the confusion matrices that each threshold produced. The AUC makes it easy to compare 1 ROC curve to another. This is a measure to compare performance of different models having a BINARY DV! 
 
@@ -224,17 +240,20 @@ par(pty = "s") ## pty sets the aspect ratio of the plot region. Two options:
 ### Hier wieder DV und dataset austauschen, ledacy.axes = TRUE heißt er beschreibt 1- Specificity auf der x-axes, renamed the x and y axes added color and more width with col and lwd
 ### DV musste hier komischwerweise nochmal definiert werden, sonst wird sie in dem code darunter nicht gefunden
 
-Geschlecht <- data_Geschlecht$Geschlecht
-model_Geschlecht_ROC <- roc(Geschlecht, modelGeschlechtRF$votes[,1], plot=TRUE, ledacy.axes=TRUE, percent=TRUE, xlab="False Positive Percentage", ylab="True Positive Percentage", col="#4daf4a", lwd=4, print.auc=TRUE)
+#Geschlecht <- data_Geschlecht$Geschlecht
+model_Geschlecht_ROC <- roc(weiblich_maennlich~modelGeschlechtRF$votes[,1], plot=TRUE, ledacy.axes=TRUE, percent=TRUE, xlab="False Positive Percentage", ylab="True Positive Percentage", col="#4daf4a", lwd=4, print.auc=TRUE)
 
 # If we want to find out the optimal threshold we can store the 
 # data used to make the ROC graph in a variable...
-roc.info_Geschlecht <- roc(Geschlecht, modelGeschlechtRF$votes[,1], legacy.axes=TRUE)
+roc.info_Geschlecht <- roc(weiblich_maennlich, modelGeschlechtRF$votes[,1], legacy.axes=TRUE)
 str(roc.info_Geschlecht)
 
+
+# ------------------------------------------------MODEL COMPARISON------------------------------------------------
+
+
 # Code wenn wir zwei Modelle vergleichen wollen
-##
-#######################################
+
 # roc(Geschlecht, model$data_Geschlecht, plot=TRUE, ledacy.axes=TRUE, percent=TRUE, xlab="False Positive Percentage", ylab="True Positive Percentage", col="#4daf4a", lwd=4, print.auc=TRUE)
 
 # plot.roc(Geschlecht, model$votes[,1], percent=TRUE, col="#4daf4a", lwd=4, print.auc=TRUE, add=TRUE, print.auc.y=40)
@@ -244,11 +263,29 @@ str(roc.info_Geschlecht)
 # legend("bottomright", legend=c("Logisitic Regression", "Random Forest"), col=c("#377eb8", "#4daf4a"), lwd=4)
 
 
+# ----------------------------------------------MODEL EVALUATION-------------------------------------------------
+
+
 # Apply model to test_df --> test_dfGeschlecht
 
 # predict outcome using model from train_df applied to the test_df
 
-predictions <- predict(modelGeschlechtRF, newdata=test_dfGeschlecht)
+### hier auch einmal nach dem testdf der DV umbenennen
+
+predictions <- predict(model, newdata=test_dfGeschlecht)
 
 # Create confusion matrix
 confusionMatrix(data=predictions, test_dfGeschlecht$Geschlecht)
+
+
+#--------------------------------------------WHEN BEST MODEL IS FOUND-----------------------------------------------------
+
+#save model to disk 
+
+final_model <- model
+saveRDS(final_model, "./final_model.rds")
+
+#load the model
+
+super_model <- readRDS("./final_model.rds")
+print(super_model)
