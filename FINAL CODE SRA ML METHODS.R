@@ -25,6 +25,7 @@ library(ROSE)
 library(ranger)
 library(tidyverse)
 library(MASS)
+library(pdp)
 
 
 #--------------------------------------DATA PRE-PROCESSING------------------------------------------
@@ -409,6 +410,8 @@ print(modelGeschlechtRF)
 
 # test of the ideal mtry, splitrule and min-node.size
 
+set.seed(1997)
+
 myGrid = expand.grid(mtry = c(1:20),
                      splitrule = "extratrees", # What does this mean? Theres also "gini" --> the gini tells you which variables were the most important for building the trees 
                      min.node.size = c(5,10,15))
@@ -457,11 +460,12 @@ summary(modelGeschlechtRF)
 ### hier auch den model namen ändern
 
 varImp(modelGeschlechtRF)
-plot(varImp(modelGeschlechtRF), 10, main = "weiblich_maennlich")
+plot(varImp(modelGeschlechtRF), 20, main = "weiblich_maennlich")
 
 #checking direction of the 10 most important variables
 ###anpassen: name vom dataset
 imp <- varImp(modelGeschlechtRF)
+imp <- imp[[1]]
 impvar <- rownames(imp)[order(imp, decreasing=TRUE)]
 impvar <- impvar[1:10]
 op <- par(mfrow=c(2, 5))
@@ -480,7 +484,7 @@ par(op)
 
 ### hier auch einmal nach dem testdf der DV umbenennen
 
-predictions <- predict(model, newdata=test_dfGeschlechtMW)
+predictions <- predict(modelGeschlechtRF, newdata=test_dfGeschlechtMW)
 
 # Create confusion matrix
 confusionMatrix(data=predictions, test_dfGeschlechtMW$weiblich_maennlich)
