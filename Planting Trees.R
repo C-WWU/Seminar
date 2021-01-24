@@ -20,6 +20,9 @@ install.packages("e1071")
 library(e1071)
 install.packages("pdp")
 library(pdp)
+install.packages("dplyr")
+library(dplyr)
+
 
 #load data
 load("data_for_analysis.RData")
@@ -67,6 +70,15 @@ index <- createDataPartition(data_Geschlecht$Geschlecht, p=.8, list= FALSE, time
 train_dfGeschlecht <- data_Geschlecht[index,]
 test_dfGeschlecht <- data_Geschlecht[-index,]
 
+### hier das dataset, DV und Ausprägungen anpassen
+
+#train_dfGeschlecht$Geschlecht[train_dfGeschlecht$Geschlecht == 1] <- "weiblich"
+#train_dfGeschlecht$Geschlecht[train_dfGeschlecht$Geschlecht == 2] <- "männlich"
+#train_dfGeschlecht$Geschlecht[train_dfGeschlecht$Geschlecht == 3] <- "divers"
+
+#train_dfGeschlecht$Geschlecht <- as.factor(train_dfGeschlecht$Geschlecht)
+#test_dfGeschlecht$Geschlecht <- as.factor(test_dfGeschlecht$Geschlecht)
+
 
 
 #----------------------------------------BUILDING AND TRAINING THE MODEL---------------------------------------------
@@ -79,7 +91,6 @@ test_dfGeschlecht <- data_Geschlecht[-index,]
 model <- randomForest(Geschlecht ~ ., data=train_dfGeschlecht, proximity=TRUE, mtry = sqrt(229))
 
 #Modell prüfen
-model 
 
 print(model)
 
@@ -175,8 +186,8 @@ which(oob.values == min(oob.values))
 ###anpassen: DV, Data, ntree
 model <- randomForest(Geschlecht ~ ., 
                       data=train_dfGeschlecht,
-                      ntree=500, 
-                      proximity=TRUE, 
+                      ntree=1000, 
+                      proximity=TRUE,
                       mtry=which(oob.values == min(oob.values)), 
                       Importance=TRUE)
 
@@ -222,12 +233,14 @@ par(pty = "s") ## pty sets the aspect ratio of the plot region. Two options:
 ### Hier wieder DV und dataset austauschen, legacy.axes = TRUE heißt er beschreibt 1- Specificity auf der x-axes, renamed the x and y axes added color and more width with col and lwd
 ### DV musste hier komischwerweise nochmal definiert werden, sonst wird sie in dem code darunter nicht gefunden
 
-Geschlecht <- train_dfGeschlecht$Geschlecht
-model_Geschlecht_ROC <- roc(Geschlecht, model$votes[,1], plot=TRUE, ledacy.axes=TRUE, percent=TRUE, xlab="False Positive Percentage", ylab="True Positive Percentage", col="#4daf4a", lwd=4, print.auc=TRUE)
+
+model_Geschlecht_ROC <- roc(Geschlecht, model$votes[,1], plot=TRUE, legacy.axes=TRUE, percent=TRUE, xlab="False Positive Percentage", ylab="True Positive Percentage", col="#4daf4a", lwd=4, print.auc=TRUE)
 
 # If we want to find out the optimal threshold we can store the 
 # data used to make the ROC graph in a variable...
+
 roc.info_Geschlecht <- roc(Geschlecht, model$votes[,1], legacy.axes=TRUE)
+
 str(roc.info_Geschlecht)
 
 

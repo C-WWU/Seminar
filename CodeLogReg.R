@@ -15,6 +15,7 @@ library(e1071)
 library(tidyverse)
 library(MASS)
 library(dplyr)
+library(pROC)
 
 # load data 
 
@@ -24,17 +25,17 @@ cols_names <- names(data)
 cols_names
 
 #Gibt es NAs in der DV?
-sum(is.na(data_Geschlecht$weiblich_maennlich)) #keine NAs
+sum(is.na(data_GeschlechtMW$weiblich_maennlich)) #keine NAs
 ###folgende Kommentierung und Code nur drin lassen und anpassen, wenn es NAs gibt --> bitte prüfen, dass der Code auch das richtige macht :)
 #Respondents mit NAs für diese Variable löschen (NAs stehen nur, wenn Respondent "Keine Angabe" gemacht hat, daher bedeutet löschen keinen Informationsverlust)
-data_Geschlecht <- data_Geschlecht %>% filter(weiblich_maennlich != "NA")
+data_Geschlecht <- data_GeschlechtMW %>% filter(weiblich_maennlich != "NA")
 
 
 ###hier: Zeilen anpassen, die wir auswählen, und Dateienname ändern zu jew. Variable
-data_Geschlecht <- data[,c(313, 27:255)]
+data_GeschlechtMW <- data[,c(313, 27:255)]
 
-cols_Geschlecht <- names(data_Geschlecht)
-data_Geschlecht$weiblich_maennlich <- as.factor(data_Geschlecht$weiblich_maennlich)
+cols_Geschlecht <- names(data_GeschlechtMW)
+data_GeschlechtMW$weiblich_maennlich <- as.factor(data_GeschlechtMW$weiblich_maennlich)
 
 #Training und Test Dataset
 set.seed(1997)
@@ -46,15 +47,15 @@ set.seed(1997)
 
 # Partitioning of the data: Create index matrix of selected values
 
-# Create index matrix 
-index <- createDataPartition(data_Geschlecht$weiblich_maennlich, p=.8, list= FALSE, times= 1)
+index <- createDataPartition(data_GeschlechtMW$weiblich_maennlich, p=.8, list= FALSE, times= 1)
 
 # Create train_dfGeschlecht & test_dfGeschlecht
 
 ### name anpassen an DV
 
-train_dfGeschlecht <- data_Geschlecht[index,]
-test_dfGeschlecht <- data_Geschlecht[-index,]
+train_dfGeschlechtMW <- data_GeschlechtMW[index,]
+test_dfGeschlechtMW <- data_GeschlechtMW[-index,]
+
 
 #re-label values of outcome (0 = weiblich, 1 = männlich)
 
@@ -65,8 +66,8 @@ test_dfGeschlecht <- data_Geschlecht[-index,]
 
 # Convert DV into type factor (wenn noch nicht geschehen)
 
-train_dfGeschlecht$Geschlecht <- as.factor(train_dfGeschlecht$Geschlecht)
-test_dfGeschlecht$Geschlecht <- as.factor(train_dfGeschlecht$Geschlecht)
+train_dfGeschlechtMW$weiblich_maennlich <- as.factor(train_dfGeschlechtMW$weiblich_maennlich)
+test_dfGeschlechtMW$weiblich_maennlich <- as.factor(test_dfGeschlechtMW$weiblich_maennlich)
 
 #----------------------------------------BUILDING AND TRAINING THE MODEL---------------------------------------------
 
@@ -74,8 +75,7 @@ test_dfGeschlecht$Geschlecht <- as.factor(train_dfGeschlecht$Geschlecht)
 # Specify the type of training method used & number of folds --> bei uns 10-fold Cross-Validation
 
 myControl = trainControl(
-  method = "repeatcv",
-  repeats=3,
+  method = "cv",
   number = 10, 
   verboseIter = TRUE,
   summaryFunction = twoClassSummary, #Wenn das benutzt wird, auch ClassProbs = True setzen!; Nimmt in kombin 
@@ -92,7 +92,7 @@ set.seed(1997)
 
 # apply stepwise logistic regression to find most importand IV's 
 
-model <- glm(weiblich_maennlich~., data = train_dfGeschlecht, family = binomial) %>% 
+model <- glm(weiblich_maennlich~., data = train_dfGeschlechtMW, family = binomial) %>% 
   stepAIC(trace = FALSE)
 
 
@@ -104,26 +104,30 @@ model <- glm(weiblich_maennlich~., data = train_dfGeschlecht, family = binomial)
 
 set.seed(1997)
 
-model1 <- train(weiblich_maennlich ~ . 
-               data=train_dfGeschlecht,
+model1 <- train(weiblich_maennlich ~ RB_Leipzig + FC_Bayern_Muenchen + adidas_Deutschland + Westwing + dm, 
+               data=train_dfGeschlechtMW,
                method = "glm", family= binomial, 
-               trControl=myControl) 
+               na.action = na.omit,
+               trControl=myControl)
 
 set.seed(1998)
 
-model2 <- train(weiblich_maennlich ~ . 
-                data=train_dfGeschlecht,
+model2 = train(weiblich_maennlich ~ ., 
+                data=train_dfGeschlechtMW,
                 method = "glm", family= binomial, 
+                na.action = na.omit,
                 trControl=myControl) 
 
 set.seed(1999)
 
 model3 <- train(weiblich_maennlich ~ . 
-                data=train_dfGeschlecht,
+                data=train_dfGeschlechtMW,
                 method = "glm", family= binomial, 
+                na.action = na.omit,
                 trControl=myControl) 
 
-print(model)
+print(model2)
+
 
 #kappa rules of thumb for interpretation: 
 # .81-1.00 Almost perfect
@@ -135,24 +139,18 @@ print(model)
 
 # Output in terms of regression coefficients
 
-summary(model)
+summary(model2)
 
 # Odds Ratio 
 
-exp(coef(model))
+exp(coef(model1)) # -> funktioniert glaube ich auch leider nicht mit Cross Validation :/ dafür kann man sich aber die variable importance mit der funktion unten ausgeben lassen. 
 
 #variable Importance (predictor variables)
 
-varImp(model)
+varImp(model2)
 
-# test for multicollinearity 
 
-install.packages("car")
-library(car)
-
-vif(model)
-
-#----------------------------------------FIND BEST THRESHOLD WITH ROC----------------------------------------
+#----------------------------------------FIND BEST THRESHOLD WITH ROC !MAYBE NOT POSSIBLE WITH CROSS VALIDATION?----------------------------------------
 
 #Drawing ROC and AUC using pROC and the final model--> the ROC Graph summarizes all of the confusion matrices that each threshold produced. 
 #The AUC makes it easy to compare 1 ROC curve to another. This is a measure to compare performance of different models having a BINARY DV! 
@@ -165,14 +163,31 @@ par(pty = "s") ## pty sets the aspect ratio of the plot region. Two options:
 ### renamed the x and y axes added color and more width with col and lwd
 ### DV musste hier komischwerweise nochmal definiert werden, sonst wird sie in dem code darunter nicht gefunden
 
-Geschlecht <- traindf_Geschlecht$Geschlecht
-model_Geschlecht_ROC <- roc(weiblich_maennlich ~ model$fitted.values, plot=TRUE, ledacy.axes=TRUE, percent=TRUE, xlab="False Positive Percentage", ylab="True Positive Percentage", col="#4daf4a", lwd=4, print.auc=TRUE)
+weiblich_maennlich <- train_dfGeschlechtMW$weiblich_maennlich
+model_Geschlecht_ROC <- roc(weiblich_maennlich, model1$fitted.values, plot=TRUE, ledacy.axes=TRUE, percent=TRUE, xlab="False Positive Percentage", ylab="True Positive Percentage", col="#4daf4a", lwd=4, print.auc=TRUE)
 
 # If we want to find out the optimal threshold we can store the 
 # data used to make the ROC graph in a variable...
 
-roc.info_Geschlecht <- roc(weiblich_maennlich ~ model$fitted.values, legacy.axes=TRUE)
+roc.info_Geschlecht <- roc(weiblich_maennlich, model1$fitted.values, legacy.axes=TRUE)
+
 str(roc.info_Geschlecht)
+
+## and then extract just the information that we want from that variable.
+roc.df <- data.frame(
+  tpp=roc.info_Geschlecht$sensitivities*100, ## tpp = true positive percentage
+  fpp=(1 - roc.info_Geschlecht$specificities)*100, ## fpp = false positive precentage
+  thresholds=roc.infoGeschlecht$thresholds)
+
+head(roc.df) ## head() will show us the values for the upper right-hand corner
+## of the ROC graph, when the threshold is so low 
+## (negative infinity) that every single sample is called "obese".
+## Thus TPP = 100% and FPP = 100%
+
+tail(roc.df) ## tail() will show us the values for the lower left-hand corner
+## of the ROC graph, when the threshold is so high (infinity) 
+## that every single sample is called "not obese". 
+## Thus, TPP = 0% and FPP = 0%
 
 
 # ----------------------------------------------MODEL EVALUATION-------------------------------------------------
@@ -197,7 +212,11 @@ confusionMatrix(data=predictions, test_dfGeschlecht$Geschlecht)
 
 ### model vergleich zu anderen models wie bspw. Random Forest
 
+### erst die originale ROC curve vom model im oberen code plotten
+
 # roc(Geschlecht, model$traindf_Geschlecht, plot=TRUE, ledacy.axes=TRUE, percent=TRUE, xlab="False Positive Percentage", ylab="True Positive Percentage", col="#4daf4a", lwd=4, print.auc=TRUE)
+
+#### und dann fügen wir die ROC Curve eines anderen Models hinzu
 
 # plot.roc(Geschlecht, model$votes[,1], percent=TRUE, col="#4daf4a", lwd=4, print.auc=TRUE, add=TRUE, print.auc.y=40)
 
