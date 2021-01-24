@@ -462,7 +462,7 @@ plot(varImp(modelGeschlechtRF), 10, main = "weiblich_maennlich")
 #checking direction of the 10 most important variables
 ###anpassen: name vom dataset
 imp <- varImp(modelGeschlechtRF)
-impvar <- rownames(imp)[order(imp[, 1], decreasing=TRUE)]
+impvar <- rownames(imp)[order(imp, decreasing=TRUE)]
 impvar <- impvar[1:10]
 op <- par(mfrow=c(2, 5))
 for (i in seq_along(impvar)) {
