@@ -252,6 +252,8 @@ str(roc.info_Geschlecht)
 # ------------------------------------------------MODEL COMPARISON------------------------------------------------
 
 
+### Können wir auch lassen wenn wir Cross-Validation benutzen!!
+
 # Code wenn wir zwei Modelle vergleichen wollen
 
 # roc(Geschlecht, model$data_Geschlecht, plot=TRUE, ledacy.axes=TRUE, percent=TRUE, xlab="False Positive Percentage", ylab="True Positive Percentage", col="#4daf4a", lwd=4, print.auc=TRUE)

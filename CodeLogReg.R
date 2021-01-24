@@ -192,7 +192,6 @@ tail(roc.df) ## tail() will show us the values for the lower left-hand corner
 
 # ----------------------------------------------MODEL EVALUATION-------------------------------------------------
 
-
 # Apply model to test_df --> test_dfGeschlecht
 
 # predict outcome using model from train_df applied to the test_df
@@ -209,6 +208,7 @@ confusionMatrix(data=predictions, test_dfGeschlecht$Geschlecht)
 # ------------------------------------------------MODEL COMPARISON------------------------------------------------
 
 
+### Können wir auch lassen wenn wir Cross-Validation benutzen!!
 
 ### model vergleich zu anderen models wie bspw. Random Forest
 

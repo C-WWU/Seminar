@@ -247,6 +247,8 @@ str(roc.info_Geschlecht)
 # ------------------------------------------------MODEL COMPARISON------------------------------------------------
 
 
+### Können wir auch lassen wenn wir Cross-Validation benutzen!!
+
 # Code wenn wir zwei Modelle vergleichen wollen
 ##
 
