@@ -301,6 +301,8 @@ varImpPlot(model)
 
 #checking direction of the 10 most important variables
 ###anpassen: name vom dataset
+
+
 imp <- importance(model)
 impvar <- rownames(imp)[order(imp[, 1], decreasing=TRUE)]
 impvar <- impvar[1:10]
@@ -311,8 +313,21 @@ for (i in seq_along(impvar)) {
 }
 par(op)
 
+imp <- varImp(model)
+impvar <- rownames(imp)[order(imp[, 1], decreasing=TRUE)]
+impvar <- impvar[11:20]
+op <- par(mfrow=c(2, 5))
+for (i in seq_along(impvar)) {
+  partialPlot(model, pred.data = as.data.frame(train_dfGeschlechtMW), x.var = impvar[i], xlab=impvar[i],
+              main=paste("Partial Dependence on", impvar[i]))
+}
+par(op)
+
+
 
 #----------------------------------------FIND BEST THRESHOLD WITH ROC----------------------------------------
+
+#-------------------------------------------NUR FÜR BINARY DATA!!!-----------------------------------
 
 ### das ist eine Option, wenn für uns für diesen Code entscheiden und gegen die Cross-Validation. denn bei der Cross-Validation wird der ROC/AUC Wert bereits immer mit ausgegeben und muss nicht nochmal einzeln berechnet werden. 
 
@@ -370,7 +385,7 @@ predictions <- predict(model, newdata=test_dfGeschlechtMW)
 confusionMatrix(data=predictions, test_dfGeschlechtMW$weiblich_maennlich)
 
 
-#-------------------------------------------RANDOM FOREST WITH CROSSVALIDATION-------------------------------------------
+#-------------------------------------------RANDOM FOREST WITH CROSS-VALIDATION-------------------------------------------
 
 #--------------------------------------------BUILDING AND TRAINING THE MODEL---------------------------------------------
 
