@@ -100,7 +100,7 @@ myControl = trainControl(
   classProbs = TRUE,
   allowParallel=TRUE,
   #sampling = "smote",
-  search = "random",
+  search = "grid",
 )
 
 
@@ -128,10 +128,10 @@ model <- glm(weiblich_maennlich~., data = train_dfGeschlechtMW, family = binomia
 
 set.seed(1997)
 
-model1 <- train(weiblich_maennlich ~ RB_Leipzig + FC_Bayern_Muenchen + adidas_Deutschland + Westwing + dm, 
+model1 <- train(weiblich_maennlich ~.,
                 data=train_dfGeschlechtMW,
                 method = "glmStepAIC", family= binomial, ## es gibt auch eine method für stepwise in train aber nur für linear regression "lmstepAIC" 
-                metric = "ROC",
+                metric = "ROC", #--> for imbalanced data the metric "Kappa" can be used and improves the quality of the final model
                 na.action = na.omit,
                 trControl=myControl)
 
@@ -140,6 +140,7 @@ set.seed(1998)
 model2 = train(weiblich_maennlich ~ ., 
                data=train_dfGeschlechtMW,
                method = "glm", family= binomial, 
+               metric = "ROC",
                na.action = na.omit,
                trControl=myControl) 
 
@@ -148,6 +149,7 @@ set.seed(1999)
 model3 <- train(weiblich_maennlich ~ . 
                 data=train_dfGeschlechtMW,
                 method = "glm", family= binomial, 
+                metric = "ROC",
                 na.action = na.omit,
                 trControl=myControl) 
 
@@ -409,20 +411,38 @@ myControl = trainControl(
 
 set.seed(400)
 
-# train model with: 300 trees (default)
-
 
 modelGeschlechtRF <- train(weiblich_maennlich ~ ., # hier die DV einfügen. "~ ." heißt es werden alle Varibablen im dataframe als IV's genutzt um die DV zu predicten.
                            data=train_dfGeschlechtMW, # hier den data-frame definieren womit trainiert werden soll --> training_df!
                            method="ranger", # ranger is eine schnellere RF methode, man  kann auch "rf" für random forest eingeben
                            metric= "ROC", # hier bei metric kann man sich auch die Accuracy ausgeben lassen
                            na.action = na.omit, # sagt aus, dass fehlende Werte rausgelassen werden beim training
+                           num.tree = 500, #
                            trControl = myControl) # training methode: bei uns Cross-Validation
 
 
 # print model
 
 print(modelGeschlechtRF)
+summary(modelGeschlechtRF)
+
+
+set.seed(401)
+
+# Adjust num.trees to 1000 to evaluate which model performs better
+
+modelGeschlechtRF2 <- train(weiblich_maennlich ~ ., # hier die DV einfügen. "~ ." heißt es werden alle Varibablen im dataframe als IV's genutzt um die DV zu predicten.
+                           data=train_dfGeschlechtMW, # hier den data-frame definieren womit trainiert werden soll --> training_df!
+                           method="ranger", # ranger is eine schnellere RF methode, man  kann auch "rf" für random forest eingeben
+                           metric= "ROC", # hier bei metric kann man sich auch die Accuracy ausgeben lassen
+                           na.action = na.omit, # sagt aus, dass fehlende Werte rausgelassen werden beim training
+                           num.tree = 500, #
+                           trControl = myControl) # training methode: bei uns Cross-Validation
+
+# print model
+
+print(modelGeschlechtRF2)
+summary(modelGeschlechtRF2)
 
 # test of the ideal mtry, splitrule and min-node.size
 
@@ -438,7 +458,8 @@ modelGeschlechtRF <- train(weiblich_maennlich ~ .,
                            tuneGrid = myGrid,
                            method="ranger", # ranger is eine schnellere RF methode
                            metric= "ROC", # hier bei metric kann man sich auch die Accuracy ausgeben lassen
-                           na.action = na.omit, 
+                           na.action = na.omit,
+                           num.tree = 500,
                            trControl = myControl)
 
 # Print model to console
@@ -461,6 +482,7 @@ modelGeschlechtRF <- train(weiblich_maennlich ~ .,
                            method="ranger", metric= "ROC", # hier bei metric kann man sich auch die Accuracy ausgeben lassen
                            tuneGrid = myGrid,
                            na.action = na.omit,
+                           num.tree = 500,
                            trControl = myControl, 
                            importance = 'impurity')
 
@@ -477,6 +499,10 @@ summary(modelGeschlechtRF)
 
 varImp(modelGeschlechtRF)
 plot(varImp(modelGeschlechtRF), 20, main = "weiblich_maennlich")
+
+
+#--------------ACHTUNG: DIE VARIABLE IMPORTANCE + RICHTUNG FUNKTIONIERT FÜR DIESEN CODE NOCH NICHT-----------------------------------------
+
 
 #checking direction of the 10 most important variables
 ###anpassen: name vom dataset
