@@ -243,6 +243,22 @@ roc.info_Geschlecht <- roc(Geschlecht, model$votes[,1], legacy.axes=TRUE)
 
 str(roc.info_Geschlecht)
 
+## and then extract just the information that we want from that variable.
+roc.df <- data.frame(
+  tpp=roc.info_Geschlecht$sensitivities*100, ## tpp = true positive percentage
+  fpp=(1 - roc.info_Geschlecht$specificities)*100, ## fpp = false positive precentage
+  thresholds=roc.infoGeschlecht$thresholds)
+
+head(roc.df) ## head() will show us the values for the upper right-hand corner
+## of the ROC graph, when the threshold is so low 
+## (negative infinity) that every single sample is called "obese".
+## Thus TPP = 100% and FPP = 100%
+
+tail(roc.df) ## tail() will show us the values for the lower left-hand corner
+## of the ROC graph, when the threshold is so high (infinity) 
+## that every single sample is called "not obese". 
+## Thus, TPP = 0% and FPP = 0%
+
 
 # ------------------------------------------------MODEL COMPARISON------------------------------------------------
 
