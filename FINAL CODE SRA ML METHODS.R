@@ -402,7 +402,7 @@ myControl = trainControl(
   summaryFunction = twoClassSummary, #Wenn das benutzt wird, auch ClassProbs = True setzen!
   classProbs = TRUE,
   allowParallel=TRUE,
-  #sampling = "smote",
+  #sampling = "smote", #wenn sampling, dann hier anpassen und für alle drei Varianten ausprobieren!! (up, down, smote)
   search = "random",
 )
 
@@ -436,7 +436,7 @@ modelGeschlechtRF2 <- train(weiblich_maennlich ~ ., # hier die DV einfügen. "~ 
                            method="ranger", # ranger is eine schnellere RF methode, man  kann auch "rf" für random forest eingeben
                            metric= "ROC", # hier bei metric kann man sich auch die Accuracy ausgeben lassen
                            na.action = na.omit, # sagt aus, dass fehlende Werte rausgelassen werden beim training
-                           num.tree = 500, #
+                           num.tree = 1000, #
                            trControl = myControl) # training methode: bei uns Cross-Validation
 
 # print model
@@ -473,10 +473,10 @@ plot(modelGeschlechtRF)
 bestmtry <- modelGeschlechtRF$bestTune$mtry
 
 
-### hier das finale model mit bestmtry und node size einfügen 
+### hier das finale model mit bestmtry und node size einfügen , auch best num.tree anpassen
 
 set.seed(400)
-myGrid <- expand.grid(mtry = bestmtry, splitrule ="extratrees", min.node.size = 10)
+myGrid <- expand.grid(mtry = 15, splitrule ="extratrees", min.node.size = 10)
 modelGeschlechtRF <- train(weiblich_maennlich ~ ., 
                            data=train_dfGeschlechtMW, 
                            method="ranger", metric= "ROC", # hier bei metric kann man sich auch die Accuracy ausgeben lassen
