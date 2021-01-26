@@ -141,7 +141,7 @@ set.seed(1998)
 model2 = train(weiblich_maennlich ~ Alman_Memes + Pamela_Reif + Tagesschau + AfD + Selena_Gomez, 
                data=train_dfGeschlechtMW,
                method = "glm", family= binomial, 
-               metric = "ROC",
+               metric = "ROC", 
                na.action = na.omit,
                trControl=myControl) 
 
@@ -204,192 +204,7 @@ predictions <- predict(model1, newdata=test_dfGeschlechtMW)
 confusionMatrix(data=predictions, test_dfGeschlechtMW$weiblich_maennlich)
 
 
-#-------------------------------------------------RANDOM FOREST-----------------------------------------------------------
-
-#----------------------------------------BUILDING AND TRAINING THE MODEL---------------------------------------------
-
-
-###mtry: wenn numerisch, dann default = sqrt(229); wenn continuous, dann default = 229/3
-### generates 300 tress by default, können wir so lassen
-###anpassen: IV, data = neues Dataset; mtry anpassen zu entweder sqrt(229) oder 229/3
-model <- randomForest(weiblich_maennlich ~ ., data=train_dfGeschlechtMW, na.action = na.omit, proximity=TRUE, mtry = sqrt(229))
-
-#Modell prüfen
-
-print(model)
-
-#grafische Darstellung des OOB samples:
-
-###anpassen: Z. 58 times = 1+Ausprägungen; Z. 59 rep anpassen mit ausprägungen, z. 60ff Error = anpassen!!
-oob.error.data <- data.frame(
-  Trees=rep(1:nrow(model$err.rate), times=4),
-  Type=rep(c("OOB", "1", "2", "3"), each=nrow(model$err.rate)),
-  Error=c(model$err.rate[,"OOB"], 
-          model$err.rate[,"1"],  
-          model$err.rate[,"2"],
-          model$err.rate[,"3"]))
-
-
-ggplot(data=oob.error.data, aes(x=Trees, y=Error)) +
-  geom_line(aes(color=Type))
-
-#Plot und Modell speichern
-###NAmen anpassen zu richtiger Variable!
-ggsave("oob_error_rate_500_trees_Geschlecht.pdf")
-
-###Model abspeichern: Variablenname anpassen
-model_Geschlecht_500 <- model
-
-## Kommentieren: wie hat sich der Error verändert? Größer, kleiner, oder gleich? Sprich, war es notwendig mit 1000 Trees zu arbeiten?
-
-#zweites Model mit 1000 Trees --> wird error weniger oder stagniert er? 
-##Modelgleichung: DV anpassen, data = .. anpassen
-model <- randomForest(weiblich_maennlich ~ ., data=train_dfGeschlechtMW, ntree = 1000, na.action = na.omit, proximity=TRUE, mtry = sqrt(229))
-model
-
-
-oob.error.data <- data.frame(
-  Trees=rep(1:nrow(model$err.rate), times=4),
-  Type=rep(c("OOB", "1", "2", "3"), each=nrow(model$err.rate)),
-  Error=c(model$err.rate[,"OOB"], 
-          model$err.rate[,"1"], 
-          model$err.rate[,"2"],
-          model$err.rate[,"3"]))
-
-
-ggplot(data=oob.error.data, aes(x=Trees, y=Error)) +
-  geom_line(aes(color=Type))
-
-ggsave("oob_error_rate_1000_trees_Geschlecht.pdf")
-
-model_Geschlecht_1000 <- model
-
-## Kommentieren: wie hat sich der Error verändert? Größer, kleiner, oder gleich? Sprich, war es notwendig mit 1000 Trees zu arbeiten?
-
-
-###ABWÄGEN: auch ausprobieren für andere Zahl von Trees notwendig, zb 500? (dann einfach Kopieren und ntree = 500 setzen) 
-
-
-# Prüfen: was ist das ideale mtry? 
-###Zeile 110: Modellgleichung anpassen wie davor; ntree wählen welches besser war (300 oder 1000 oder anderes)
-oob.values <- vector(length=20)
-for(i in 1:20) {
-  temp.model <- randomForest(weiblich_maennlich ~ ., data=train_dfGeschlechtMW,na.action = na.omit, mtry=i, ntree=1000)
-  oob.values[i] <- temp.model$err.rate[nrow(temp.model$err.rate),1]
-}
-oob.values
-# find  minimum error
-min(oob.values)
-# find  optimal value for mtry
-which(oob.values == min(oob.values))
-
-# create a model for proximities using the best value for mtry and check for most important variables
-###anpassen: DV, Data, ntree
-model <- randomForest(weiblich_maennlich ~ ., 
-                      data=train_dfGeschlechtMW,
-                      ntree=1000, 
-                      proximity=TRUE,
-                      na.action = na.omit,
-                      mtry=which(oob.values == min(oob.values)), 
-                      Importance=TRUE)
-
-# print model
-model
-
-#evaluate variable importance
-
-importance(model)
-varImpPlot(model)
-
-# Mean Decrease Gini - Measure of variable importance based on the Gini impurity index used for the calculation of splits in trees.
-
-#checking direction of the 10 most important variables
-###anpassen: name vom dataset
-
-
-imp <- importance(model)
-impvar <- rownames(imp)[order(imp[, 1], decreasing=TRUE)]
-impvar <- impvar[1:10]
-op <- par(mfrow=c(2, 5))
-for (i in seq_along(impvar)) {
-  partialPlot(model, pred.data = as.data.frame(train_dfGeschlechtMW), x.var = impvar[i], xlab=impvar[i],
-              main=paste("Partial Dependence on", impvar[i]))
-}
-par(op)
-
-imp <- varImp(model)
-impvar <- rownames(imp)[order(imp[, 1], decreasing=TRUE)]
-impvar <- impvar[11:20]
-op <- par(mfrow=c(2, 5))
-for (i in seq_along(impvar)) {
-  partialPlot(model, pred.data = as.data.frame(train_dfGeschlechtMW), x.var = impvar[i], xlab=impvar[i],
-              main=paste("Partial Dependence on", impvar[i]))
-}
-par(op)
-
-
-
-#----------------------------------------FIND BEST THRESHOLD WITH ROC----------------------------------------
-
-#-------------------------------------------NUR FÜR BINARY DATA!!!-----------------------------------
-
-### das ist eine Option, wenn für uns für diesen Code entscheiden und gegen die Cross-Validation. denn bei der Cross-Validation wird der ROC/AUC Wert bereits immer mit ausgegeben und muss nicht nochmal einzeln berechnet werden. 
-
-#Drawing ROC and AUC using pROC and the final model--> the ROC Graph summarizes all of the confusion matrices that each threshold produced. The AUC makes it easy to compare 1 ROC curve to another. This is a measure to compare performance of different models having a BINARY DV! 
-
-par(pty = "s") ## pty sets the aspect ratio of the plot region. Two options:
-##                "s" - creates a square plotting region
-##                "m" - (the default) creates a maximal plotting region
-
-### Hier wieder DV und dataset austauschen, legacy.axes = TRUE heißt er beschreibt 1- Specificity auf der x-axes, renamed the x and y axes added color and more width with col and lwd
-### DV musste hier komischwerweise nochmal definiert werden, sonst wird sie in dem code darunter nicht gefunden
-
-weiblich_maennlich <- train_dfGeschlechtMW$weiblich_maennlich
-model_Geschlecht_ROC <- roc(weiblich_maennlich, model$votes[,1], plot=TRUE, legacy.axes=TRUE, percent=TRUE, xlab="False Positive Percentage", ylab="True Positive Percentage", col="#4daf4a", lwd=4, print.auc=TRUE)
-
-# If we want to find out the optimal threshold we can store the 
-# data used to make the ROC graph in a variable...
-
-roc.info_Geschlecht <- roc(weiblich_maennlich, model$votes[,1], legacy.axes=TRUE)
-
-str(roc.info_Geschlecht)
-
-## and then extract just the information that we want from that variable.
-roc.df <- data.frame(
-  tpp=roc.info_Geschlecht$sensitivities*100, ## tpp = true positive percentage
-  fpp=(1 - roc.info_Geschlecht$specificities)*100, ## fpp = false positive precentage
-  thresholds=roc.infoGeschlecht$thresholds)
-
-head(roc.df) ## head() will show us the values for the upper right-hand corner
-## of the ROC graph, when the threshold is so low 
-## (negative infinity) that every single sample is called "männlich/weiblich".
-## Thus TPP = 100% and FPP = 100%
-
-tail(roc.df) ## tail() will show us the values for the lower left-hand corner
-## of the ROC graph, when the threshold is so high (infinity) 
-## that every single sample is called "männlich/weiblich". 
-## Thus, TPP = 0% and FPP = 0%
-
-### Now that we're done with our ROC fun, let's reset the par() variables.
-
-par(pty = "m")
-
-# ----------------------------------------------MODEL EVALUATION-------------------------------------------------
-
-
-# Apply model to test_df --> test_dfGeschlecht
-
-# predict outcome using model from train_df applied to the test_df
-
-### hier auch einmal nach dem testdf der DV umbenennen
-
-predictions <- predict(model, newdata=test_dfGeschlechtMW)
-
-# Create confusion matrix
-confusionMatrix(data=predictions, test_dfGeschlechtMW$weiblich_maennlich)
-
-
-#-------------------------------------------RANDOM FOREST WITH CROSS-VALIDATION-------------------------------------------
+#---------------------------------------------------RANDOM FOREST----------------------------------------------------
 
 #--------------------------------------------BUILDING AND TRAINING THE MODEL---------------------------------------------
 
@@ -404,7 +219,7 @@ myControl = trainControl(
   classProbs = TRUE,
   allowParallel=TRUE,
   #sampling = "smote", #wenn sampling, dann hier anpassen und für alle drei Varianten ausprobieren!! (up, down, smote)
-  search = "random",
+  search = "grid",
 )
 
 
@@ -449,7 +264,7 @@ summary(modelGeschlechtRF2)
 
 set.seed(1997)
 
-myGrid = expand.grid(mtry = c(1:20),
+myGrid = expand.grid(mtry = c(10:20),
                      splitrule = "extratrees", # What does this mean? Theres also "gini" --> the gini tells you which variables were the most important for building the trees 
                      min.node.size = c(5,10,15))
 
@@ -477,7 +292,7 @@ bestmtry <- modelGeschlechtRF$bestTune$mtry
 ### hier das finale model mit bestmtry und node size einfügen , auch best num.tree anpassen
 
 set.seed(400)
-myGrid <- expand.grid(mtry = 15, splitrule ="extratrees", min.node.size = 10)
+myGrid <- expand.grid(mtry = 10, splitrule ="extratrees", min.node.size = 15)
 modelGeschlechtRF <- train(weiblich_maennlich ~ ., 
                            data=train_dfGeschlechtMW, 
                            method="ranger", metric= "ROC", # hier bei metric kann man sich auch die Accuracy ausgeben lassen
