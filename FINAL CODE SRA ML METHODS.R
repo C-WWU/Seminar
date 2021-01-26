@@ -17,14 +17,22 @@ install.packages("e1071")
 library(e1071)
 install.packages("dplyr")
 library(dplyr)
+install.packages("stepPlr")
 library(stepPlr)
+install.packages("mlbench")
 library(mlbench)
+install.packages("readxl")
 library(readxl)
+install.packages("DMwR")
 library(DMwR)
+install.packages("ROSE")
 library(ROSE)
+install.packages("ranger")
 library(ranger)
 library(tidyverse)
+install.packages("MASS")
 library(MASS)
+install.packages("pdp")
 library(pdp)
 
 
@@ -33,6 +41,8 @@ library(pdp)
 # load data 
 
 load("data_for_analysis.RData")
+
+#data <- full  #oder ändern zu data <- reduced_set
 
 cols_names <- names(data)  
 cols_names
@@ -53,7 +63,7 @@ data_GeschlechtMW$weiblich_maennlich <- as.factor(data_GeschlechtMW$weiblich_mae
 sum(is.na(data_GeschlechtMW$weiblich_maennlich)) #keine NAs
 ###folgende Kommentierung und Code nur drin lassen und anpassen, wenn es NAs gibt --> bitte prüfen, dass der Code auch das richtige macht :)
 #Respondents mit NAs für diese Variable löschen (NAs stehen nur, wenn Respondent "Keine Angabe" gemacht hat, daher bedeutet löschen keinen Informationsverlust)
-data_Geschlecht <- data_GeschlechtMW %>% filter(weiblich_maennlich != "NA")
+data_GeschlechtMW <- data_GeschlechtMW %>% subset(data_GeschlechtMW$weiblich_maennlich != "NA")
 
 
 
@@ -96,11 +106,11 @@ myControl = trainControl(
   method = "cv",
   number = 10, 
   verboseIter = TRUE,
-  summaryFunction = twoClassSummary, #Wenn das benutzt wird, auch ClassProbs = True setzen!; Nimmt in kombin 
-  classProbs = TRUE,
+  summaryFunction = twoClassSummary, #für linear raus!! Wenn das benutzt wird, auch ClassProbs = True setzen! und ClassProbs für linear auch raus
+  classProbs = TRUE, #für linear raus
   allowParallel=TRUE,
-  #sampling = "smote",
-  search = "grid",
+  #sampling = "smote", #wenn unbalanced, dann auch ausprobieren für: sampling = "up" / "down" / "smote"
+  search = "grid"
 )
 
 
@@ -128,7 +138,7 @@ model1 <- train(weiblich_maennlich ~.,
 
 set.seed(1998)
 
-model2 = train(weiblich_maennlich ~ ., 
+model2 = train(weiblich_maennlich ~ Alman_Memes + Pamela_Reif + Tagesschau + AfD + Selena_Gomez, 
                data=train_dfGeschlechtMW,
                method = "glm", family= binomial, 
                metric = "ROC",
@@ -137,7 +147,7 @@ model2 = train(weiblich_maennlich ~ .,
 
 set.seed(1999)
 
-model3 <- train(weiblich_maennlich ~ . 
+model3 <- train(weiblich_maennlich ~ . ,
                 data=train_dfGeschlechtMW,
                 method = "glm", family= binomial, 
                 metric = "ROC",
