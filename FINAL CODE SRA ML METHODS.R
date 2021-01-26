@@ -108,15 +108,6 @@ myControl = trainControl(
 
 set.seed(1997)
 
-# apply stepwise logistic regression to find most importand IV's 
-
-### die braucht bei uns aktuell enorm lang, da die step-wise 229 Variablen durchrechnen muss. 
-### Eventuell kann man diesen Step überspringen und relevante Variablen aus der RF Methode und eigene 5-10 wichtige hinzufügen. 
-
-model <- glm(weiblich_maennlich~., data = train_dfGeschlechtMW, family = binomial) %>% 
-  stepAIC(trace = FALSE)
-
-
 # Specify logistic regression model with most important IV's (maybe also these indicated by random forest and our own suggestions)
 
 ### DV wird zuerst in den Klammern genannt, das auch immer anpassen. Der Rest kann eigentlich so bleiben. 
@@ -131,7 +122,7 @@ set.seed(1997)
 model1 <- train(weiblich_maennlich ~.,
                 data=train_dfGeschlechtMW,
                 method = "glmStepAIC", family= binomial, ## es gibt auch eine method für stepwise in train aber nur für linear regression "lmstepAIC" 
-                metric = "ROC", #--> for imbalanced data the metric "Kappa" can be used and improves the quality of the final model
+                metric = "ROC", #--> for imbalanced data the metric "Kappa" can be used and improves the quality of the final model; for linear regression use "RSME"
                 na.action = na.omit,
                 trControl=myControl)
 
@@ -211,7 +202,7 @@ confusionMatrix(data=predictions, test_dfGeschlechtMW$weiblich_maennlich)
 ###mtry: wenn numerisch, dann default = sqrt(229); wenn continuous, dann default = 229/3
 ### generates 300 tress by default, können wir so lassen
 ###anpassen: IV, data = neues Dataset; mtry anpassen zu entweder sqrt(229) oder 229/3
-model <- randomForest(weiblich_maennlich ~ ., data=train_dfGeschlechtMW, proximity=TRUE, mtry = sqrt(229))
+model <- randomForest(weiblich_maennlich ~ ., data=train_dfGeschlechtMW, na.action = na.omit, proximity=TRUE, mtry = sqrt(229))
 
 #Modell prüfen
 
