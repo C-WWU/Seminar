@@ -131,23 +131,23 @@ set.seed(1997)
 
 model1 <- train(weiblich_maennlich ~.,
                 data=train_dfGeschlechtMW,
-                method = "glmStepAIC", family= binomial, ## es gibt auch eine method für stepwise in train aber nur für linear regression "lmstepAIC" 
+                method = "glm", family= binomial, ## es gibt auch eine method für stepwise in train aber nur für linear regression "lmstepAIC" 
                 metric = "ROC", #--> for imbalanced data the metric "Kappa" can be used and improves the quality of the final model; for linear regression use "RSME"
                 na.action = na.omit,
                 trControl=myControl)
 
 set.seed(1998)
 
-model2 = train(weiblich_maennlich ~ Alman_Memes + Pamela_Reif + Tagesschau + AfD + Selena_Gomez, 
+model2 = train(weiblich_maennlich ~ .,
                data=train_dfGeschlechtMW,
-               method = "glm", family= binomial, 
+               method = "glmnet", family= binomial, 
                metric = "ROC", 
                na.action = na.omit,
                trControl=myControl) 
 
 set.seed(1999)
 
-model3 <- train(weiblich_maennlich ~ . ,
+model3 <- train(weiblich_maennlich ~ Alman_Memes + Pamela_Reif + Tagesschau + AfD + Selena_Gomez,
                 data=train_dfGeschlechtMW,
                 method = "glm", family= binomial, 
                 metric = "ROC",

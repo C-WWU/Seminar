@@ -32,6 +32,9 @@ install.packages("MASS")
 library(MASS)
 install.packages("pdp")
 library(pdp)
+install.packages("elasticnet")
+library(elasticnet)
+
 
 
 #--------------------------------------DATA PRE-PROCESSING------------------------------------------
@@ -133,6 +136,8 @@ model1 <- train(weiblich_maennlich ~.,
                 metric = "ROC", #--> for imbalanced data the metric "Kappa" can be used and improves the quality of the final model; for linear regression use "RSME"
                 na.action = na.omit,
                 trControl=myControl)
+
+
 
 set.seed(1998)
 

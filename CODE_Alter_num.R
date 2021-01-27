@@ -26,7 +26,11 @@ library(ranger)
 library(tidyverse)
 library(MASS)
 library(pdp)
-
+library(plyr)
+install.packages("glmnet")
+library(glmnet)
+install.packages("Matrix")
+library(Matrix)
 
 #--------------------------------------DATA PRE-PROCESSING------------------------------------------
 
@@ -46,7 +50,7 @@ data_Alter<- data[,c(24, 27:255)]
 ### es ist besonders wichtig die gewünschte DV in einen Faktor zu transformieren, da "caret" nicht mit 0/1 ausprägungen umgehen kann, wenn das model trainiert werden soll. 
 
 cols_Alter <- names(data_Alter)
-data_Alter$Alter <- as.factor(data_Alter$Alter)
+data_Alter$Alter <- as.numeric(data_Alter$Alter)
 
 #Gibt es NAs in der DV?
 sum(is.na(data_GeschlechtMW$weiblich_maennlich)) #keine NAs
@@ -100,20 +104,6 @@ myControl = trainControl(
   search = "random",
 )
 
-
-# set random seed again
-
-set.seed(1997)
-
-# apply stepwise logistic regression to find most importand IV's 
-
-### die braucht bei uns aktuell enorm lang, da die step-wise 229 Variablen durchrechnen muss. 
-### Eventuell kann man diesen Step überspringen und relevante Variablen aus der RF Methode und eigene 5-10 wichtige hinzufügen. 
-
-model <- lm(Alter~., data = train_dfAlter) %>% 
-  stepAIC(trace = FALSE)
-
-
 # Specify logistic regression model with most important IV's (maybe also these indicated by random forest and our own suggestions)
 
 ### DV wird zuerst in den Klammern genannt, das auch immer anpassen. Der Rest kann eigentlich so bleiben. 
@@ -123,64 +113,70 @@ model <- lm(Alter~., data = train_dfAlter) %>%
 
 # set random seed again
 
-set.seed(1997)
-
-model1 <- train(Alter ~ .,
-                data =train_dfAlter,
-                method = "lmStepAIC", ## es gibt auch eine method für stepwise in train aber nur für linear regression "lmstepAIC" 
-                metric = "RMSE",
-                na.action = na.omit,
-                trControl=myControl)
-
-set.seed(1998)
-
-model2 = train(Alter ~ ., 
-               data=train_dfAlter,
-               method = "lm", 
-               metric = "Rsquared",
-               na.action = na.omit,
-               trControl=myControl) 
-
 set.seed(1999)
 
-model3 <- train(weiblich_maennlich ~ . 
-                data=train_dfGeschlechtMW,
-                method = "glm", family= binomial, 
+model2 <- train(Alter ~ ., 
+                data=train_dfAlter,
+                method = "lm",  
                 na.action = na.omit,
                 trControl=myControl) 
 
+
 print(model1)
-print(model2)
-print(model3)
-
-#kappa rules of thumb for interpretation: 
-# .81-1.00 Almost perfect
-# .61-.80 Substantial
-# .41-60 Moderate
-# .21-.40 Fair
-# .00-.20 Slight
-# < .00 Poor 
-
-# Output in terms of regression coefficients
-
 summary(model1)
-summary(model2)
-summary(model3)
-
-### in der model/summary stehen sowohl der AIC wert, als auch der ROC (AUC) wert, nachdem wir die Modelle miteinander vergleichen können. 
-
-### AUC sollte möglichst hoch sein = nahe 1. 
-### AIC sollte so niedrig wie möglich sein. 
-### Sensitivity (True Positives) sollte möglichst hoch sein = nahe 1
-### Specificity (True Negatives) sollte möglichst hoch sein = nahe 1
 
 #variable Importance (predictor variables)
 
 ### diese Funktion gibt noch einmal die 10 wichtigsten variablen des models aus.
 
 varImp(model1)
+
+
+set.seed(1997)
+
+myGrid <- expand.grid(alpha = 0:1,
+                      lambda = seq(0.0001, 1, length = 100))
+model2 <- train(Alter ~ .,
+                data =train_dfAlter,
+                method = "glmnet", ## es gibt auch eine method für stepwise in train aber nur für linear regression "lmstepAIC" 
+                metric = "RMSE",
+                na.action = na.omit,
+                tuneGrid = myGrid,
+                trControl=myControl)
+
+print(model2)
+summary(model2)
+
+#variable Importance (predictor variables)
+
+### diese Funktion gibt noch einmal die 10 wichtigsten variablen des models aus.
+
 varImp(model2)
+
+ImportanceAll <- varImp(model1)$importance
+
+ImportanceAll
+
+set.seed(1998)
+
+model3 = train(Alter ~ Jan_Josef_Liefers + Barbara_Schoeneberger+Apotheken_Umschau+Alman_Memes+Tagesschau +Dein_Beichtstuhl+Chefkoch+Dieter_Nuhr+Pamela_Reif+Faktastisch+Made_My_Day+Huawei_Deutschland 
+               +Querdenken711+Helene_Fischer +Tiere_suchen_ein_Zuhause+Martin_Ruetter+Felix_Lobrecht+Silbermond+Shirin_David+Die_Linke, 
+               data=train_dfAlter,
+               method = "lm", 
+               metric = "RMSE",
+               na.action = na.omit,
+               trControl=myControl) 
+
+print(model3)
+summary(model3)
+
+#variable Importance (predictor variables)
+
+### diese Funktion gibt noch einmal die 10 wichtigsten variablen des models aus.
+
+
 varImp(model3)
+
 
 
 # ----------------------------------------------MODEL EVALUATION-------------------------------------------------
@@ -192,11 +188,11 @@ varImp(model3)
 
 ### hier auch einmal nach dem testdf der DV umbenennen
 
-predictions <- predict(model1, newdata=test_dfAlter)
+predictions <- predict(model3, newdata=test_dfAlter)
 
 # Create confusion matrix
 
-confusionMatrix(data=predictions, test_Alter$Alter)
+confusionMatrix(factor(predictions), test_dfAlter$Alter)
 
 
 #-------------------------------------------------RANDOM FOREST-----------------------------------------------------------
@@ -373,7 +369,7 @@ set.seed(400)
 modelAlter <- train(Alter ~ ., # hier die DV einfügen. "~ ." heißt es werden alle Varibablen im dataframe als IV's genutzt um die DV zu predicten.
                            data=train_dfAlter, # hier den data-frame definieren womit trainiert werden soll --> training_df!
                            method="ranger", # ranger is eine schnellere RF methode, man  kann auch "rf" für random forest eingeben
-                           metric= "Rsquared", # hier bei metric kann man sich auch die Accuracy ausgeben lassen
+                           metric= "RMSE", # hier bei metric kann man sich auch die Accuracy ausgeben lassen
                            na.action = na.omit, # sagt aus, dass fehlende Werte rausgelassen werden beim training
                            trControl = myControl, 
                           importance = 'impurity') # training methode: bei uns Cross-Validation
@@ -396,7 +392,7 @@ modelAlter <- train(Alter ~ .,
                            data=train_dfAlter,
                            tuneGrid = myGrid,
                            method="ranger", # ranger is eine schnellere RF methode
-                           metric= "Rsquared", # hier bei metric kann man sich auch die Accuracy ausgeben lassen
+                           metric= "RSME", # hier bei metric kann man sich auch die Accuracy ausgeben lassen
                            na.action = na.omit, 
                            trControl = myControl)
 
