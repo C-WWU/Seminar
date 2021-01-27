@@ -179,7 +179,7 @@ myGrid <- expand.grid(alpha = 0:1,
 
 model2 <- train(weiblich_maennlich ~ .,
                data=train_dfGeschlechtMW,
-               method = "glmnet", family= binomial, 
+               method = "glmnet", 
                metric = "ROC", 
                na.action = na.omit,
                tuneGrid = myGrid,
@@ -192,7 +192,7 @@ coef(model2$finalModel, model2$finalModel$lambdaOpt)
 
 varImp(model2)
 
-ImportanceAll2 <- varImp(model1)$importance
+ImportanceAll2 <- varImp(model2)$importance
 ImportanceAll2 <- arrange(ImportanceAll2, desc(Overall))
 ImportanceAll2
 
@@ -215,8 +215,7 @@ confusionMatrix(data=predictions2, test_dfGeschlechtMW$weiblich_maennlich)
 
 set.seed(1999)
 
-model3 <- train(weiblich_maennlich ~ Alman_Memes + Pamela_Reif + Tagesschau + AfD + Selena_Gomez,
-                data=train_dfGeschlechtMW,
+model3 <- train(weiblich_maennlich ~ EA_Sports_FIFA + Mady_Morrison + Gamingzelle + Montana_Black + Jens_Knossalla + kicker + Bundeswehr + Christian_Lindner + Die_Partei + Inscope21 + Ischtar_Isik + RB_Leipzig + Reyst + Leon_Skincare + Christoph_Icke_Dommisch + Linda_DIY + NYX_Professional_Makeup + Tiere_suchen_ein_Zuhause + dm + Playboy_Germany,                data=train_dfGeschlechtMW,
                 method = "glm", family= binomial, 
                 metric = "ROC",
                 na.action = na.omit,
@@ -227,7 +226,7 @@ summary(model3)
 
 varImp(model3)
 
-ImportanceAll3 <- varImp(model1)$importance
+ImportanceAll3 <- varImp(model3)$importance
 ImportanceAll3 <- arrange(ImportanceAll3, desc(Overall))
 ImportanceAll3
 
@@ -250,27 +249,6 @@ confusionMatrix(data=predictions3, test_dfGeschlechtMW$weiblich_maennlich)
 
 bestregression_GeschlechtMW <- model3
 
-
-# ---RAUS?--------------------------------------MODEL EVALUATION-------------------------------------------------
-
-
-# Apply model to test_df --> test_dfGeschlecht
-
-# predict outcome using model from train_df applied to the test_df
-
-### hier auch einmal nach dem testdf der DV umbenennen
-
-predictions1 <- predict(model1, newdata=test_dfGeschlechtMW)
-predictions2 <- predict(model2, newdata=test_dfGeschlechtMW)
-predictions3 <- predict(model3, newdata=test_dfGeschlechtMW)
-
-
-
-# Create confusion matrix
-
-confusionMatrix(data=predictions1, test_dfGeschlechtMW$weiblich_maennlich)
-confusionMatrix(data=predictions2, test_dfGeschlechtMW$weiblich_maennlich)
-confusionMatrix(data=predictions3, test_dfGeschlechtMW$weiblich_maennlich)
 
 #---------------------------------------------------RANDOM FOREST----------------------------------------------------
 
