@@ -270,6 +270,8 @@ myControl = trainControl(
 )
 
 
+####-------tree 1 --------------------------------------------------
+
 #set random seed again 
 
 set.seed(400)
@@ -288,7 +290,19 @@ modelGeschlechtRF <- train(weiblich_maennlich ~ ., # hier die DV einfügen. "~ .
 
 print(modelGeschlechtRF)
 summary(modelGeschlechtRF)
+plot(modelGeschlechtRF)
 
+# Apply model to test_df --> test_dfGeschlecht
+
+# predict outcome using model from train_df applied to the test_df
+
+### hier auch einmal nach dem testdf der DV umbenennen
+predictions <- predict(modelGeschlechtRF, newdata=test_dfGeschlechtMW)
+
+# Create confusion matrix
+confusionMatrix(data=predictions, test_dfGeschlechtMW$weiblich_maennlich)
+
+####-------tree 2 --------------------------------------------------
 
 set.seed(401)
 
@@ -306,6 +320,20 @@ modelGeschlechtRF2 <- train(weiblich_maennlich ~ ., # hier die DV einfügen. "~ 
 
 print(modelGeschlechtRF2)
 summary(modelGeschlechtRF2)
+plot(modelGeschlechtRF2)
+
+# Apply model to test_df --> test_dfGeschlecht
+
+# predict outcome using model from train_df applied to the test_df
+
+### hier auch einmal nach dem testdf der DV umbenennen
+predictions <- predict(modelGeschlechtRF, newdata=test_dfGeschlechtMW)
+
+# Create confusion matrix
+confusionMatrix(data=predictions, test_dfGeschlechtMW$weiblich_maennlich)
+
+
+####-------tree 3 --------------------------------------------------
 
 # test of the ideal mtry, splitrule and min-node.size
 
@@ -331,10 +359,23 @@ modelGeschlechtRF
 summary(modelGeschlechtRF)
 plot(modelGeschlechtRF)
 
+# Apply model to test_df --> test_dfGeschlecht
+
+# predict outcome using model from train_df applied to the test_df
+
+### hier auch einmal nach dem testdf der DV umbenennen
+predictions <- predict(modelGeschlechtRF, newdata=test_dfGeschlechtMW)
+
+# Create confusion matrix
+confusionMatrix(data=predictions, test_dfGeschlechtMW$weiblich_maennlich)
+
+
 #save the best mtry 
 
 bestmtry <- modelGeschlechtRF$bestTune$mtry
 
+
+####-------tree 4 --------------------------------------------------
 
 ### hier das finale model mit bestmtry und node size einfügen , auch best num.tree anpassen
 
@@ -363,6 +404,16 @@ summary(modelGeschlechtRF)
 varImp(modelGeschlechtRF)
 plot(varImp(modelGeschlechtRF), 20, main = "weiblich_maennlich")
 
+# Apply model to test_df --> test_dfGeschlecht
+
+# predict outcome using model from train_df applied to the test_df
+
+### hier auch einmal nach dem testdf der DV umbenennen
+predictions <- predict(modelGeschlechtRF, newdata=test_dfGeschlechtMW)
+
+# Create confusion matrix
+confusionMatrix(data=predictions, test_dfGeschlechtMW$weiblich_maennlich)
+
 
 #--------------ACHTUNG: DIE VARIABLE IMPORTANCE + RICHTUNG FUNKTIONIERT FÜR DIESEN CODE NOCH NICHT-----------------------------------------
 
@@ -379,20 +430,6 @@ for (i in seq_along(impvar)) {
               main=paste("Partial Dependence on", impvar[i]))
 }
 par(op)
-
-# ----------------------------------------------MODEL EVALUATION-------------------------------------------------
-
-
-# Apply model to test_df --> test_dfGeschlecht
-
-# predict outcome using model from train_df applied to the test_df
-
-### hier auch einmal nach dem testdf der DV umbenennen
-
-predictions <- predict(modelGeschlechtRF, newdata=test_dfGeschlechtMW)
-
-# Create confusion matrix
-confusionMatrix(data=predictions, test_dfGeschlechtMW$weiblich_maennlich)
 
 
 #------------------------------------------------WHEN BEST MODEL IS FOUND-----------------------------------------------------
