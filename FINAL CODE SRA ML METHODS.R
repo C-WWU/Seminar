@@ -41,6 +41,7 @@ library(glmnet)
 install.packages("Matrix")
 library(Matrix)
 
+options(max.print = 100000)
 
 #--------------------------------------DATA PRE-PROCESSING------------------------------------------
 
