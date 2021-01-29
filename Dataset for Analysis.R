@@ -739,9 +739,9 @@ data <- data %>%
 #Version 2: Persönlichkeit mit je nur 2 Ausgängen coden: <4 oder >4; 4 = NA
 data <- data %>% mutate(Extraversion2 = case_when(Extraversion < 4 ~ 'Introvertiert',
                                                                 Extraversion > 4 ~ 'Extrovertiert'))
-data <- data %>% mutate(Agreeableness2 = case_when(Agreeableness < 4 ~ 'Not Agreeable',
+data <- data %>% mutate(Agreeableness2 = case_when(Agreeableness < 4 ~ 'Not_Agreeable',
                                                                 Agreeableness > 4 ~ 'Agreeable'))
-data <- data %>% mutate(Conscientiousness2 = case_when(Conscientiousness < 4 ~ 'Not Conscientious',
+data <- data %>% mutate(Conscientiousness2 = case_when(Conscientiousness < 4 ~ 'Not_Conscientious',
                                                             Agreeableness > 4 ~ 'Conscientious'))
 data <- data %>% mutate(Emotional_stablity2 = case_when(Emotional_stablity < 4 ~ 'Unstable',
                                                             Agreeableness > 4 ~ 'Stable'))
@@ -758,8 +758,8 @@ data <- data %>%
 
 
 #Version 2: mit je nur 2 Ausgängen coden: <4 oder >4; 4 = NA
-data <- data %>% mutate(Green2 = case_when(Green_Values < 4 ~ 'No',
-                                            Green_Values > 4 ~ 'Yes'))
+data <- data %>% mutate(Green2 = case_when(Green_Values < 4 ~ 'Ja',
+                                            Green_Values > 4 ~ 'Nein'))
 
 
 #####
@@ -802,20 +802,20 @@ data <- data %>% mutate(weiblich_maennlich = case_when(Geschlecht == 1 ~ 'weibli
 
 
 #Bildung: niedrig, mittel, hoch
-data <- data %>% mutate(Bildungsgruppe = case_when(Bildungsabschluss == "(Noch) kein Abschluss" ~ 'niedrige Bildung',
-                                                           Bildungsabschluss == "Hauptschulabschluss" ~ 'niedrige Bildung',
-                                                           Bildungsabschluss == "Realschulabschluss" ~ 'niedrige Bildung',
-                                                           Bildungsabschluss == "Abitur" ~ 'mittlere Bildung',
-                                                           Bildungsabschluss == "Hochschulabschluss (Bachelor oder Master)" ~ 'hohe Bildung',
-                                                           Bildungsabschluss == "Promotion" ~ 'hohe Bildung'))
+data <- data %>% mutate(Bildungsgruppe = case_when(Bildungsabschluss == "(Noch) kein Abschluss" ~ 'niedrig',
+                                                           Bildungsabschluss == "Hauptschulabschluss" ~ 'niedrig',
+                                                           Bildungsabschluss == "Realschulabschluss" ~ 'niedrig',
+                                                           Bildungsabschluss == "Abitur" ~ 'mittel',
+                                                           Bildungsabschluss == "Hochschulabschluss (Bachelor oder Master)" ~ 'hoch',
+                                                           Bildungsabschluss == "Promotion" ~ 'hoch'))
 
 #Einkommen: hohe, mittlere, niedrige Einkommensgruppe
-data <- data %>% mutate(Einkommensgruppe = case_when(Nettoeinkommen == "0 € - 1000 €" ~ 'niedriges Einkommen',
-                                                               Nettoeinkommen == "1001 € - 2000€" ~ 'niedriges Einkommen',
-                                                               Nettoeinkommen == "2001 € - 3000 €" ~ 'mittleres Einkommen',
-                                                               Nettoeinkommen == "3001 € - 4000 €" ~ 'mittleres Einkommen',
-                                                               Nettoeinkommen == "4001 € - 5000 €" ~ 'hohes Einkommen',
-                                                               Nettoeinkommen == "Mehr als 5000 €" ~ 'hohes Einkommen'))
+data <- data %>% mutate(Einkommensgruppe = case_when(Nettoeinkommen == "0 € - 1000 €" ~ 'niedrig',
+                                                               Nettoeinkommen == "1001 € - 2000€" ~ 'niedrig',
+                                                               Nettoeinkommen == "2001 € - 3000 €" ~ 'mittel',
+                                                               Nettoeinkommen == "3001 € - 4000 €" ~ 'mittel',
+                                                               Nettoeinkommen == "4001 € - 5000 €" ~ 'hoch',
+                                                               Nettoeinkommen == "Mehr als 5000 €" ~ 'hoch'))
 #Beziehungsstatus: alleine oder in Beziehung
 data <- data %>% mutate(Allein_vs_Beziehung = case_when(Beziehungsstatus == "Single" ~ 'Allein',
                                                     Beziehungsstatus == "Geschieden" ~ 'Allein',
@@ -834,33 +834,33 @@ data <- data %>% mutate(Arbeitend_oder_nicht = case_when(Beschaeftigung == "Arbe
 
 
 #Alkohol Konsum: nie, selten, häufig (3 Ausprägungen) oder Konsum ja nein (2 Ausprägungen)
-data <- data %>% mutate(Alkoholgruppe = case_when(`Alkohol_Konsum` == "Nein" ~ 'kein Konsum',
-                                                          `Alkohol_Konsum` == "Ja, mindestens einmal im Jahr" ~ 'niedriger Konsum',
-                                                          `Alkohol_Konsum` == "Ja, mindestens einmal im Monat" ~ 'niedriger Konsum',
-                                                          `Alkohol_Konsum` == "Ja, mindestens einmal pro Woche" ~ 'hoher Konsum',
-                                                          `Alkohol_Konsum` == "Ja, mehrmals pro Woche" ~ 'hoher Konsum',
-                                                          `Alkohol_Konsum` == "Ja, täglich" ~ 'hoher Konsum'))
+data <- data %>% mutate(Alkoholgruppe = case_when(`Alkohol_Konsum` == "Nein" ~ 'kein_Konsum',
+                                                          `Alkohol_Konsum` == "Ja, mindestens einmal im Jahr" ~ 'niedrig',
+                                                          `Alkohol_Konsum` == "Ja, mindestens einmal im Monat" ~ 'niedrig',
+                                                          `Alkohol_Konsum` == "Ja, mindestens einmal pro Woche" ~ 'hoch',
+                                                          `Alkohol_Konsum` == "Ja, mehrmals pro Woche" ~ 'hoch',
+                                                          `Alkohol_Konsum` == "Ja, täglich" ~ 'hoch'))
 
 data <- data %>% mutate(Alkohol_ja_nein = ifelse(Alkohol_Konsum == "Nein", "Nein", "Ja"))
 
 #Zigaretten Konsum: nie, selten, häufig (3 Ausprägungen) oder Konsum ja nein (2 Ausprägungen)
-data <- data %>% mutate(Zigarettengruppe = case_when(`Zigaretten_Konsum` == "Nein" ~ 'kein Konsum',
-                                                                `Zigaretten_Konsum` == "Ja, mindestens einmal im Jahr" ~ 'niedriger Konsum',
-                                                                `Zigaretten_Konsum` == "Ja, mindestens einmal im Monat" ~ 'niedriger Konsum',
-                                                                `Zigaretten_Konsum` == "Ja, mindestens einmal pro Woche" ~ 'hoher Konsum',
-                                                                `Zigaretten_Konsum` == "Ja, mehrmals pro Woche" ~ 'hoher Konsum',
-                                                                `Zigaretten_Konsum` == "Ja, täglich" ~ 'hoher Konsum'))
+data <- data %>% mutate(Zigarettengruppe = case_when(`Zigaretten_Konsum` == "Nein" ~ 'kein_Konsum',
+                                                                `Zigaretten_Konsum` == "Ja, mindestens einmal im Jahr" ~ 'niedrig',
+                                                                `Zigaretten_Konsum` == "Ja, mindestens einmal im Monat" ~ 'niedrig',
+                                                                `Zigaretten_Konsum` == "Ja, mindestens einmal pro Woche" ~ 'hoch',
+                                                                `Zigaretten_Konsum` == "Ja, mehrmals pro Woche" ~ 'hoch',
+                                                                `Zigaretten_Konsum` == "Ja, täglich" ~ 'hoch'))
 
 data <- data %>% mutate(Zigaretten_ja_nein = ifelse(Zigaretten_Konsum == "Nein", "Nein", "Ja"))
 
 
 #Drogen Konsum: nie, selten, häufig (3 Ausprägungen) oder Konsum ja nein (2 Ausprägungen)
-data <- data %>% mutate(Drogengruppe = case_when(`Drogen_Konsum` == "Nein" ~ 'kein Konsum',
-                                                        `Drogen_Konsum` == "Ja, mindestens einmal im Jahr" ~ 'niedriger Konsum',
-                                                        `Drogen_Konsum` == "Ja, mindestens einmal im Monat" ~ 'niedriger Konsum',
-                                                        `Drogen_Konsum` == "Ja, mindestens einmal pro Woche" ~ 'hoher Konsum',
-                                                        `Drogen_Konsum` == "Ja, mehrmals pro Woche" ~ 'hoher Konsum',
-                                                        `Drogen_Konsum` == "Ja, täglich" ~ 'hoher Konsum'))
+data <- data %>% mutate(Drogengruppe = case_when(`Drogen_Konsum` == "Nein" ~ 'kein_Konsum',
+                                                        `Drogen_Konsum` == "Ja, mindestens einmal im Jahr" ~ 'niedrig',
+                                                        `Drogen_Konsum` == "Ja, mindestens einmal im Monat" ~ 'niedrig',
+                                                        `Drogen_Konsum` == "Ja, mindestens einmal pro Woche" ~ 'hoch',
+                                                        `Drogen_Konsum` == "Ja, mehrmals pro Woche" ~ 'hoch',
+                                                        `Drogen_Konsum` == "Ja, täglich" ~ 'hoch'))
 
 data <- data %>% mutate(Drogen_ja_nein = ifelse(Drogen_Konsum == "Nein", "Nein", "Ja"))
 
@@ -907,16 +907,16 @@ data$`Anzahl_Kinder`[data$`Anzahl_Kinder` == 20] <- 0
 data <- data %>% mutate(Anzahl_Kinder_grob = case_when(Anzahl_Kinder == 0 ~ "0",
                                                        Anzahl_Kinder == 1 ~ "1",
                                                        Anzahl_Kinder == 2 ~ "2",
-                                                       Anzahl_Kinder >2 ~ "3 oder mehr"))
+                                                       Anzahl_Kinder >2 ~ "3_oder_mehr"))
 
 #Wahl Partei: zu nur zwei Ausgängen formulieren, z.B.: CDU ja oder nein
-data <- data %>% mutate(CDU_CSU_Waehler = ifelse(Wahl_Partei == "CDU/CSU", "ja", "nein"))
-data <- data %>% mutate(SPD_Waehler = ifelse(Wahl_Partei == "SPD", "ja", "nein"))
-data <- data %>% mutate(Gruene_Waehler = ifelse(Wahl_Partei == "Bündnis 90/Die Grünen", "ja", "nein"))
-data <- data %>% mutate(FDP_Waehler = ifelse(Wahl_Partei == "FDP", "ja", "nein"))
-data <- data %>% mutate(AfD_Waehler = ifelse(Wahl_Partei == "AfD", "ja", "nein"))
-data <- data %>% mutate(Linke_Waehler = ifelse(Wahl_Partei == "Die Linke", "ja", "nein"))
-data <- data %>% mutate(Nichtwahler = ifelse(Wahl_Partei == "Ich würde nicht wählen gehen", "ja", "nein"))
+data <- data %>% mutate(CDU_CSU_Waehler = ifelse(Wahl_Partei == "CDU/CSU", "Ja", "Nein"))
+data <- data %>% mutate(SPD_Waehler = ifelse(Wahl_Partei == "SPD", "Ja", "Nein"))
+data <- data %>% mutate(Gruene_Waehler = ifelse(Wahl_Partei == "Bündnis 90/Die Grünen", "Ja", "Nein"))
+data <- data %>% mutate(FDP_Waehler = ifelse(Wahl_Partei == "FDP", "Ja", "Nein"))
+data <- data %>% mutate(AfD_Waehler = ifelse(Wahl_Partei == "AfD", "Ja", "Nein"))
+data <- data %>% mutate(Linke_Waehler = ifelse(Wahl_Partei == "Die Linke", "Ja", "Nein"))
+data <- data %>% mutate(Nichtwahler = ifelse(Wahl_Partei == "Ich würde nicht wählen gehen", "Ja", "Nein"))
 
 
 #####
@@ -1167,7 +1167,7 @@ data$`Wahl_Partei_Sonstiges` <- tolower(data$`Wahl_Partei_Sonstiges`)
 data$`Wahl_Partei` <- ifelse(data$`Wahl_Partei_Sonstiges` %in% "die partei", "Die Partei", data$`Wahl_Partei`)
 
 #auch für Die Partei Wähler Variable erstellen
-data <- data %>% mutate(Die_Partei_Waehler = ifelse(Wahl_Partei == "Die Partei", "ja", "nein"))
+data <- data %>% mutate(Die_Partei_Waehler = ifelse(Wahl_Partei == "Die Partei", "Ja", "Nein"))
 
 
 Partei <- as.data.frame(table(data$`Wahl_Partei`)/sum(table(data$`Wahl_Partei`)))
