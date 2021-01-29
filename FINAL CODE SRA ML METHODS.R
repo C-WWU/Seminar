@@ -250,6 +250,8 @@ confusionMatrix(data=predictions3, test_dfGeschlechtMW$weiblich_maennlich)
 
 bestregression_GeschlechtMW <- model3
 
+#####
+
 
 #---------------------------------------------------RANDOM FOREST----------------------------------------------------
 
@@ -270,70 +272,7 @@ myControl = trainControl(
 )
 
 
-####-------tree 1 --------------------------------------------------
-
-#set random seed again 
-
-set.seed(400)
-
-
-modelGeschlechtRF <- train(weiblich_maennlich ~ ., # hier die DV einfügen. "~ ." heißt es werden alle Varibablen im dataframe als IV's genutzt um die DV zu predicten.
-                           data=train_dfGeschlechtMW, # hier den data-frame definieren womit trainiert werden soll --> training_df!
-                           method="ranger", # ranger is eine schnellere RF methode, man  kann auch "rf" für random forest eingeben
-                           metric= "ROC", # hier bei metric kann man sich auch die Accuracy ausgeben lassen
-                           na.action = na.omit, # sagt aus, dass fehlende Werte rausgelassen werden beim training
-                           num.tree = 500, #
-                           trControl = myControl) # training methode: bei uns Cross-Validation
-
-
-# print model
-
-print(modelGeschlechtRF)
-summary(modelGeschlechtRF)
-plot(modelGeschlechtRF)
-
-# Apply model to test_df --> test_dfGeschlecht
-
-# predict outcome using model from train_df applied to the test_df
-
-### hier auch einmal nach dem testdf der DV umbenennen
-predictions <- predict(modelGeschlechtRF, newdata=test_dfGeschlechtMW)
-
-# Create confusion matrix
-confusionMatrix(data=predictions, test_dfGeschlechtMW$weiblich_maennlich)
-
-####-------tree 2 --------------------------------------------------
-
-set.seed(401)
-
-# Adjust num.trees to 1000 to evaluate which model performs better
-
-modelGeschlechtRF2 <- train(weiblich_maennlich ~ ., # hier die DV einfügen. "~ ." heißt es werden alle Varibablen im dataframe als IV's genutzt um die DV zu predicten.
-                           data=train_dfGeschlechtMW, # hier den data-frame definieren womit trainiert werden soll --> training_df!
-                           method="ranger", # ranger is eine schnellere RF methode, man  kann auch "rf" für random forest eingeben
-                           metric= "ROC", # hier bei metric kann man sich auch die Accuracy ausgeben lassen
-                           na.action = na.omit, # sagt aus, dass fehlende Werte rausgelassen werden beim training
-                           num.tree = 1000, #
-                           trControl = myControl) # training methode: bei uns Cross-Validation
-
-# print model
-
-print(modelGeschlechtRF2)
-summary(modelGeschlechtRF2)
-plot(modelGeschlechtRF2)
-
-# Apply model to test_df --> test_dfGeschlecht
-
-# predict outcome using model from train_df applied to the test_df
-
-### hier auch einmal nach dem testdf der DV umbenennen
-predictions <- predict(modelGeschlechtRF, newdata=test_dfGeschlechtMW)
-
-# Create confusion matrix
-confusionMatrix(data=predictions, test_dfGeschlechtMW$weiblich_maennlich)
-
-
-####-------tree 3 --------------------------------------------------
+####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
 
 # test of the ideal mtry, splitrule and min-node.size
 
@@ -374,8 +313,46 @@ confusionMatrix(data=predictions, test_dfGeschlechtMW$weiblich_maennlich)
 
 bestmtry <- modelGeschlechtRF$bestTune$mtry
 
+####-------tree 2: num.tree prüfen --------------------------------------------------
 
-####-------tree 4 --------------------------------------------------
+# test of ideal num.tree --> try if numtree 1000 leads to better results!
+###mtry, splitrule und min.node.size zu dem anpassen, was tree 1 gefunden hat!
+
+set.seed(1997)
+
+myGrid = expand.grid(mtry = 10,
+                     splitrule = "extratrees", 
+                     min.node.size = 15)
+
+
+modelGeschlechtRF <- train(weiblich_maennlich ~ ., 
+                           data=train_dfGeschlechtMW,
+                           tuneGrid = myGrid,
+                           method="ranger", # ranger is eine schnellere RF methode
+                           metric= "ROC", # hier bei metric kann man sich auch die Accuracy ausgeben lassen
+                           na.action = na.omit,
+                           num.tree = 500,
+                           trControl = myControl)
+
+# Print model to console
+
+modelGeschlechtRF
+summary(modelGeschlechtRF)
+plot(modelGeschlechtRF)
+
+# Apply model to test_df --> test_dfGeschlecht
+
+# predict outcome using model from train_df applied to the test_df
+
+### hier auch einmal nach dem testdf der DV umbenennen
+predictions <- predict(modelGeschlechtRF, newdata=test_dfGeschlechtMW)
+
+# Create confusion matrix
+confusionMatrix(data=predictions, test_dfGeschlechtMW$weiblich_maennlich)
+
+
+
+####-------tree 3: Final --------------------------------------------------
 
 ### hier das finale model mit bestmtry und node size einfügen , auch best num.tree anpassen
 
@@ -415,7 +392,7 @@ predictions <- predict(modelGeschlechtRF, newdata=test_dfGeschlechtMW)
 confusionMatrix(data=predictions, test_dfGeschlechtMW$weiblich_maennlich)
 
 
-#--------------ACHTUNG: DIE VARIABLE IMPORTANCE + RICHTUNG FUNKTIONIERT FÜR DIESEN CODE NOCH NICHT-----------------------------------------
+#--------------Variable Direction: Partial Plots-----------------------------------------
 
 
 #checking direction of the 10 most important variables
@@ -451,20 +428,6 @@ PartialPlots %>% partial(pred.var = impvar[17]) %>%plotPartial
 PartialPlots %>% partial(pred.var = impvar[18]) %>%plotPartial
 PartialPlots %>% partial(pred.var = impvar[19]) %>%plotPartial
 PartialPlots %>% partial(pred.var = impvar[20]) %>%plotPartial
-
-# ----------------------------------------------MODEL EVALUATION-------------------------------------------------
-
-
-# Apply model to test_df --> test_dfGeschlecht
-
-# predict outcome using model from train_df applied to the test_df
-
-### hier auch einmal nach dem testdf der DV umbenennen
-
-predictions <- predict(modelGeschlechtRF, newdata=test_dfGeschlechtMW)
-
-# Create confusion matrix
-confusionMatrix(data=predictions, test_dfGeschlechtMW$weiblich_maennlich)
 
 
 #------------------------------------------------WHEN BEST MODEL IS FOUND-----------------------------------------------------
