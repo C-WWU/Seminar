@@ -307,8 +307,16 @@ plot(modelGeschlechtRF)
 ### hier auch einmal nach dem testdf der DV umbenennen
 predictions <- predict(modelGeschlechtRF, newdata=test_dfGeschlechtMW)
 
-# Create confusion matrix
+# Create confusion matrix --> nur für classification
 confusionMatrix(data=predictions, test_dfGeschlechtMW$weiblich_maennlich)
+
+#check performance measures --> für numerisch
+MAE(predictions, test_dfGreen1$Green_Values)
+MSE(predictions, test_dfGreen1$Green_Values)
+RMSE(predictions, test_dfGreen1$Green_Values)
+R2(predictions, test_dfGreen1$Green_Values)
+
+#PEARSON
 
 
 #save the best mtry 
@@ -349,8 +357,16 @@ plot(modelGeschlechtRF)
 ### hier auch einmal nach dem testdf der DV umbenennen
 predictions <- predict(modelGeschlechtRF, newdata=test_dfGeschlechtMW)
 
-# Create confusion matrix
+# Create confusion matrix --> nur für classification
 confusionMatrix(data=predictions, test_dfGeschlechtMW$weiblich_maennlich)
+
+#check performance measures --> für numerisch
+MAE(predictions, test_dfGreen1$Green_Values)
+MSE(predictions, test_dfGreen1$Green_Values)
+RMSE(predictions, test_dfGreen1$Green_Values)
+R2(predictions, test_dfGreen1$Green_Values)
+
+#PEARSON
 
 
 
@@ -390,8 +406,16 @@ plot(varImp(modelGeschlechtRF), 20, main = "weiblich_maennlich")
 ### hier auch einmal nach dem testdf der DV umbenennen
 predictions <- predict(modelGeschlechtRF, newdata=test_dfGeschlechtMW)
 
-# Create confusion matrix
+# Create confusion matrix --> nur für classification
 confusionMatrix(data=predictions, test_dfGeschlechtMW$weiblich_maennlich)
+
+#check performance measures --> für numerisch
+MAE(predictions, test_dfGreen1$Green_Values)
+MSE(predictions, test_dfGreen1$Green_Values)
+RMSE(predictions, test_dfGreen1$Green_Values)
+R2(predictions, test_dfGreen1$Green_Values)
+
+#PEARSON
 
 
 #--------------Variable Direction: Partial Plots-----------------------------------------
