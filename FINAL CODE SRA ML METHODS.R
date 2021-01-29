@@ -420,19 +420,37 @@ confusionMatrix(data=predictions, test_dfGeschlechtMW$weiblich_maennlich)
 
 #checking direction of the 10 most important variables
 ###anpassen: name vom dataset
+
+
 imp <- importance(modelGeschlechtRF$finalModel)
 imp <- as.data.frame(imp)
 impvar <- rownames(imp)[order(imp[1], decreasing=TRUE)]
-impvar <- impvar[1:10]
-op <- par(mfrow=c(2, 5))
-for (i in seq_along(impvar)) {
-  partial(modelGeschlechtRF$finalModel, pred.data = train_dfGeschlechtMW$weiblich_maennlich, x.var = impvar[i], xlab=impvar[i],
-              main=paste("Partial Dependence on", impvar[i]), plot = TRUE)
-}
-par(op)
+impvar <- impvar[1:20]
 
-<<<<<<< HEAD
-modelGeschlechtRF %>% partial(pred.var = "kicker") %>%plotPartial(smooth = TRUE, lwd = 2, ylab = expression(f(EA_Sports_FIFA)))
+#Model umbenennen
+
+PartialPlots <- modelGeschlechtRF
+
+PartialPlots %>% partial(pred.var = impvar[1]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[2]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[3]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[4]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[5]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[6]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[7]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[8]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[9]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[10]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[11]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[12]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[13]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[14]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[15]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[16]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[17]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[18]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[19]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[20]) %>%plotPartial
 
 # ----------------------------------------------MODEL EVALUATION-------------------------------------------------
 
@@ -448,8 +466,6 @@ predictions <- predict(modelGeschlechtRF, newdata=test_dfGeschlechtMW)
 # Create confusion matrix
 confusionMatrix(data=predictions, test_dfGeschlechtMW$weiblich_maennlich)
 
-=======
->>>>>>> 33c6b866be958c71f1d914bef3c133b4339f28c0
 
 #------------------------------------------------WHEN BEST MODEL IS FOUND-----------------------------------------------------
 
