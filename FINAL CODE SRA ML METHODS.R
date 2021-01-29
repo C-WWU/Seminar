@@ -137,7 +137,7 @@ set.seed(1997)
 
 model1 <- train(weiblich_maennlich ~.,
                 data=train_dfGeschlechtMW,
-                method = "glm", family= binomial, ## es gibt auch eine method für stepwise in train aber nur für linear regression "lmstepAIC" 
+                method = "glm", family= binomial, ## für mehr als zwei Ausprägungen (z.B. Alkohol) --> method = "multinom"
                 metric = "ROC", #--> for imbalanced data the metric "Kappa" can be used and improves the quality of the final model; for linear regression use "RSME"
                 na.action = na.omit,
                 trControl=myControl)
