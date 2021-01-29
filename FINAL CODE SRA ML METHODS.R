@@ -15,7 +15,7 @@ install.packages("caret")
 library(caret)
 install.packages("e1071")
 library(e1071)
-install.packages("dplyr")
+library(plyr)
 library(dplyr)
 install.packages("stepPlr")
 library(stepPlr)
@@ -34,7 +34,14 @@ install.packages("MASS")
 library(MASS)
 install.packages("pdp")
 library(pdp)
+install.packages("elasticnet")
+library(elasticnet)
+install.packages("glmnet")
+library(glmnet)
+install.packages("Matrix")
+library(Matrix)
 
+options(max.print = 100000)
 
 #--------------------------------------DATA PRE-PROCESSING------------------------------------------
 
@@ -114,9 +121,6 @@ myControl = trainControl(
 )
 
 
-# set random seed again
-
-set.seed(1997)
 
 # Specify logistic regression model with most important IV's (maybe also these indicated by random forest and our own suggestions)
 
@@ -125,70 +129,73 @@ set.seed(1997)
 ### Wenn man eine lineare Regression bei bspw. dem Alter machen möchte, dann einmal die Method zu "lm" ändern und family zu "linear"?
 ### HIER DIE "~ ." WEG UND DIE WICHTIGSTEN VARIABLEN MIT + EINFÜGEN. DIESEN SCHRITT MEHRMALS WIEDERHOLEN UM DAS BESTE MODEL ZU FINDEN
 
-# set random seed again
+
+
+#--------------first regression: all parameters-----------------
 
 set.seed(1997)
 
 model1 <- train(weiblich_maennlich ~.,
                 data=train_dfGeschlechtMW,
-                method = "glm", family= binomial, ## es gibt auch eine method für stepwise in train aber nur für linear regression "lmstepAIC" 
+                method = "glm", family= binomial, ## für mehr als zwei Ausprägungen (z.B. Alkohol) --> method = "multinom"
                 metric = "ROC", #--> for imbalanced data the metric "Kappa" can be used and improves the quality of the final model; for linear regression use "RSME"
                 na.action = na.omit,
                 trControl=myControl)
 
-set.seed(1998)
-
-model2 = train(weiblich_maennlich ~ .,
-               data=train_dfGeschlechtMW,
-               method = "glmnet", family= binomial, 
-               metric = "ROC", 
-               na.action = na.omit,
-               trControl=myControl) 
-
-set.seed(1999)
-
-model3 <- train(weiblich_maennlich ~ Alman_Memes + Pamela_Reif + Tagesschau + AfD + Selena_Gomez,
-                data=train_dfGeschlechtMW,
-                method = "glm", family= binomial, 
-                metric = "ROC",
-                na.action = na.omit,
-                trControl=myControl) 
-
 print(model1)
-print(model2)
-print(model3)
-
-#kappa rules of thumb for interpretation: 
-# .81-1.00 Almost perfect
-# .61-.80 Substantial
-# .41-60 Moderate
-# .21-.40 Fair
-# .00-.20 Slight
-# < .00 Poor 
-
-# Output in terms of regression coefficients
-
 summary(model1)
-summary(model2)
-summary(model3)
-
-### in der model/summary stehen sowohl der AIC wert, als auch der ROC (AUC) wert, nachdem wir die Modelle miteinander vergleichen können. 
-
-### AUC sollte möglichst hoch sein = nahe 1. 
-### AIC sollte so niedrig wie möglich sein. 
-### Sensitivity (True Positives) sollte möglichst hoch sein = nahe 1
-### Specificity (True Negatives) sollte möglichst hoch sein = nahe 1
 
 #variable Importance (predictor variables)
 
 ### diese Funktion gibt noch einmal die 10 wichtigsten variablen des models aus.
 
 varImp(model1)
+
+#look for most important variables
+ImportanceAll1 <- varImp(model1)$importance
+ImportanceAll1 <- arrange(ImportanceAll1, desc(Overall))
+ImportanceAll1
+
+# Apply model to test_df --> test_dfGeschlecht
+
+# predict outcome using model from train_df applied to the test_df
+
+### hier auch einmal nach dem testdf der DV umbenennen
+
+predictions1 <- predict(model1, newdata=test_dfGeschlechtMW)
+
+
+# Create confusion matrix
+
+confusionMatrix(data=predictions1, test_dfGeschlechtMW$weiblich_maennlich)
+
+
+
+#------second regression: ridge/lasso for shrinking model---------
+
+set.seed(1998)
+
+myGrid <- expand.grid(alpha = 0:1,
+                      lambda = seq(0.0001, 1, length = 100))
+
+model2 <- train(weiblich_maennlich ~ .,
+               data=train_dfGeschlechtMW,
+               method = "glmnet", 
+               metric = "ROC", 
+               na.action = na.omit,
+               tuneGrid = myGrid,
+               trControl=myControl) 
+
+print(model2)
+summary(model2)
+coef(model2$finalModel, model2$finalModel$lambdaOpt)
+
+
 varImp(model2)
-varImp(model3)
 
-
-# ----------------------------------------------MODEL EVALUATION-------------------------------------------------
+ImportanceAll2 <- varImp(model2)$importance
+ImportanceAll2 <- arrange(ImportanceAll2, desc(Overall))
+ImportanceAll2
 
 
 # Apply model to test_df --> test_dfGeschlecht
@@ -197,11 +204,51 @@ varImp(model3)
 
 ### hier auch einmal nach dem testdf der DV umbenennen
 
-predictions <- predict(model1, newdata=test_dfGeschlechtMW)
+predictions2 <- predict(model2, newdata=test_dfGeschlechtMW)
+
 
 # Create confusion matrix
 
-confusionMatrix(data=predictions, test_dfGeschlechtMW$weiblich_maennlich)
+confusionMatrix(data=predictions2, test_dfGeschlechtMW$weiblich_maennlich)
+
+
+#------------third regression: specify ideal model--------------
+
+set.seed(1999)
+
+model3 <- train(weiblich_maennlich ~ EA_Sports_FIFA + Mady_Morrison + Gamingzelle + Montana_Black + Jens_Knossalla + kicker + Bundeswehr + Christian_Lindner + Die_Partei + Inscope21 + Ischtar_Isik + RB_Leipzig + Reyst + Leon_Skincare + Christoph_Icke_Dommisch + Linda_DIY + NYX_Professional_Makeup + Tiere_suchen_ein_Zuhause + dm + Playboy_Germany,                data=train_dfGeschlechtMW,
+                method = "glm", family= binomial, 
+                metric = "ROC",
+                na.action = na.omit,
+                trControl=myControl) 
+
+print(model3)
+summary(model3)
+
+varImp(model3)
+
+ImportanceAll3 <- varImp(model3)$importance
+ImportanceAll3 <- arrange(ImportanceAll3, desc(Overall))
+ImportanceAll3
+
+
+# Apply model to test_df --> test_dfGeschlecht
+
+# predict outcome using model from train_df applied to the test_df
+
+### hier auch einmal nach dem testdf der DV umbenennen
+
+predictions3 <- predict(model3, newdata=test_dfGeschlechtMW)
+
+
+# Create confusion matrix
+
+confusionMatrix(data=predictions3, test_dfGeschlechtMW$weiblich_maennlich)
+
+
+#----------save best regression model----------------------
+
+bestregression_GeschlechtMW <- model3
 
 
 #---------------------------------------------------RANDOM FOREST----------------------------------------------------
@@ -223,6 +270,8 @@ myControl = trainControl(
 )
 
 
+####-------tree 1 --------------------------------------------------
+
 #set random seed again 
 
 set.seed(400)
@@ -241,7 +290,19 @@ modelGeschlechtRF <- train(weiblich_maennlich ~ ., # hier die DV einfügen. "~ .
 
 print(modelGeschlechtRF)
 summary(modelGeschlechtRF)
+plot(modelGeschlechtRF)
 
+# Apply model to test_df --> test_dfGeschlecht
+
+# predict outcome using model from train_df applied to the test_df
+
+### hier auch einmal nach dem testdf der DV umbenennen
+predictions <- predict(modelGeschlechtRF, newdata=test_dfGeschlechtMW)
+
+# Create confusion matrix
+confusionMatrix(data=predictions, test_dfGeschlechtMW$weiblich_maennlich)
+
+####-------tree 2 --------------------------------------------------
 
 set.seed(401)
 
@@ -259,6 +320,20 @@ modelGeschlechtRF2 <- train(weiblich_maennlich ~ ., # hier die DV einfügen. "~ 
 
 print(modelGeschlechtRF2)
 summary(modelGeschlechtRF2)
+plot(modelGeschlechtRF2)
+
+# Apply model to test_df --> test_dfGeschlecht
+
+# predict outcome using model from train_df applied to the test_df
+
+### hier auch einmal nach dem testdf der DV umbenennen
+predictions <- predict(modelGeschlechtRF, newdata=test_dfGeschlechtMW)
+
+# Create confusion matrix
+confusionMatrix(data=predictions, test_dfGeschlechtMW$weiblich_maennlich)
+
+
+####-------tree 3 --------------------------------------------------
 
 # test of the ideal mtry, splitrule and min-node.size
 
@@ -284,10 +359,23 @@ modelGeschlechtRF
 summary(modelGeschlechtRF)
 plot(modelGeschlechtRF)
 
+# Apply model to test_df --> test_dfGeschlecht
+
+# predict outcome using model from train_df applied to the test_df
+
+### hier auch einmal nach dem testdf der DV umbenennen
+predictions <- predict(modelGeschlechtRF, newdata=test_dfGeschlechtMW)
+
+# Create confusion matrix
+confusionMatrix(data=predictions, test_dfGeschlechtMW$weiblich_maennlich)
+
+
 #save the best mtry 
 
 bestmtry <- modelGeschlechtRF$bestTune$mtry
 
+
+####-------tree 4 --------------------------------------------------
 
 ### hier das finale model mit bestmtry und node size einfügen , auch best num.tree anpassen
 
@@ -316,6 +404,16 @@ summary(modelGeschlechtRF)
 varImp(modelGeschlechtRF)
 plot(varImp(modelGeschlechtRF), 20, main = "weiblich_maennlich")
 
+# Apply model to test_df --> test_dfGeschlecht
+
+# predict outcome using model from train_df applied to the test_df
+
+### hier auch einmal nach dem testdf der DV umbenennen
+predictions <- predict(modelGeschlechtRF, newdata=test_dfGeschlechtMW)
+
+# Create confusion matrix
+confusionMatrix(data=predictions, test_dfGeschlechtMW$weiblich_maennlich)
+
 
 #--------------ACHTUNG: DIE VARIABLE IMPORTANCE + RICHTUNG FUNKTIONIERT FÜR DIESEN CODE NOCH NICHT-----------------------------------------
 
@@ -333,6 +431,7 @@ for (i in seq_along(impvar)) {
 }
 par(op)
 
+<<<<<<< HEAD
 modelGeschlechtRF %>% partial(pred.var = "kicker") %>%plotPartial(smooth = TRUE, lwd = 2, ylab = expression(f(EA_Sports_FIFA)))
 
 # ----------------------------------------------MODEL EVALUATION-------------------------------------------------
@@ -349,6 +448,8 @@ predictions <- predict(modelGeschlechtRF, newdata=test_dfGeschlechtMW)
 # Create confusion matrix
 confusionMatrix(data=predictions, test_dfGeschlechtMW$weiblich_maennlich)
 
+=======
+>>>>>>> 33c6b866be958c71f1d914bef3c133b4339f28c0
 
 #------------------------------------------------WHEN BEST MODEL IS FOUND-----------------------------------------------------
 
