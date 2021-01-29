@@ -299,6 +299,7 @@ modelGeschlechtRF <- train(weiblich_maennlich ~ .,
 modelGeschlechtRF
 summary(modelGeschlechtRF)
 plot(modelGeschlechtRF)
+  #best mtry = xx, splitrule = xx, min.node.size = xx
 
 # Apply model to test_df --> test_dfGeschlecht
 
@@ -349,6 +350,7 @@ modelGeschlechtRF <- train(weiblich_maennlich ~ .,
 modelGeschlechtRF
 summary(modelGeschlechtRF)
 plot(modelGeschlechtRF)
+  #best mtry = xx, splitrule = xx, min.node.size = xx
 
 # Apply model to test_df --> test_dfGeschlecht
 
@@ -368,6 +370,7 @@ R2(predictions, test_dfGreen1$Green_Values)
 
 #PEARSON
 
+#fit model with num.trees = xx trees (better performance)
 
 
 ####-------tree 3: Final --------------------------------------------------
