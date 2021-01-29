@@ -322,16 +322,18 @@ plot(varImp(modelGeschlechtRF), 20, main = "weiblich_maennlich")
 
 #checking direction of the 10 most important variables
 ###anpassen: name vom dataset
-imp <- varImp(modelGeschlechtRF)
-imp <- imp[[1]]
-impvar <- rownames(imp)[order(imp, decreasing=TRUE)]
+imp <- importance(modelGeschlechtRF$finalModel)
+imp <- as.data.frame(imp)
+impvar <- rownames(imp)[order(imp[1], decreasing=TRUE)]
 impvar <- impvar[1:10]
 op <- par(mfrow=c(2, 5))
 for (i in seq_along(impvar)) {
-  partialPlot(modelGeschlechtRF, pred.data = as.data.frame(train_dfGeschlechtMW), x.var = impvar[i], xlab=impvar[i],
-              main=paste("Partial Dependence on", impvar[i]))
+  partial(modelGeschlechtRF$finalModel, pred.data = train_dfGeschlechtMW$weiblich_maennlich, x.var = impvar[i], xlab=impvar[i],
+              main=paste("Partial Dependence on", impvar[i]), plot = TRUE)
 }
 par(op)
+
+modelGeschlechtRF %>% partial(pred.var = "kicker") %>%plotPartial(smooth = TRUE, lwd = 2, ylab = expression(f(EA_Sports_FIFA)))
 
 # ----------------------------------------------MODEL EVALUATION-------------------------------------------------
 
