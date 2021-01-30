@@ -266,12 +266,12 @@ bestregression_GeschlechtMW <- model3
 
 
 # Specify the type of training method used & number of folds --> bei uns 10-fold Cross-Validation
-
+set.seed(1997)
 myControl = trainControl(
   method = "cv",
   number = 10, 
   verboseIter = TRUE,
-  summaryFunction = twoClassSummary, #Wenn das benutzt wird, auch ClassProbs = True setzen!
+  summaryFunction = twoClassSummary, #nur für binär; Wenn das benutzt wird, auch ClassProbs = True setzen!
   classProbs = TRUE,
   allowParallel=TRUE,
   #sampling = "smote", #wenn sampling, dann hier anpassen und für alle drei Varianten ausprobieren!! (up, down, smote)
@@ -293,8 +293,8 @@ myGrid = expand.grid(mtry = c(10:20),
 modelGeschlechtRF <- train(weiblich_maennlich ~ ., 
                            data=train_dfGeschlechtMW,
                            tuneGrid = myGrid,
-                           method="ranger", # ranger is eine schnellere RF methode
-                           metric= "ROC", # hier bei metric kann man sich auch die Accuracy ausgeben lassen
+                           method="ranger",
+                           metric= "ROC", # numeric: RMSE; categorical: Kappa; binary: ROC
                            na.action = na.omit,
                            num.tree = 500,
                            trControl = myControl, 
@@ -491,7 +491,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 ### hier das finale model mit bestmtry und node size einfügen , auch best num.tree anpassen
 
-set.seed(400)
+set.seed(1997)
 myGrid <- expand.grid(mtry = 10, splitrule ="extratrees", min.node.size = 15)
 modelGeschlechtRF <- train(weiblich_maennlich ~ ., 
                            data=train_dfGeschlechtMW, 
@@ -576,7 +576,6 @@ for(the_roc in model_list_roc){
 results_df_roc <- bind_rows(results_list_roc)
 
 # Plot ROC curve for all 5 models
-
 custom_col <- c("#000000", "#009E73", "#0072B2", "#D55E00", "#CC79A7")
 
 ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
