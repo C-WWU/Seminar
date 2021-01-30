@@ -297,7 +297,8 @@ modelGeschlechtRF <- train(weiblich_maennlich ~ .,
                            metric= "ROC", # hier bei metric kann man sich auch die Accuracy ausgeben lassen
                            na.action = na.omit,
                            num.tree = 500,
-                           trControl = myControl)
+                           trControl = myControl, 
+                           importance = 'impurity')
 
 # Print model to console
 
@@ -348,7 +349,8 @@ modelGeschlechtRF <- train(weiblich_maennlich ~ .,
                            metric= "ROC", # hier bei metric kann man sich auch die Accuracy ausgeben lassen
                            na.action = na.omit,
                            num.tree = 500,
-                           trControl = myControl)
+                           trControl = myControl, 
+                           importance = 'impurity')
 
 # Print model to console
 
