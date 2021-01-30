@@ -758,8 +758,8 @@ data <- data %>%
 
 
 #Version 2: mit je nur 2 Ausgängen coden: <4 oder >4; 4 = NA
-data <- data %>% mutate(Green2 = case_when(Green_Values < 4 ~ 'Ja',
-                                            Green_Values > 4 ~ 'Nein'))
+data <- data %>% mutate(Green2 = case_when(Green_Values < 4 ~ 'Nein',
+                                            Green_Values > 4 ~ 'Ja'))
 
 
 #####
@@ -771,8 +771,8 @@ table(data$Corona_ist_harmlos_gleich_Grippe)
 table(data$Glaube_nicht_an_Corona)
 
 #define new variable Corona_Attitude: Accept vs. Reject
-data <- data %>% mutate(Corona_Hardliner = ifelse((`Corona_Massnahmen_muessten_haerter_sein` == 6 | `Corona_Massnahmen_muessten_haerter_sein` == 7), yes = 1, no = 0))
-data <- data %>% mutate(Corona_Softliner = ifelse((`Corona_Massnahmen_uebertrieben` == 6 | `Corona_Massnahmen_uebertrieben` == 7), yes = 1, no = 0))
+data <- data %>% mutate(Corona_Hardliner = ifelse((`Corona_Massnahmen_muessten_haerter_sein` == 5 |`Corona_Massnahmen_muessten_haerter_sein` == 6 | `Corona_Massnahmen_muessten_haerter_sein` == 7), yes = 1, no = 0))
+data <- data %>% mutate(Corona_Softliner = ifelse((`Corona_Massnahmen_uebertrieben` == 5 |`Corona_Massnahmen_uebertrieben` == 6 | `Corona_Massnahmen_uebertrieben` == 7), yes = 1, no = 0))
 data <- data %>% mutate(Corona_Skeptiker = ifelse((`Corona_ist_harmlos_gleich_Grippe` == 5 | `Corona_ist_harmlos_gleich_Grippe` == 6 | `Corona_ist_harmlos_gleich_Grippe` == 7), yes = 1, no = 0))
 data <- data %>% mutate(Corona_Leugner = ifelse((`Glaube_nicht_an_Corona` == 5 | `Glaube_nicht_an_Corona` == 6 | `Glaube_nicht_an_Corona` == 7), yes = 1, no = 0))
 

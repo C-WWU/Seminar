@@ -330,6 +330,58 @@ R2(predictions, test_dfGreen1$Green_Values)
 
 bestmtry <- modelGeschlechtRF$bestTune$mtry
 
+#check for AUC 
+#####(nur binär und kategorisch)
+test_roc <- function(model, data) {
+  
+  roc(test_dfGreen2$Green2,
+      predict(model, data, type = "prob")[, "Ja"])
+  
+}
+
+RFGreen2_11 %>%
+  test_roc(data = test_dfGreen2) %>%
+  auc()
+
+###nur für binär
+#compare different ROC-plots
+model_list <- list(M1 = RFGreen2_11,
+                   M2 = RFGreen2_11,
+                   M3 = RFGreen2_11)
+
+model_list_roc <- model_list %>%
+  map(test_roc, data = test_dfGreen2)
+
+model_list_roc %>%
+  map(auc)
+
+results_list_roc <- list(NA)
+num_mod <- 1
+
+for(the_roc in model_list_roc){
+  
+  results_list_roc[[num_mod]] <- 
+    tibble(tpr = the_roc$sensitivities,
+           fpr = 1 - the_roc$specificities,
+           model = names(model_list)[num_mod])
+  
+  num_mod <- num_mod + 1
+  
+}
+
+results_df_roc <- bind_rows(results_list_roc)
+
+# Plot ROC curve for all 5 models
+
+custom_col <- c("#000000", "#009E73", "#0072B2", "#D55E00", "#CC79A7")
+
+ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
+  geom_line(aes(color = model), size = 1) +
+  scale_color_manual(values = custom_col) +
+  geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
+  theme_bw(base_size = 18)
+
+
 ####-------tree 2: num.tree prüfen --------------------------------------------------
 
 # test of ideal num.tree --> try if numtree 1000 leads to better results!
@@ -377,7 +429,62 @@ R2(predictions, test_dfGreen1$Green_Values)
 
 #PEARSON
 
+
+#check for AUC 
+#####(nur binär und kategorisch)
+test_roc <- function(model, data) {
+  
+  roc(test_dfGreen2$Green2,
+      predict(model, data, type = "prob")[, "Ja"])
+  
+}
+
+RFGreen2_11 %>%
+  test_roc(data = test_dfGreen2) %>%
+  auc()
+
+###nur für binär
+#compare different ROC-plots
+model_list <- list(M1 = RFGreen2_11,
+                   M2 = RFGreen2_11,
+                   M3 = RFGreen2_11)
+
+model_list_roc <- model_list %>%
+  map(test_roc, data = test_dfGreen2)
+
+model_list_roc %>%
+  map(auc)
+
+results_list_roc <- list(NA)
+num_mod <- 1
+
+for(the_roc in model_list_roc){
+  
+  results_list_roc[[num_mod]] <- 
+    tibble(tpr = the_roc$sensitivities,
+           fpr = 1 - the_roc$specificities,
+           model = names(model_list)[num_mod])
+  
+  num_mod <- num_mod + 1
+  
+}
+
+results_df_roc <- bind_rows(results_list_roc)
+
+# Plot ROC curve for all 5 models
+
+custom_col <- c("#000000", "#009E73", "#0072B2", "#D55E00", "#CC79A7")
+
+ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
+  geom_line(aes(color = model), size = 1) +
+  scale_color_manual(values = custom_col) +
+  geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
+  theme_bw(base_size = 18)
+
+
+
 #fit model with num.trees = xx trees (better performance)
+
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -426,6 +533,58 @@ RMSE(predictions, test_dfGreen1$Green_Values)
 R2(predictions, test_dfGreen1$Green_Values)
 
 #PEARSON
+
+#check for AUC 
+#####(nur binär und kategorisch)
+test_roc <- function(model, data) {
+  
+  roc(test_dfGreen2$Green2,
+      predict(model, data, type = "prob")[, "Ja"])
+  
+}
+
+RFGreen2_11 %>%
+  test_roc(data = test_dfGreen2) %>%
+  auc()
+
+###nur für binär
+#compare different ROC-plots
+model_list <- list(M1 = RFGreen2_11,
+                   M2 = RFGreen2_11,
+                   M3 = RFGreen2_11)
+
+model_list_roc <- model_list %>%
+  map(test_roc, data = test_dfGreen2)
+
+model_list_roc %>%
+  map(auc)
+
+results_list_roc <- list(NA)
+num_mod <- 1
+
+for(the_roc in model_list_roc){
+  
+  results_list_roc[[num_mod]] <- 
+    tibble(tpr = the_roc$sensitivities,
+           fpr = 1 - the_roc$specificities,
+           model = names(model_list)[num_mod])
+  
+  num_mod <- num_mod + 1
+  
+}
+
+results_df_roc <- bind_rows(results_list_roc)
+
+# Plot ROC curve for all 5 models
+
+custom_col <- c("#000000", "#009E73", "#0072B2", "#D55E00", "#CC79A7")
+
+ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
+  geom_line(aes(color = model), size = 1) +
+  scale_color_manual(values = custom_col) +
+  geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
+  theme_bw(base_size = 18)
+
 
 
 #--------------Variable Direction: Partial Plots-----------------------------------------
