@@ -20,6 +20,8 @@ install.packages("pdp")
 install.packages("elasticnet")
 install.packages("glmnet")
 install.packages("Matrix")
+install.packages("Hmisc")
+
 
 library(ggplot2)
 library(cowplot)
@@ -42,6 +44,8 @@ library(pdp)
 library(elasticnet)
 library(glmnet)
 library(Matrix)
+library(Hmisc)
+
 
 options(max.print = 100000)
 
@@ -64,7 +68,7 @@ data_GeschlechtMW <- data[,c(313, 27:255)]
 
 
 ### es ist besonders wichtig die gewünschte DV in einen Faktor zu transformieren, da "caret" nicht mit 0/1 ausprägungen umgehen kann, wenn das model trainiert werden soll. 
-
+###nur für binär/categorical
 cols_Geschlecht <- names(data_GeschlechtMW)
 data_GeschlechtMW$weiblich_maennlich <- as.factor(data_GeschlechtMW$weiblich_maennlich)
 
@@ -286,7 +290,7 @@ myControl = trainControl(
 set.seed(1997)
 
 myGrid = expand.grid(mtry = c(10:20),
-                     splitrule = "extratrees", # What does this mean? Theres also "gini" --> the gini tells you which variables were the most important for building the trees 
+                     splitrule = "extratrees", 
                      min.node.size = c(5,10,15))
 
 
@@ -314,16 +318,23 @@ plot(modelGeschlechtRF)
 ### hier auch einmal nach dem testdf der DV umbenennen
 predictions <- predict(modelGeschlechtRF, newdata=test_dfGeschlechtMW)
 
-# Create confusion matrix --> nur für classification
+# Create confusion matrix --> nur für classification (binär oder categorical)
 confusionMatrix(data=predictions, test_dfGeschlechtMW$weiblich_maennlich)
 
 #check performance measures --> für numerisch
 MAE(predictions, test_dfGreen1$Green_Values)
-MSE(predictions, test_dfGreen1$Green_Values)
 RMSE(predictions, test_dfGreen1$Green_Values)
 R2(predictions, test_dfGreen1$Green_Values)
 
-#PEARSON
+###numeric only:
+#calculate Pearson coefficient for predictions and actual values
+# Correlations with significance levels
+
+pearsonGreen1_1 <- cor.test(predictions, test_dfGreen1$Green_Values, method = "pearson")
+pearsonGreen1_1
+
+spearmanGreen1_1 <- cor.test(predictions, test_dfGreen1$Green_Values, method = "spearman")
+spearmanGreen1_1
 
 
 #save the best mtry 
@@ -343,7 +354,7 @@ RFGreen2_11 %>%
   test_roc(data = test_dfGreen2) %>%
   auc()
 
-###nur für binär
+###nur für binär (von hier bis Ende des Abschnitts)
 #compare different ROC-plots
 model_list <- list(M1 = RFGreen2_11,
                    M2 = RFGreen2_11,
@@ -389,18 +400,18 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 set.seed(1997)
 
-myGrid = expand.grid(mtry = 10,
-                     splitrule = "extratrees", 
-                     min.node.size = 15)
+myGrid = expand.grid(mtry = 10,   #anpassen!
+                     splitrule = "extratrees", #anpassen!
+                     min.node.size = 15)   #anpassen!
 
 
 modelGeschlechtRF <- train(weiblich_maennlich ~ ., 
                            data=train_dfGeschlechtMW,
                            tuneGrid = myGrid,
-                           method="ranger", # ranger is eine schnellere RF methode
-                           metric= "ROC", # hier bei metric kann man sich auch die Accuracy ausgeben lassen
+                           method="ranger", 
+                           metric= "ROC", 
                            na.action = na.omit,
-                           num.tree = 500,
+                           num.tree = 1000,
                            trControl = myControl, 
                            importance = 'impurity')
 
@@ -409,7 +420,6 @@ modelGeschlechtRF <- train(weiblich_maennlich ~ .,
 modelGeschlechtRF
 summary(modelGeschlechtRF)
 plot(modelGeschlechtRF)
-  #best mtry = xx, splitrule = xx, min.node.size = xx
 
 # Apply model to test_df --> test_dfGeschlecht
 
@@ -423,15 +433,23 @@ confusionMatrix(data=predictions, test_dfGeschlechtMW$weiblich_maennlich)
 
 #check performance measures --> für numerisch
 MAE(predictions, test_dfGreen1$Green_Values)
-MSE(predictions, test_dfGreen1$Green_Values)
 RMSE(predictions, test_dfGreen1$Green_Values)
 R2(predictions, test_dfGreen1$Green_Values)
 
-#PEARSON
+###numeric only:
+#calculate Pearson coefficient for predictions and actual values
+# Correlations with significance levels
+
+pearsonGreen1_1 <- cor.test(predictions, test_dfGreen1$Green_Values, method = "pearson")
+pearsonGreen1_1
+
+spearmanGreen1_1 <- cor.test(predictions, test_dfGreen1$Green_Values, method = "spearman")
+spearmanGreen1_1
+
 
 
 #check for AUC 
-#####(nur binär und kategorisch)
+#####(nur binär und kategorisch) (von hier bis Ende des Abschnitts)
 test_roc <- function(model, data) {
   
   roc(test_dfGreen2$Green2,
@@ -483,9 +501,8 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 
 
+
 #fit model with num.trees = xx trees (better performance)
-
-
 
 ####-------tree 3: Final --------------------------------------------------
 
@@ -528,11 +545,19 @@ confusionMatrix(data=predictions, test_dfGeschlechtMW$weiblich_maennlich)
 
 #check performance measures --> für numerisch
 MAE(predictions, test_dfGreen1$Green_Values)
-MSE(predictions, test_dfGreen1$Green_Values)
 RMSE(predictions, test_dfGreen1$Green_Values)
 R2(predictions, test_dfGreen1$Green_Values)
 
-#PEARSON
+###numeric only:
+#calculate Pearson coefficient for predictions and actual values
+# Correlations with significance levels
+
+pearsonGreen1_1 <- cor.test(predictions, test_dfGreen1$Green_Values, method = "pearson")
+pearsonGreen1_1
+
+spearmanGreen1_1 <- cor.test(predictions, test_dfGreen1$Green_Values, method = "spearman")
+spearmanGreen1_1
+
 
 #check for AUC 
 #####(nur binär und kategorisch)
@@ -547,7 +572,7 @@ RFGreen2_11 %>%
   test_roc(data = test_dfGreen2) %>%
   auc()
 
-###nur für binär
+###nur für binär (von hier bis Ende des Abschnitts)
 #compare different ROC-plots
 model_list <- list(M1 = RFGreen2_11,
                    M2 = RFGreen2_11,
@@ -590,15 +615,15 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 
 #checking direction of the 10 most important variables
-###anpassen: name vom dataset
 
+###anpassen: name vom dataset
 
 imp <- importance(modelGeschlechtRF$finalModel)
 imp <- as.data.frame(imp)
 impvar <- rownames(imp)[order(imp[1], decreasing=TRUE)]
 impvar <- impvar[1:20]
 
-#Model umbenennen
+###Model umbenennen
 
 PartialPlots <- modelGeschlechtRF
 
