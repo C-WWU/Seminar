@@ -75,6 +75,11 @@ sum(is.na(data_GeschlechtMW$weiblich_maennlich)) #keine NAs
 data_GeschlechtMW <- data_GeschlechtMW %>% subset(data_GeschlechtMW$weiblich_maennlich != "NA")
 
 
+#ist die Variable unbalanced?
+table(data_GeschlechtMW$weiblich_maennlich) #Verteilung in Ordnung
+max(table(data_GeschlechtMW$weiblich_maennlich)/sum(table(data_GeschlechtMW$weiblich_maennlich))) #no information rate 61%
+
+
 
 #----------------------------------------DATA PARTITIONING------------------------------------
 
