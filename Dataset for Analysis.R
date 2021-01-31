@@ -3,24 +3,26 @@
 #####
 #load and install packages
 install.packages("readr")
+install.packages("naniar")
+install.packages("cowplot")
+install.packages("randomForest")
+install.packages("pROC")
+install.packages("caret")
+install.packages("e1071")
+
 library(readr)
 library(plyr)
 library(dplyr)
 library(tidyverse)
 library(ggplot2)
 library(scales)
-install.packages("naniar")
 library(naniar)
-install.packages("cowplot")
 library(cowplot)
-install.packages("randomForest")
 library(randomForest)
-install.packages("pROC")
 library(pROC)
-install.packages("caret")
 library(caret)
-install.packages("e1071")
 library(e1071)
+
 
 
 #####
@@ -923,7 +925,7 @@ data <- data %>% mutate(Nichtwahler = ifelse(Wahl_Partei == "Ich w√ºrde nicht w√
 #new info
 
 #wie vielen Accounts folgt jeder der Befragten?
-Accounts <- data %>% select(`Alman_Memes` : `Selena_Gomez`)
+Accounts <- data[,c(27:255)]
 Account_names <- names(Accounts)
 
 data[c(Account_names)] <- sapply(data[c(Account_names)], as.numeric)
@@ -1228,7 +1230,7 @@ ggplot(cor_accounts_df, aes(Tagesschau))+
 #Descriptives Accounts
 
 #Followers per Account
-Accounts <- data %>% select(Alman_Memes : Selena_Gomez)
+Accounts <- data[,c(27:255)]
 Followers_Accounts <- as.data.frame(colSums(Accounts, na.rm = TRUE))
 colnames(Followers_Accounts) <- "Followers"
 
