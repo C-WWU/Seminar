@@ -1,21 +1,35 @@
 
 #----------------------FINAL CODE IN SOCIALLY IRRESPONSIBLE ALGORITHMS------------------------------
-
 #install and load relevant packages
-library(ggplot2)
+
 install.packages("cowplot")
-library(cowplot)
 install.packages("randomForest")
-library(randomForest)
 install.packages("pROC")
-library(pROC)
 install.packages("readr")
-library(readr)
 install.packages("caret")
-library(caret)
 install.packages("e1071")
+install.packages("stepPlr")
+install.packages("mlbench")
+install.packages("readxl")
+install.packages("DMwR")
+install.packages("ROSE")
+install.packages("ranger")
+install.packages("MASS")
+install.packages("pdp")
+install.packages("elasticnet")
+install.packages("glmnet")
+install.packages("Matrix")
+install.packages("Hmisc")
+
+
+library(ggplot2)
+library(cowplot)
+library(randomForest)
+library(pROC)
+library(readr)
+library(caret)
 library(e1071)
-install.packages("dplyr")
+library(plyr)
 library(dplyr)
 library(stepPlr)
 library(mlbench)
@@ -26,11 +40,13 @@ library(ranger)
 library(tidyverse)
 library(MASS)
 library(pdp)
-library(plyr)
-install.packages("glmnet")
+library(elasticnet)
 library(glmnet)
-install.packages("Matrix")
 library(Matrix)
+library(Hmisc)
+
+
+options(max.print = 100000)
 
 #--------------------------------------DATA PRE-PROCESSING------------------------------------------
 
@@ -53,10 +69,10 @@ cols_Alter <- names(data_Alter)
 data_Alter$Alter <- as.numeric(data_Alter$Alter)
 
 #Gibt es NAs in der DV?
-sum(is.na(data_GeschlechtMW$weiblich_maennlich)) #keine NAs
+sum(is.na(data_Alter$Alter)) #keine NAs
 ###folgende Kommentierung und Code nur drin lassen und anpassen, wenn es NAs gibt --> bitte prüfen, dass der Code auch das richtige macht :)
 #Respondents mit NAs für diese Variable löschen (NAs stehen nur, wenn Respondent "Keine Angabe" gemacht hat, daher bedeutet löschen keinen Informationsverlust)
-data_Geschlecht <- data_GeschlechtMW %>% filter(weiblich_maennlich != "NA")
+data_Geschlecht <- data_Alter%>% filter(Alter != "NA")
 
 
 
@@ -85,368 +101,106 @@ train_dfAlter <- data_Alter[index,]
 test_dfAlter <- data_Alter[-index,]
 
 
-#--------------------------------------LOGISTIC REGRESSION/ LINEAR REGRESSION-----------------------------------------------------
-
-
-#-----------------------------------------BUILDING AND TRAINING THE MODEL---------------------------------------------
-
-
-# Specify the type of training method used & number of folds --> bei uns 10-fold Cross-Validation
-
-# hier muss eigentlich nichts geändert werden, es sei denn wir haben ein unbalanced sample, dann müssten wir überlegen welche resampling Methode wir wählen (hier ausgeklammert mit "smote")
-
-myControl = trainControl(
-  method = "cv",
-  number = 10, 
-  verboseIter = TRUE,
-  allowParallel=TRUE,
-  #sampling = "smote",
-  search = "random",
-)
-
-# Specify logistic regression model with most important IV's (maybe also these indicated by random forest and our own suggestions)
-
-### DV wird zuerst in den Klammern genannt, das auch immer anpassen. Der Rest kann eigentlich so bleiben. 
-### Aktuell ist hier die Logistische Regression als Method eingetragen. 
-### Wenn man eine lineare Regression bei bspw. dem Alter machen möchte, dann einmal die Method zu "lm" ändern und family zu "linear"?
-### HIER DIE "~ ." WEG UND DIE WICHTIGSTEN VARIABLEN MIT + EINFÜGEN. DIESEN SCHRITT MEHRMALS WIEDERHOLEN UM DAS BESTE MODEL ZU FINDEN
-
-# set random seed again
-
-set.seed(1999)
-
-model2 <- train(Alter ~ ., 
-                data=train_dfAlter,
-                method = "lm",  
-                na.action = na.omit,
-                trControl=myControl) 
-
-
-print(model1)
-summary(model1)
-
-#variable Importance (predictor variables)
-
-### diese Funktion gibt noch einmal die 10 wichtigsten variablen des models aus.
-
-varImp(model1)
-
-
-set.seed(1997)
-
-myGrid <- expand.grid(alpha = 0:1,
-                      lambda = seq(0.0001, 1, length = 100))
-model2 <- train(Alter ~ .,
-                data =train_dfAlter,
-                method = "glmnet", ## es gibt auch eine method für stepwise in train aber nur für linear regression "lmstepAIC" 
-                metric = "RMSE",
-                na.action = na.omit,
-                tuneGrid = myGrid,
-                trControl=myControl)
-
-print(model2)
-summary(model2)
-
-#variable Importance (predictor variables)
-
-### diese Funktion gibt noch einmal die 10 wichtigsten variablen des models aus.
-
-varImp(model2)
-
-ImportanceAll <- varImp(model1)$importance
-
-ImportanceAll
-
-set.seed(1998)
-
-model3 = train(Alter ~ Jan_Josef_Liefers + Barbara_Schoeneberger+Apotheken_Umschau+Alman_Memes+Tagesschau +Dein_Beichtstuhl+Chefkoch+Dieter_Nuhr+Pamela_Reif+Faktastisch+Made_My_Day+Huawei_Deutschland 
-               +Querdenken711+Helene_Fischer +Tiere_suchen_ein_Zuhause+Martin_Ruetter+Felix_Lobrecht+Silbermond+Shirin_David+Die_Linke, 
-               data=train_dfAlter,
-               method = "lm", 
-               metric = "RMSE",
-               na.action = na.omit,
-               trControl=myControl) 
-
-print(model3)
-summary(model3)
-
-#variable Importance (predictor variables)
-
-### diese Funktion gibt noch einmal die 10 wichtigsten variablen des models aus.
-
-
-varImp(model3)
-
-
-
-# ----------------------------------------------MODEL EVALUATION-------------------------------------------------
-
-
-# Apply model to test_df --> test_dfGeschlecht
-
-# predict outcome using model from train_df applied to the test_df
-
-### hier auch einmal nach dem testdf der DV umbenennen
-
-predictions <- predict(model3, newdata=test_dfAlter)
-
-# Create confusion matrix
-
-confusionMatrix(factor(predictions), test_dfAlter$Alter)
-
-
-#-------------------------------------------------RANDOM FOREST-----------------------------------------------------------
-
-#----------------------------------------BUILDING AND TRAINING THE MODEL---------------------------------------------
-
-
-###mtry: wenn numerisch, dann default = sqrt(229); wenn continuous, dann default = 229/3
-### generates 300 tress by default, können wir so lassen
-###anpassen: IV, data = neues Dataset; mtry anpassen zu entweder sqrt(229) oder 229/3
-
-set.seed(789)
-
-model <- randomForest(Alter ~ ., data=train_dfAlter, proximity=TRUE, mtry = sqrt(229), Importance=TRUE)
-
-#Modell prüfen
-
-print(model)
-summary(model)
-
-#grafische Darstellung des OOB samples:
-
-###anpassen: Z. 58 times = 1+Ausprägungen; Z. 59 rep anpassen mit ausprägungen, z. 60ff Error = anpassen!!
-oob.error.data <- data.frame(
-  Trees=rep(1:nrow(model$err.rate), times=4),
-  Type=rep(c("OOB", "1", "2", "3"), each=nrow(model$err.rate)),
-  Error=c(model$err.rate[,"OOB"], 
-          model$err.rate[,"1"],  
-          model$err.rate[,"2"],
-          model$err.rate[,"3"]))
-
-
-ggplot(data=oob.error.data, aes(x=Trees, y=Error)) +
-  geom_line(aes(color=Type))
-
-#Plot und Modell speichern
-###NAmen anpassen zu richtiger Variable!
-ggsave("oob_error_rate_500_trees_Geschlecht.pdf")
-
-###Model abspeichern: Variablenname anpassen
-model_Geschlecht_500 <- model
-
-## Kommentieren: wie hat sich der Error verändert? Größer, kleiner, oder gleich? Sprich, war es notwendig mit 1000 Trees zu arbeiten?
-
-#zweites Model mit 1000 Trees --> wird error weniger oder stagniert er? 
-##Modelgleichung: DV anpassen, data = .. anpassen
-model <- randomForest(Alter ~ ., data=train_dfAlter, ntree = 1000, proximity=TRUE, mtry = sqrt(229), importance =TRUE)
-model
-
-
-oob.error.data <- data.frame(
-  Trees=rep(1:nrow(model$err.rate), times=4),
-  Type=rep(c("OOB", "1", "2", "3"), each=nrow(model$err.rate)),
-  Error=c(model$err.rate[,"OOB"], 
-          model$err.rate[,"1"], 
-          model$err.rate[,"2"],
-          model$err.rate[,"3"]))
-
-
-ggplot(data=oob.error.data, aes(x=Trees, y=Error)) +
-  geom_line(aes(color=Type))
-
-ggsave("oob_error_rate_1000_trees_Geschlecht.pdf")
-
-model_Geschlecht_1000 <- model
-
-## Kommentieren: wie hat sich der Error verändert? Größer, kleiner, oder gleich? Sprich, war es notwendig mit 1000 Trees zu arbeiten?
-
-
-###ABWÄGEN: auch ausprobieren für andere Zahl von Trees notwendig, zb 500? (dann einfach Kopieren und ntree = 500 setzen) 
-
-
-# Prüfen: was ist das ideale mtry? 
-
-set.seed(1234)
-model <- tuneRF(train_dfAlter, train_dfAlter$Alter, mtryStart = 3, ntreeTry = 500, stepFactor=2, improve=0.05, trace = TRUE, plot=TRUE) #doBest = TRUE/FALSE
-
-
-
-###Zeile 110: Modellgleichung anpassen wie davor; ntree wählen welches besser war (300 oder 1000 oder anderes)
-oob.values <- vector(length=20)
-for(i in 1:20) {
-  temp.model <- randomForest(Alter ~ ., data=train_dfAlter, mtry=i, ntree=500)
-  oob.values[i] <- temp.model$err.rate[nrow(temp.model$err.rate),1]
-}
-oob.values
-# find  minimum error
-min(oob.values)
-# find  optimal value for mtry
-which(oob.values == min(oob.values))
-
-# create a model for proximities using the best value for mtry and check for most important variables
-###anpassen: DV, Data, ntree
-model <- randomForest(Alter ~ ., 
-                      data=train_dfAlter,
-                      ntree=1000, 
-                      proximity=TRUE,
-                      mtry=192, 
-                      Importance=TRUE)
-
-# print model
-model
-summary(model)
-
-#evaluate variable importance
-
-varImp(model)
-varImpPlot(model)
-
-# Mean Decrease Gini - Measure of variable importance based on the Gini impurity index used for the calculation of splits in trees.
-
-#checking direction of the 10-20 most important variables
-###anpassen: name vom dataset
-
-imp <- varImp(model)
-impvar <- rownames(imp)[order(imp[, 1], decreasing=TRUE)]
-impvar <- impvar[1:10]
-op <- par(mfrow=c(2, 5))
-for (i in seq_along(impvar)) {
-  partialPlot(model, pred.data = as.data.frame(train_dfAlter), x.var = impvar[i], xlab=impvar[i],
-              main=paste("Partial Dependence on", impvar[i]))
-}
-par(op)
-
-imp <- varImp(model)
-impvar <- rownames(imp)[order(imp[, 1], decreasing=TRUE)]
-impvar <- impvar[11:20]
-op <- par(mfrow=c(2, 5))
-for (i in seq_along(impvar)) {
-  partialPlot(model, pred.data = as.data.frame(train_dfAlter), x.var = impvar[i], xlab=impvar[i],
-              main=paste("Partial Dependence on", impvar[i]))
-}
-par(op)
-
-# ----------------------------------------------MODEL EVALUATION-------------------------------------------------
-
-
-# Apply model to test_df --> test_dfGeschlecht
-
-# predict outcome using model from train_df applied to the test_df
-
-### hier auch einmal nach dem testdf der DV umbenennen
-
-predictions <- predict(model, newdata=test_dfAlter)
-
-# Create confusion matrix
-confusionMatrix(data=predictions, test_dfAlter$Alter)
-
-
-#-------------------------------------------RANDOM FOREST WITH CROSS-VALIDATION-------------------------------------------
+#---------------------------------------------------RANDOM FOREST----------------------------------------------------
 
 #--------------------------------------------BUILDING AND TRAINING THE MODEL---------------------------------------------
 
 
 # Specify the type of training method used & number of folds --> bei uns 10-fold Cross-Validation
-
+set.seed(1997)
 myControl = trainControl(
   method = "cv",
   number = 10, 
   verboseIter = TRUE,
   allowParallel=TRUE,
-  #sampling = "smote",
-  search = "random",
+  #sampling = "smote", #wenn sampling, dann hier anpassen und für alle drei Varianten ausprobieren!! (up, down, smote)
+  search = "grid",
 )
 
 
-#set random seed again 
-
-set.seed(400)
-
-# train model with: 300 trees (default)
-
-
-modelAlter <- train(Alter ~ ., # hier die DV einfügen. "~ ." heißt es werden alle Varibablen im dataframe als IV's genutzt um die DV zu predicten.
-                           data=train_dfAlter, # hier den data-frame definieren womit trainiert werden soll --> training_df!
-                           method="ranger", # ranger is eine schnellere RF methode, man  kann auch "rf" für random forest eingeben
-                           metric= "RMSE", # hier bei metric kann man sich auch die Accuracy ausgeben lassen
-                           na.action = na.omit, # sagt aus, dass fehlende Werte rausgelassen werden beim training
-                           trControl = myControl, 
-                          importance = 'impurity') # training methode: bei uns Cross-Validation
-
-
-# print model
-
-print(modelAlter)
+####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
 
 # test of the ideal mtry, splitrule and min-node.size
 
 set.seed(1997)
 
-myGrid = expand.grid(mtry = c(1:20),
-                     splitrule = "variance", # What does this mean? Theres also "gini" --> the gini tells you which variables were the most important for building the trees 
+myGrid = expand.grid(mtry = c(10:20),
+                     splitrule = "extratrees", 
                      min.node.size = c(5,10,15))
 
-
-modelAlter <- train(Alter ~ ., 
+set.seed(667)
+modelAlterRF <- train(Alter ~ ., 
                            data=train_dfAlter,
                            tuneGrid = myGrid,
-                           method="ranger", # ranger is eine schnellere RF methode
-                           metric= "RSME", # hier bei metric kann man sich auch die Accuracy ausgeben lassen
-                           na.action = na.omit, 
-                           trControl = myControl)
-
-# Print model to console
-
-modelAlter
-summary(modelAlter)
-plot(modelAlter)
-
-#save the best mtry 
-
-bestmtry <- modelAlter$bestTune$mtry
-
-
-### hier das finale model mit bestmtry und node size einfügen 
-
-set.seed(400)
-myGrid <- expand.grid(mtry = bestmtry, splitrule ="variance", min.node.size = 5)
-modelGeschlechtRF <- train(Alter ~ ., 
-                           data=train_dfAlter, 
-                           method="ranger", metric= "Rsquared", # hier bei metric kann man sich auch die Accuracy ausgeben lassen
-                           tuneGrid = myGrid,
+                           method="ranger",
+                           metric= "RMSE", # numeric: RMSE; categorical: Kappa; binary: ROC
                            na.action = na.omit,
+                           num.tree = 500,
                            trControl = myControl, 
                            importance = 'impurity')
 
-# Print model
-### hier den Model namen ändern
-print(modelAlter)
+# Print model to console
 
-#output in terms of regression coefficients
-summary(modelAlter)
+modelAlterRF
+summary(modelAlterRF)
+plot(modelAlterRF)
 
-#evaluate variable importance 
-# Mean Decrease Gini - Measure of variable importance based on the Gini impurity index used for the calculation of splits in trees.
-### hier auch den model namen ändern
 
-varImp(modelAlter)
-plot(varImp(modelAlter), 20, main = "Alter")
+#best mtry = 13, splitrule = extratrees, min.node.size = 5
 
-#checking direction of the 10 most important variables
-###anpassen: name vom dataset
-imp <- varImp(modelAlter)
-imp <- imp[[1]]
-impvar <- rownames(imp)[order(imp, decreasing=TRUE)]
-impvar <- impvar[1:10]
-op <- par(mfrow=c(2, 5))
-for (i in seq_along(impvar)) {
-  partial(modelGeschlechtRF, pred.data = as.data.frame(train_dfAlter), x.var = impvar[i], xlab=impvar[i],
-              main=paste("Partial Dependence on", impvar[i]), paropts = list(.packages = "ranger"), plot = TRUE)
-}
-par(op)
+# Apply model to test_df --> test_dfGeschlecht
 
-# ----------------------------------------------MODEL EVALUATION-------------------------------------------------
+# predict outcome using model from train_df applied to the test_df
+
+### hier auch einmal nach dem testdf der DV umbenennen
+predictions <- predict(modelAlterRF, newdata=test_dfAlter)
+
+#check performance measures --> für numerisch
+MAE(predictions, test_dfAlter$Alter)
+RMSE(predictions, test_dfAlter$Alter)
+R2(predictions, test_dfAlter$Alter)
+
+###numeric only:
+#calculate Pearson coefficient for predictions and actual values
+# Correlations with significance levels
+
+pearsonAlterRF <- cor.test(predictions, test_dfAlter$Alter, method = "pearson")
+pearsonAlterRF
+
+spearmanGreen1_1 <- cor.test(predictions, test_dfAlter$Alter, method = "spearman")
+spearmanGreen1_1
+
+
+#save the best mtry 
+
+bestmtry <- modelAlterRF$bestTune$mtry
+
+####-------tree 2: num.tree prüfen --------------------------------------------------
+
+# test of ideal num.tree --> try if numtree 1000 leads to better results!
+###mtry, splitrule und min.node.size zu dem anpassen, was tree 1 gefunden hat!
+
+set.seed(1997)
+
+myGrid = expand.grid(mtry = 13,   #anpassen!
+                     splitrule = "extratrees", #anpassen!
+                     min.node.size = 5)   #anpassen!
+
+
+modelAlterRF1 <- train(Alter ~ ., 
+                           data=train_dfAlter,
+                           tuneGrid = myGrid,
+                           method="ranger", 
+                           metric= "RMSE", 
+                           na.action = na.omit,
+                           num.tree = 1000,
+                           trControl = myControl, 
+                           importance = 'impurity')
+
+# Print model to console
+
+modelAlterRF1
+summary(modelAlterRF1)
 
 
 # Apply model to test_df --> test_dfGeschlecht
@@ -454,11 +208,117 @@ par(op)
 # predict outcome using model from train_df applied to the test_df
 
 ### hier auch einmal nach dem testdf der DV umbenennen
+predictions <- predict(modelAlterRF1, newdata=test_dfAlter)
 
-predictions <- predict(modelAlter, newdata=test_dfAlter)
 
-# Create confusion matrix
-confusionMatrix(data=predictions, test_dfAlter$Alter)
+#check performance measures --> für numerisch
+MAE(predictions, test_dfAlter$Alter)
+RMSE(predictions, test_dfAlter$Alter)
+R2(predictions, test_dfAlter$Alter)
+
+###numeric only:
+#calculate Pearson coefficient for predictions and actual values
+# Correlations with significance levels
+
+pearsonAlter1 <- cor.test(predictions, test_dfAlter$Alter, method = "pearson")
+pearsonAlter1
+
+spearmanAlter1 <- cor.test(predictions, test_dfAlter$Alter, method = "spearman")
+spearmanAlter1
+
+
+
+#fit model with num.trees = xx trees (better performance)
+
+####-------tree 3: Final --------------------------------------------------
+
+### hier das finale model mit bestmtry und node size einfügen , auch best num.tree anpassen
+
+set.seed(1997)
+myGrid <- expand.grid(mtry = 13, splitrule ="extratrees", min.node.size = 5)
+modelAlterfinal <- train(Alter ~ ., 
+                           data=train_dfAlter, 
+                           method="ranger", 
+                           metric= "RMSE", # hier bei metric kann man sich auch die Accuracy ausgeben lassen
+                           tuneGrid = myGrid,
+                           na.action = na.omit,
+                           num.tree = 500,
+                           trControl = myControl, 
+                           importance = 'impurity')
+
+# Print model
+### hier den Model namen ändern
+print(modelAlterfinal)
+
+#output in terms of regression coefficients
+summary(modelAlterfinal)
+
+#evaluate variable importance 
+# Mean Decrease Gini - Measure of variable importance based on the Gini impurity index used for the calculation of splits in trees.
+### hier auch den model namen ändern
+
+varImp(modelAlterfinal)
+plot(varImp(modelAlterfinal), 20, main = "weiblich_maennlich")
+
+# Apply model to test_df --> test_dfGeschlecht
+
+# predict outcome using model from train_df applied to the test_df
+
+### hier auch einmal nach dem testdf der DV umbenennen
+predictions <- predict(modelAlterfinal, newdata=test_dfAlter)
+
+
+#check performance measures --> für numerisch
+MAE(predictions, test_dfAlter$Alter)
+RMSE(predictions, test_dfAlter$Alter)
+R2(predictions, test_dfAlter$Alter)
+
+###numeric only:
+#calculate Pearson coefficient for predictions and actual values
+# Correlations with significance levels
+
+pearsonAlterfinal <- cor.test(predictions, test_dfAlter$Alter, method = "pearson")
+pearsonAlterfinal
+
+spearmanAlterfinal <- cor.test(predictions, test_dfAlter$Alter, method = "spearman")
+spearmanAlterfinal
+
+#--------------Variable Direction: Partial Plots-----------------------------------------
+
+
+#checking direction of the 10 most important variables
+
+###anpassen: name vom dataset
+
+imp <- importance(modelAlterfinal$finalModel)
+imp <- as.data.frame(imp)
+impvar <- rownames(imp)[order(imp[1], decreasing=TRUE)]
+impvar <- impvar[1:20]
+
+###Model umbenennen
+
+PartialPlots <- modelAlterfinal
+
+PartialPlots %>% partial(pred.var = impvar[1]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[2]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[3]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[4]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[5]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[6]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[7]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[8]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[9]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[10]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[11]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[12]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[13]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[14]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[15]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[16]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[17]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[18]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[19]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[20]) %>%plotPartial
 
 
 #------------------------------------------------WHEN BEST MODEL IS FOUND-----------------------------------------------------
@@ -472,3 +332,4 @@ saveRDS(final_model, "./final_model.rds")
 
 super_model <- readRDS("./final_model.rds")
 print(super_model)
+
