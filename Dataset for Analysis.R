@@ -818,6 +818,7 @@ data <- data %>% mutate(Einkommensgruppe = case_when(Nettoeinkommen == "0 € - 
                                                                Nettoeinkommen == "3001 € - 4000 €" ~ 'mittel',
                                                                Nettoeinkommen == "4001 € - 5000 €" ~ 'hoch',
                                                                Nettoeinkommen == "Mehr als 5000 €" ~ 'hoch'))
+
 #Beziehungsstatus: alleine oder in Beziehung
 data <- data %>% mutate(Allein_vs_Beziehung = case_when(Beziehungsstatus == "Single" ~ 'Allein',
                                                     Beziehungsstatus == "Geschieden" ~ 'Allein',
@@ -919,6 +920,14 @@ data <- data %>% mutate(FDP_Waehler = ifelse(Wahl_Partei == "FDP", "Ja", "Nein")
 data <- data %>% mutate(AfD_Waehler = ifelse(Wahl_Partei == "AfD", "Ja", "Nein"))
 data <- data %>% mutate(Linke_Waehler = ifelse(Wahl_Partei == "Die Linke", "Ja", "Nein"))
 data <- data %>% mutate(Nichtwahler = ifelse(Wahl_Partei == "Ich würde nicht wählen gehen", "Ja", "Nein"))
+
+#Einkommen: über oder unter Durchschnitt Nettoeinkommen
+data <- data %>% mutate(Durchschnittseinkommen = case_when(Nettoeinkommen == "0 € - 1000 €" ~ 'weniger2000',
+                                                           Nettoeinkommen == "1001 € - 2000€" ~ 'weniger2000',
+                                                           Nettoeinkommen == "2001 € - 3000 €" ~ 'mehr2000',
+                                                           Nettoeinkommen == "3001 € - 4000 €" ~ 'mehr2000',
+                                                           Nettoeinkommen == "4001 € - 5000 €" ~ 'mehr2000',
+                                                           Nettoeinkommen == "Mehr als 5000 €" ~ 'mehr2000'))
 
 
 #####

@@ -49,10 +49,6 @@ library(Hmisc)
 
 options(max.print = 100000)
 
-###Miriam Stand: 
-#Green 1: Code steht, muss angepasst werden
-#Green2: Code steht, muss angepasst werden
-
 
 #######################
 #Green Values: numeric
@@ -280,9 +276,9 @@ RFGreen1_1
 summary(RFGreen1_1)
 plot(RFGreen1_1)
 
-#best mtry:
-#splitrule:
-#min.node.size used:
+#best mtry:10
+#splitrule: extratrees
+#min.node.size used: 10
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(RFGreen1_1, newdata=test_dfGreen1)
@@ -302,18 +298,13 @@ spearmanGreen1_1
 
 
 
-
-#save the best mtry 
-
-bestmtry <- modelGeschlechtRF$bestTune$mtry
-
 ####-------tree 2: num.tree prüfen --------------------------------------------------
 
 #getunte Werte setzen und num.tree ausprobieren --> ist mehr besser?
 
 set.seed(1997)
 
-myGrid <- expand.grid(mtry = 10, splitrule ="extratrees", min.node.size = 15)
+myGrid <- expand.grid(mtry = 10, splitrule ="extratrees", min.node.size = 10)
 
 RFGreen1_2 <- train(Green_Values ~ ., 
                     data=train_dfGreen1,
@@ -329,7 +320,6 @@ RFGreen1_2 <- train(Green_Values ~ .,
 
 RFGreen1_2
 summary(RFGreen1_2)
-plot(RFGreen1_2)
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(RFGreen1_2, newdata=test_dfGreen1)
@@ -348,7 +338,7 @@ pearsonGreen1_2
 spearmanGreen1_2 <- cor.test(predictions, test_dfGreen1$Green_Values, method = "spearman")
 spearmanGreen1_2
 
-#num.trees xx performs better
+#num.trees 1000 performs slightly better
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -356,7 +346,7 @@ spearmanGreen1_2
 #final getunte Werte einsetzen
 
 set.seed(1997)
-myGrid <- expand.grid(mtry = 10, splitrule ="extratrees", min.node.size = 15)
+
 RFGreen1_fin <- train(Green_Values ~ ., 
                            data=train_dfGreen1, 
                            method="ranger", metric= "RMSE",
@@ -364,13 +354,11 @@ RFGreen1_fin <- train(Green_Values ~ .,
                            na.action = na.omit,
                            num.tree = 1000,
                            trControl = myControl, 
-                      na.action = na.omit,
                            importance = 'impurity')
 
 # Print model
 RFGreen1_fin
 summary(RFGreen1_fin)
-plot(RFGreen1_fin)
 
 #evaluate variable importance 
 # Mean Decrease Gini - Measure of variable importance based on the Gini impurity index used for the calculation of splits in trees.
@@ -744,28 +732,6 @@ myControl1 = trainControl(
   search = "grid"
 )
 
-myControl2 = trainControl(
-  method = "cv",
-  number = 10, 
-  verboseIter = TRUE,
-  summaryFunction = twoClassSummary, 
-  classProbs = TRUE, 
-  allowParallel=TRUE,
-  sampling = "up", 
-  search = "grid"
-)
-
-myControl3 = trainControl(
-  method = "cv",
-  number = 10, 
-  verboseIter = TRUE,
-  summaryFunction = twoClassSummary, 
-  classProbs = TRUE, 
-  allowParallel=TRUE,
-  sampling = "down", 
-  search = "grid"
-)
-
 
 
 
@@ -782,7 +748,7 @@ myGrid = expand.grid(mtry = c(10:20),
                      min.node.size = c(5,10,15))
 
 set.seed(1997)
-RFGreen2_11 <- train(Green2 ~ ., 
+RFGreen2_1 <- train(Green2 ~ ., 
                     data=train_dfGreen2,
                     tuneGrid = myGrid,
                     method="ranger", 
@@ -791,60 +757,20 @@ RFGreen2_11 <- train(Green2 ~ .,
                     na.action = na.omit,
                     trControl = myControl1, 
                     importance = 'impurity')
-set.seed(1997)
-RFGreen2_12 <- train(Green2 ~ ., 
-                     data=train_dfGreen2,
-                     tuneGrid = myGrid,
-                     method="ranger", 
-                     metric= "ROC",
-                     num.tree = 500,
-                     na.action = na.omit,
-                     trControl = myControl2, 
-                     importance = 'impurity')
-set.seed(1997)
-RFGreen2_13 <- train(Green2 ~ ., 
-                     data=train_dfGreen2,
-                     tuneGrid = myGrid,
-                     method="ranger", 
-                     metric= "ROC",
-                     num.tree = 500,
-                     na.action = na.omit,
-                     trControl = myControl3, 
-                     importance = 'impurity')
 
 # Print models to console
 
-RFGreen2_11
-summary(RFGreen2_11)
-plot(RFGreen2_11)
-#mtry = xx, extratrees, min.node.size = xx
-
-
-RFGreen2_12
-summary(RFGreen2_12)
-plot(RFGreen2_12)
-#mtry = xx, extratrees, min.node.size = xx
-
-
-RFGreen2_13
-summary(RFGreen2_13)
-plot(RFGreen2_13)
-#mtry = xx, extratrees, min.node.size = xx
+RFGreen2_1
+summary(RFGreen2_1)
+plot(RFGreen2_1)
+#mtry = 13, extratrees, min.node.size = 10
 
 
 # predict outcome using model from train_df applied to the test_df
-predictions <- predict(RFGreen2_11, newdata=test_dfGreen2)
-predictions <- predict(RFGreen2_12, newdata=test_dfGreen2)
-predictions <- predict(RFGreen2_13, newdata=test_dfGreen2)
+predictions1 <- predict(RFGreen2_1, newdata=test_dfGreen2)
 
 # Create confusion matrix
 confusionMatrix(data=as.factor(predictions1), as.factor(test_dfGreen2$Green2))
-confusionMatrix(data=as.factor(predictions2), as.factor(test_dfGreen2$Green2))
-confusionMatrix(data=as.factor(predictions3), as.factor(test_dfGreen2$Green2))
-
-#save the best mtry 
-
-bestmtry <- modelGeschlechtRF$bestTune$mtry
 
 
 #check for auc
@@ -855,25 +781,14 @@ test_roc <- function(model, data) {
   
 }
 
-#model1 auc
-RFGreen2_11 %>%
+#model1 auc: 0.6346
+RFGreen2_1 %>%
   test_roc(data = test_dfGreen2) %>%
   auc()
 
-#model2 auc
-RFGreen2_12 %>%
-  test_roc(data = test_dfGreen2) %>%
-  auc()
 
-#model3 auc
-RFGreen2_13 %>%
-  test_roc(data = test_dfGreen2) %>%
-  auc()
-
-#compare different ROC plots
-model_list <- list(Model1 = RFGreen2_11,
-                   Model2 = RFGreen2_12,
-                   Model3 = RFGreen2_13)
+#check ROC plots
+model_list <- list(Model1 = RFGreen2_1)
 
 model_list_roc <- model_list %>%
   map(test_roc, data = test_dfGreen2)
@@ -897,7 +812,7 @@ for(the_roc in model_list_roc){
 
 results_df_roc <- bind_rows(results_list_roc)
 
-# Plot ROC curve for all 3 models
+# Plot ROC curve
 
 custom_col <- c("#000000", "#009E73", "#0072B2", "#D55E00", "#CC79A7")
 
@@ -916,73 +831,31 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 #set random seed again 
 set.seed(1997)
 
-myGrid = expand.grid(mtry = c(10:20),
-                     splitrule = "extratrees", 
-                     min.node.size = c(5,10,15))
+myGrid1 <- expand.grid(mtry = 13, splitrule ="extratrees", min.node.size = 10)
 
 set.seed(1997)
-RFGreen2_21 <- train(Green2 ~ ., 
+RFGreen2_2 <- train(Green2 ~ ., 
                      data=train_dfGreen2,
-                     tuneGrid = myGrid,
+                     tuneGrid = myGrid1,
                      method="ranger", 
                      metric= "ROC",
                      num.tree = 1000,
                      na.action = na.omit,
                      trControl = myControl1, 
                      importance = 'impurity')
-set.seed(1997)
-RFGreen2_22 <- train(Green2 ~ ., 
-                     data=train_dfGreen2,
-                     tuneGrid = myGrid,
-                     method="ranger", 
-                     metric= "ROC",
-                     num.tree = 1000,
-                     na.action = na.omit,
-                     trControl = myControl2, 
-                     importance = 'impurity')
-set.seed(1997)
-RFGreen2_23 <- train(Green2 ~ ., 
-                     data=train_dfGreen2,
-                     tuneGrid = myGrid,
-                     method="ranger", 
-                     metric= "ROC",
-                     num.tree = 1000,
-                     na.action = na.omit,
-                     trControl = myControl3, 
-                     importance = 'impurity')
 
 # Print models to console
 
-RFGreen2_21
-summary(RFGreen2_21)
-plot(RFGreen2_21)
-  #mtry = xx, extratrees, min.node.size = xx
-
-RFGreen2_22
-summary(RFGreen2_22)
-plot(RFGreen2_22)
-  #mtry = xx, extratrees, min.node.size = xx
-
-
-RFGreen2_23
-summary(RFGreen2_23)
-plot(RFGreen2_23)
-  #mtry = xx, extratrees, min.node.size = xx
+RFGreen2_2
+summary(RFGreen2_2)
 
 
 # predict outcome using model from train_df applied to the test_df
-predictions1 <- predict(RFGreen2_21, newdata=test_dfGreen2)
-predictions2 <- predict(RFGreen2_22, newdata=test_dfGreen2)
-predictions3 <- predict(RFGreen2_23, newdata=test_dfGreen2)
+predictions2 <- predict(RFGreen2_2, newdata=test_dfGreen2)
 
 # Create confusion matrix
-confusionMatrix(data=as.factor(predictions1), as.factor(test_dfGreen2$Green2))
 confusionMatrix(data=as.factor(predictions2), as.factor(test_dfGreen2$Green2))
-confusionMatrix(data=as.factor(predictions3), as.factor(test_dfGreen2$Green2))
 
-#save the best mtry 
-
-bestmtry <- modelGeschlechtRF$bestTune$mtry
 
 #check for auc
 test_roc <- function(model, data) {
@@ -993,24 +866,13 @@ test_roc <- function(model, data) {
 }
 
 #model1 auc
-RFGreen2_21 %>%
+RFGreen2_2 %>%
   test_roc(data = test_dfGreen2) %>%
   auc()
 
-#model2 auc
-RFGreen2_22 %>%
-  test_roc(data = test_dfGreen2) %>%
-  auc()
-
-#model3 auc
-RFGreen2_23 %>%
-  test_roc(data = test_dfGreen2) %>%
-  auc()
 
 #compare different ROC plots
-model_list <- list(Model1 = RFGreen2_21,
-                   Model2 = RFGreen2_22,
-                   Model3 = RFGreen2_23)
+model_list <- list(Model1 = RFGreen2_2)
 
 model_list_roc <- model_list %>%
   map(test_roc, data = test_dfGreen2)
@@ -1044,7 +906,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
 
-#better num.trees: xx trees
+#better num.trees: 500 trees (only slightly better, but better at classifying underrepresented "No"s)
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -1052,82 +914,32 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 #final getunte Werte einsetzen
 
 set.seed(1997)
-myGrid1 <- expand.grid(mtry = 10, splitrule ="extratrees", min.node.size = 15)
-myGrid2 <- expand.grid(mtry = 10, splitrule ="extratrees", min.node.size = 15)
-myGrid3 <- expand.grid(mtry = 10, splitrule ="extratrees", min.node.size = 15)
-
-set.seed(1997)
-RFGreen2_fin1 <- train(Green2 ~ ., 
+RFGreen2_fin <- train(Green2 ~ ., 
                       data=train_dfGreen2, 
                       method="ranger", metric= "ROC",
                       tuneGrid = myGrid1,
                       na.action = na.omit,
                       num.tree = 500,
                       trControl = myControl1, 
-                      na.action = na.omit,
                       importance = 'impurity')
-set.seed(1997)
-RFGreen2_fin2 <- train(Green2 ~ ., 
-                       data=train_dfGreen2, 
-                       method="ranger", metric= "ROC",
-                       tuneGrid = myGrid2,
-                       na.action = na.omit,
-                       num.tree = 500,
-                       trControl = myControl2, 
-                       na.action = na.omit,
-                       importance = 'impurity')
-set.seed(1997)
-RFGreen2_fin3 <- train(Green2 ~ ., 
-                       data=train_dfGreen2, 
-                       method="ranger", metric= "ROC",
-                       tuneGrid = myGrid3,
-                       na.action = na.omit,
-                       num.tree = 500,
-                       trControl = myControl3,
-                       na.action = na.omit, 
-                       importance = 'impurity')
 
 # Print models
-RFGreen2_fin1
-summary(RFGreen2_fin1)
-plot(RFGreen2_fin1)
-#mtry = xx, extratrees, min.node.size = xx
-
-
-RFGreen2_fin2
-summary(RFGreen2_fin2)
-plot(RFGreen2_fin2)
-#mtry = xx, extratrees, min.node.size = xx
-
-
-RFGreen2_fin3
-summary(RFGreen2_fin3)
-plot(RFGreen2_fin3)
-#mtry = xx, extratrees, min.node.size = xx
+RFGreen2_fin
+summary(RFGreen2_fin)
 
 
 #evaluate variable importance 
 # Mean Decrease Gini - Measure of variable importance based on the Gini impurity index used for the calculation of splits in trees.
 
-varImp(RFGreen2_fin1)
-plot(varImp(RFGreen2_fin1), 20, main = "Green_Values")
-
-varImp(RFGreen2_fin2)
-plot(varImp(RFGreen2_fin2), 20, main = "Green_Values")
-
-varImp(RFGreen2_fin3)
-plot(varImp(RFGreen2_fin3), 20, main = "Green_Values")
+varImp(RFGreen2_fin)
+plot(varImp(RFGreen2_fin), 20, main = "Green_Values")
 
 
 # predict outcome using model from train_df applied to the test_df
-predictions1 <- predict(RFGreen2_fin1, newdata=test_dfGreen2)
-predictions2 <- predict(RFGreen2_fin2, newdata=test_dfGreen2)
-predictions3 <- predict(RFGreen2_fin3, newdata=test_dfGreen2)
+predictions3 <- predict(RFGreen2_fin, newdata=test_dfGreen2)
 
 
 # Create confusion matrix
-confusionMatrix(data=as.factor(predictions1), as.factor(test_dfGreen2$Green2))
-confusionMatrix(data=as.factor(predictions2), as.factor(test_dfGreen2$Green2))
 confusionMatrix(data=as.factor(predictions3), as.factor(test_dfGreen2$Green2))
 
 
@@ -1139,25 +951,16 @@ test_roc <- function(model, data) {
   
 }
 
-#model1 auc
-RFGreen2_fin1 %>%
+#model auc
+RFGreen2_fin %>%
   test_roc(data = test_dfGreen2) %>%
   auc()
 
-#model2 auc
-RFGreen2_fin2 %>%
-  test_roc(data = test_dfGreen2) %>%
-  auc()
-
-#model3 auc
-RFGreen2_fin3 %>%
-  test_roc(data = test_dfGreen2) %>%
-  auc()
 
 #compare different ROC plots
-model_list <- list(Model1 = RFGreen2_fin1,
-                   Model2 = RFGreen2_fin2,
-                   Model3 = RFGreen2_fin3)
+model_list <- list(Model1 = RFGreen2_1,
+                   Model2 = RFGreen2_2,
+                   Model3 = RFGreen2_fin)
 
 model_list_roc <- model_list %>%
   map(test_roc, data = test_dfGreen2)
@@ -1193,7 +996,6 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 
 
-#best forest: model x (sampling = xx)
 
 #--------------Variable Direction: Partial Plots-----------------------------------------
 
@@ -1237,13 +1039,13 @@ PartialPlots %>% partial(pred.var = impvar[20]) %>%plotPartial
 
 #save model to disk 
 
-besttree_Green2 <- RFGreen2_fin123
+besttree_Green2 <- RFGreen2_fin
 saveRDS(besttree_Green2, "./tree_Green2.rds")
 
 #load the model
 
-Tree_Green2 <- readRDS("./tree_Green2.rds")
-print(Tree_Green2)
+besttree_Green2 <- readRDS("./tree_Green2.rds")
+print(besttree_Green2)
 
 
 
