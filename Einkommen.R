@@ -103,7 +103,7 @@ train_dfEinkommen <- data_Einkommen[index,]
 test_dfEinkommen <- data_Einkommen[-index,]
 
 #setting reference level: 
-train_dfEinkommen$Einkommensgruppe <- relevel(train_dfEinkommen$Einkommensgruppe, ref = "mittel")
+#train_dfEinkommen$Einkommensgruppe <- relevel(train_dfEinkommen$Einkommensgruppe, ref = "mittel")
 
 
 
@@ -367,29 +367,6 @@ myControl1 = trainControl(
   search = "grid"
 )
 
-myControl2 = trainControl(
-  method = "cv",
-  number = 10, 
-  verboseIter = TRUE,
-  summaryFunction = defaultSummary, 
-  classProbs = TRUE, 
-  allowParallel=TRUE,
-  sampling = "up", 
-  search = "grid"
-)
-
-myControl3 = trainControl(
-  method = "cv",
-  number = 10, 
-  verboseIter = TRUE,
-  summaryFunction = defaultSummary, 
-  classProbs = TRUE, 
-  allowParallel=TRUE,
-  sampling = "down", 
-  search = "grid"
-)
-
-
 
 ####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
 
@@ -405,7 +382,7 @@ myGrid = expand.grid(mtry = c(10:20),
                      min.node.size = c(5,10,15))
 
 set.seed(1997)
-RFEinkommen_11 <- train(Einkommensgruppe ~ ., 
+RFEinkommen_1 <- train(Einkommensgruppe ~ ., 
                      data=train_dfEinkommen,
                      tuneGrid = myGrid,
                      method="ranger", 
@@ -414,51 +391,20 @@ RFEinkommen_11 <- train(Einkommensgruppe ~ .,
                      trControl = myControl1, 
                      na.action = na.omit,
                      importance = 'impurity')
-set.seed(1997)
-RFEinkommen_12 <- train(Einkommensgruppe ~ ., 
-                     data=train_dfEinkommen,
-                     tuneGrid = myGrid,
-                     method="ranger", 
-                     metric= "Kappa",
-                     num.tree = 500,
-                     trControl = myControl2,
-                     na.action = na.omit, 
-                     importance = 'impurity')
-set.seed(1997)
-RFEinkommen_13 <- train(Einkommensgruppe ~ ., 
-                     data=train_dfEinkommen,
-                     tuneGrid = myGrid,
-                     method="ranger", 
-                     metric= "Kappa",
-                     num.tree = 500,
-                     trControl = myControl3,
-                     na.action = na.omit, 
-                     importance = 'impurity')
 
 # Print models to console
 
-RFEinkommen_11
-summary(RFEinkommen_11)
-plot(RFEinkommen_11)
-  #mtry = 17, extratrees, min.node.size = 10
+RFEinkommen_1
+summary(RFEinkommen_1)
+plot(RFEinkommen_1)
+  #mtry = 14, extratrees, min.node.size = 10
 
-RFEinkommen_12
-summary(RFEinkommen_12)
-plot(RFEinkommen_12)
-
-RFEinkommen_13
-summary(RFEinkommen_13)
-plot(RFEinkommen_13)
 
 # predict outcome using model from train_df applied to the test_df
-predictions1 <- predict(RFEinkommen_11, newdata=test_dfEinkommen)
-predictions2 <- predict(RFEinkommen_12, newdata=test_dfEinkommen)
-predictions3 <- predict(RFEinkommen_13, newdata=test_dfEinkommen)
+predictions1 <- predict(RFEinkommen_1, newdata=test_dfEinkommen)
 
 # Create confusion matrix
 confusionMatrix(data=as.factor(predictions1), as.factor(test_dfEinkommen$Einkommensgruppe))
-confusionMatrix(data=as.factor(predictions2), as.factor(test_dfEinkommen$Einkommensgruppe))
-confusionMatrix(data=as.factor(predictions3), as.factor(test_dfEinkommen$Einkommensgruppe))
 
 #check for auc
 test_roc <- function(model, data) {
@@ -468,38 +414,22 @@ test_roc <- function(model, data) {
   
 }
 
-#model1 auc
-RFEinkommen_11 %>%
-  test_roc(data = test_dfEinkommen) %>%
-  auc()
-
-#model2 auc
-RFEinkommen_12 %>%
-  test_roc(data = test_dfEinkommen) %>%
-  auc()
-
-#model3 auc
-RFEinkommen_13 %>%
+#model1 auc: 0.7018
+RFEinkommen_1 %>%
   test_roc(data = test_dfEinkommen) %>%
   auc()
 
 
-
-#save the best mtry 
-
-bestmtry <- modelGeschlechtRF$bestTune$mtry
 
 ####-------tree 2: num.tree prüfen --------------------------------------------------
 
 #getunte Werte setzen und num.tree ausprobieren --> ist mehr besser?
 
 set.seed(1997)
-myGrid1 <- expand.grid(mtry = 10, splitrule ="extratrees", min.node.size = 15)
-myGrid2 <- expand.grid(mtry = 10, splitrule ="extratrees", min.node.size = 15)
-myGrid3 <- expand.grid(mtry = 10, splitrule ="extratrees", min.node.size = 15)
+myGrid1 <- expand.grid(mtry = 14, splitrule ="extratrees", min.node.size = 10)
 
 set.seed(1997)
-RFEinkommen_21 <- train(Einkommensgruppe ~ ., 
+RFEinkommen_2 <- train(Einkommensgruppe ~ ., 
                           data=train_dfEinkommen, 
                           method="ranger", metric= "Kappa",
                           tuneGrid = myGrid1,
@@ -507,50 +437,18 @@ RFEinkommen_21 <- train(Einkommensgruppe ~ .,
                           num.tree = 1000,
                           trControl = myControl1, 
                           importance = 'impurity')
-set.seed(1997)
-RFEinkommen_22 <- train(Einkommensgruppe ~ ., 
-                          data=train_dfEinkommen, 
-                          method="ranger", metric= "Kappa",
-                          tuneGrid = myGrid2,
-                          na.action = na.omit,
-                          num.tree = 1000,
-                          trControl = myControl2, 
-                          importance = 'impurity')
-set.seed(1997)
-RFEinkommen_23 <- train(Einkommensgruppe ~ ., 
-                          data=train_dfEinkommen, 
-                          method="ranger", metric= "ROC",
-                          tuneGrid = myGrid3,
-                          na.action = na.omit,
-                          num.tree = 1000,
-                          trControl = myControl3, 
-                          importance = 'impurity')
 
 # Print models
-RFEinkommen_21
-summary(RFEinkommen_21)
-plot(RFEinkommen_21)
-  #mtry = 10, extratrees, min.node.size = 15
+RFEinkommen_2
+summary(RFEinkommen_2)
 
-
-RFEinkommen_22
-summary(RFEinkommen_22)
-plot(RFEinkommen_22)
-
-RFEinkommen_23
-summary(RFEinkommen_23)
-plot(RFEinkommen_23)
 
 # predict outcome using model from train_df applied to the test_df
-predictions1 <- predict(RFEinkommen_21, newdata=test_dfEinkommen)
-predictions2 <- predict(RFEinkommen_fin2, newdata=test_dfEinkommen)
-predictions3 <- predict(RFEinkommen_23, newdata=test_dfEinkommen)
+predictions2 <- predict(RFEinkommen_2, newdata=test_dfEinkommen)
 
 
 # Create confusion matrix
-confusionMatrix(data=as.factor(predictions1), as.factor(test_dfEinkommen$Einkommensgruppe))
 confusionMatrix(data=as.factor(predictions2), as.factor(test_dfEinkommen$Einkommensgruppe))
-confusionMatrix(data=as.factor(predictions3), as.factor(test_dfEinkommen$Einkommensgruppe))
 
 
 #check for auc
@@ -561,38 +459,21 @@ test_roc <- function(model, data) {
   
 }
 
-#model1
-RFEinkommen_21 %>%
+#model auc: 0.7069
+RFEinkommen_2 %>%
   test_roc(data = test_dfEinkommen) %>%
   auc()
-
-#model2
-RFEinkommen_22 %>%
-  test_roc(data = test_dfEinkommen) %>%
-  auc()
-
-#model3
-RFEinkommen_23 %>%
-  test_roc(data = test_dfEinkommen) %>%
-  auc()
-
 
 
 #model1: 500 trees performs better
-#model2: xx trees performs better
-#model3: xx trees performs better
+
 
 ####-------tree 3: Final --------------------------------------------------
 
-#final getunte Werte einsetzen
+#final getunte Werte einsetzen: grid übernehmen und num.tree anpassen
 
 set.seed(1997)
-myGrid1 <- expand.grid(mtry = 17, splitrule ="extratrees", min.node.size = 10)
-myGrid2 <- expand.grid(mtry = 10, splitrule ="extratrees", min.node.size = 15)
-myGrid3 <- expand.grid(mtry = 10, splitrule ="extratrees", min.node.size = 15)
-
-set.seed(1997)
-RFEinkommen_fin1 <- train(Einkommensgruppe ~ ., 
+RFEinkommen_fin <- train(Einkommensgruppe ~ ., 
                        data=train_dfEinkommen, 
                        method="ranger", metric= "Kappa",
                        tuneGrid = myGrid1,
@@ -600,62 +481,23 @@ RFEinkommen_fin1 <- train(Einkommensgruppe ~ .,
                        num.tree = 500,
                        trControl = myControl1, 
                        importance = 'impurity')
-set.seed(1997)
-RFEinkommen_fin2 <- train(Einkommensgruppe ~ ., 
-                       data=train_dfEinkommen, 
-                       method="ranger", metric= "Kappa",
-                       tuneGrid = myGrid2,
-                       na.action = na.omit,
-                       num.tree = 500,
-                       trControl = myControl2, 
-                       importance = 'impurity')
-set.seed(1997)
-RFEinkommen_fin3 <- train(Einkommensgruppe ~ ., 
-                       data=train_dfEinkommen, 
-                       method="ranger", metric= "Kappa",
-                       tuneGrid = myGrid3,
-                       na.action = na.omit,
-                       num.tree = 500,
-                       trControl = myControl3, 
-                       importance = 'impurity')
 
 # Print models
-RFEinkommen_fin1
-summary(RFEinkommen_fin1)
-plot(RFEinkommen_fin1)
-
-RFEinkommen_fin2
-summary(RFEinkommen_fin2)
-plot(RFEinkommen_fin2)
-
-RFEinkommen_fin3
-summary(RFEinkommen_fin3)
-plot(RFEinkommen_fin3)
+RFEinkommen_fin
+summary(RFEinkommen_fin)
 
 #evaluate variable importance 
 # Mean Decrease Gini - Measure of variable importance based on the Gini impurity index used for the calculation of splits in trees.
 
-varImp(RFEinkommen_fin1)
-plot(varImp(RFEinkommen_fin1), 20, main = "Green_Values")
-
-varImp(RFEinkommen_fin2)
-plot(varImp(RFEinkommen_fin2), 20, main = "Green_Values")
-
-varImp(RFEinkommen_fin3)
-plot(varImp(RFEinkommen_fin3), 20, main = "Green_Values")
+varImp(RFEinkommen_fin)
+plot(varImp(RFEinkommen_fin), 20, main = "Einkommensgruppe")
 
 
 # predict outcome using model from train_df applied to the test_df
-predictions <- predict(RFEinkommen_fin1, newdata=test_dfEinkommen)
-predictions <- predict(RFEinkommen_fin2, newdata=test_dfEinkommen)
-predictions <- predict(RFEinkommen_fin3, newdata=test_dfEinkommen)
-
+predictions3 <- predict(RFEinkommen_fin, newdata=test_dfEinkommen)
 
 # Create confusion matrix
-confusionMatrix(data=as.factor(predictions1), as.factor(test_dfEinkommen$Einkommensgruppe))
-confusionMatrix(data=as.factor(predictions2), as.factor(test_dfEinkommen$Einkommensgruppe))
 confusionMatrix(data=as.factor(predictions3), as.factor(test_dfEinkommen$Einkommensgruppe))
-
 
 #check for auc
 test_roc <- function(model, data) {
@@ -665,30 +507,18 @@ test_roc <- function(model, data) {
   
 }
 
-#model1
-RFEinkommen_31 %>%
-  test_roc(data = test_dfEinkommen) %>%
-  auc()
-
-#model2
-RFEinkommen_32 %>%
-  test_roc(data = test_dfEinkommen) %>%
-  auc()
-
-#model3
-RFEinkommen_33 %>%
+#model auc: 0.7054
+RFEinkommen_fin %>%
   test_roc(data = test_dfEinkommen) %>%
   auc()
 
 
-#best predictor: model x (sampling = xx)
+
 
 #--------------Variable Direction: Partial Plots-----------------------------------------
 
 
-#checking direction of the 10 most important variables
-###anpassen: name vom dataset
-
+#checking direction of the 20 most important variables
 
 imp <- importance(RFEinkommen_fin$finalModel)
 imp <- as.data.frame(imp)
@@ -699,36 +529,80 @@ impvar <- impvar[1:20]
 
 PartialPlots <- RFEinkommen_fin
 
-PartialPlots %>% partial(pred.var = impvar[1]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[2]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[3]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[4]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[5]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[6]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[7]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[8]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[9]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[10]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[11]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[12]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[13]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[14]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[15]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[16]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[17]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[18]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[19]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[20]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "niedrig") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "niedrig") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "niedrig") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "niedrig") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "niedrig") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "niedrig") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "niedrig") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "niedrig") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "niedrig") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "niedrig") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "niedrig") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "niedrig") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "niedrig") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "niedrig") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "niedrig") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "niedrig") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "niedrig") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "niedrig") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "niedrig") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "niedrig") %>%plotPartial
+
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "mittel") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "mittel") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "mittel") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "mittel") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "mittel") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "mittel") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "mittel") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "mittel") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "mittel") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "mittel") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "mittel") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "mittel") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "mittel") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "mittel") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "mittel") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "mittel") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "mittel") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "mittel") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "mittel") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "mittel") %>%plotPartial
+
+
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "hoch") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "hoch") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "hoch") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "hoch") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "hoch") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "hoch") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "hoch") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "hoch") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "hoch") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "hoch") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "hoch") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "hoch") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "hoch") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "hoch") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "hoch") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "hoch") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "hoch") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "hoch") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "hoch") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "hoch") %>%plotPartial
+
 
 
 #------------------------------------------------WHEN BEST MODEL IS FOUND-----------------------------------------------------
 
 #save model to disk 
 
-besttree_Einkommen <- RFGreen2_fin123
+besttree_Einkommen <- RFGreen2_fin1
 saveRDS(besttree_Einkommen, "./tree_Einkommen.rds")
 
 #load the model
 
-tree_Einkommen <- readRDS("./tree_Einkommen.rds")
-print(tree_Einkommen)
+besttree_Einkommen <- readRDS("./tree_Einkommen.rds")
+print(besttree_Einkommen)
