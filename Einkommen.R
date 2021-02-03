@@ -98,250 +98,6 @@ index <- createDataPartition(data_Einkommen$Einkommensgruppe, p=.8, list= FALSE,
 train_dfEinkommen <- data_Einkommen[index,]
 test_dfEinkommen <- data_Einkommen[-index,]
 
-#setting reference level: 
-#train_dfEinkommen$Einkommensgruppe <- relevel(train_dfEinkommen$Einkommensgruppe, ref = "mittel")
-
-
-
-
-#--------------------------------------LOGISTIC REGRESSION/ LINEAR REGRESSION-----------------------------------------------------
-
-#-----------------------------------------BUILDING AND TRAINING THE MODEL---------------------------------------------
-
-
-# Specify the type of training method used & number of folds --> bei uns 10-fold Cross-Validation
-
-myControl1 = trainControl(
-  method = "cv",
-  number = 10, 
-  verboseIter = TRUE,
-  summaryFunction = defaultSummary, 
-  classProbs = TRUE, 
-  allowParallel=TRUE,
-  sampling = "smote", 
-  search = "grid"
-)
-
-myControl2 = trainControl(
-  method = "cv",
-  number = 10, 
-  verboseIter = TRUE,
-  summaryFunction = defaultSummary, 
-  classProbs = TRUE, 
-  allowParallel=TRUE,
-  sampling = "up", 
-  search = "grid"
-)
-
-myControl3 = trainControl(
-  method = "cv",
-  number = 10, 
-  verboseIter = TRUE,
-  summaryFunction = defaultSummary, 
-  classProbs = TRUE, 
-  allowParallel=TRUE,
-  sampling = "down", 
-  search = "grid"
-)
-
-
-
-
-# Specify multinomial regression model with most important IV's
-
-
-#--------------first regression with Control1: all parameters-----------------
-
-set.seed(1997)
-
-model1.1 <- train(Einkommensgruppe ~.,
-                  data=train_dfEinkommen,
-                  method = "lda", 
-                  metric = "Kappa",  #metric Kappa hilft bei imbalanced data
-                  na.action = na.omit,
-                  trControl=myControl1)
-
-print(model1.1)
-summary(model1.1)
-
-#variable Importance (predictor variables)
-
-varImp(model1.1)
-
-#look for most important variables
-ImportanceAll1.1 <- varImp(model1.1)$importance
-ImportanceAll1.1 <- arrange(ImportanceAll1.1, desc(Overall))
-ImportanceAll1.1
-
-# Apply model to test_df --> test_dfGeschlecht
-
-# predict outcome using model from train_df applied to the test_df
-
-predictions1.1 <- predict(model1.1, newdata=test_dfEinkommen)
-
-
-# Create confusion matrix
-
-confusionMatrix(data=as.factor(predictions1.1), as.factor(test_dfEinkommen$Einkommensgruppe))
-
-
-#--------------first regression with Control2: all parameters-----------------
-
-set.seed(1997)
-
-model1.2 <- train(Einkommensgruppe ~.,
-                  data=train_dfEinkommen,
-                  method = "multinom", 
-                  metric = "Kappa", 
-                  na.action = na.omit,
-                  trControl=myControl2)
-
-print(model1.2)
-summary(model1.2)
-
-#variable Importance (predictor variables)
-
-varImp(model1.2)
-
-#look for most important variables
-ImportanceAll1.2 <- varImp(model1.2)$importance
-ImportanceAll1.2 <- arrange(ImportanceAll1.2, desc(Overall))
-ImportanceAll1.2
-
-# Apply model to test_df --> test_dfGeschlecht
-
-# predict outcome using model from train_df applied to the test_df
-
-predictions1.2 <- predict(model1.2, newdata=test_dfEinkommen)
-
-
-# Create confusion matrix
-
-confusionMatrix(data=as.factor(predictions1.2), as.factor(test_dfEinkommen$Einkommensgruppe))
-
-
-#--------------first regression with Control3: all parameters-----------------
-
-set.seed(1997)
-
-model1.3 <- train(Einkommensgruppe ~.,
-                  data=train_dfEinkommen,
-                  method = "multinom", 
-                  metric = "Kappa", 
-                  na.action = na.omit,
-                  trControl=myControl3)
-
-print(model1.3)
-summary(model1.3)
-
-#variable Importance (predictor variables)
-
-varImp(model1.3)
-
-#look for most important variables
-ImportanceAll1.3 <- varImp(model1.3)$importance
-ImportanceAll1.3 <- arrange(ImportanceAll1.3, desc(Overall))
-ImportanceAll1.3
-
-# Apply model to test_df --> test_dfGeschlecht
-
-# predict outcome using model from train_df applied to the test_df
-
-predictions1.3 <- predict(model1.3, newdata=test_dfEinkommen)
-
-
-# Create confusion matrix
-
-confusionMatrix(data=as.factor(predictions1.3), as.factor(test_dfEinkommen$Einkommensgruppe))
-
-##upsampling (Control2) works best, will be used further --> best ROC and Sens, second best prediction accuracy
-
-
-#------second regression: ridge/lasso for shrinking model---------
-
-set.seed(1998)
-
-myGrid <- expand.grid(alpha = 0:1,
-                      lambda = seq(0.0001, 1, length = 100))
-
-model2 <- train(Einkommensgruppe ~ .,
-                data=train_dfEinkommen,
-                method = "glmnet", 
-                metric = "Kappa", 
-                na.action = na.omit,
-                tuneGrid = myGrid,
-                trControl=myControl2) 
-
-print(model2)
-summary(model2)
-coef(model2$finalModel, model2$finalModel$lambdaOpt)
-
-
-varImp(model2)
-
-ImportanceAll2 <- varImp(model2)$importance
-ImportanceAll2 <- arrange(ImportanceAll2, desc(Overall))
-ImportanceAll2
-
-
-# Apply model to test_df --> test_dfGeschlecht
-
-# predict outcome using model from train_df applied to the test_df
-
-### hier auch einmal nach dem testdf der DV umbenennen
-
-predictions2 <- predict(model2, newdata=test_dfEinkommen)
-
-
-# Create confusion matrix
-
-confusionMatrix(as.factor(predictions2), as.factor(test_dfEinkommen$Einkommensgruppe))
-
-
-#------------third regression: specify ideal model--------------
-
-#######WEITER ANPASSEN!!!
-
-set.seed(1999)
-
-model3 <- train(Einkommensgruppe ~ Die_groesste_Community_fuer_Muetter + Mohammed_Harkous + Felix_Lobrecht + RTL_Aktuell + Lisa_Mueller + Kelly_Misses_Vlog + DFB + Ischtar_Isik + Alice_Weidel + McFit + Aldi_Nord + Annenmaykantereit + Xbox_DACH + Yvonne_Pfeffer + Manuel_Neuer + Felix_von_der_Laden + Ford_Deutschland + Lillydoo + LionTTV + Wacken_Open_Air + CDU + AfD + FDP + Sarah_Harrison + Plantbased_Food_and_Travel + Create_By_Obi + katholisch_de + Evangelisch_de + Weber_Grill,
-                data = train_dfEinkommen,
-                method = "multinom", 
-                metric = "Kappa",
-                na.action = na.omit,
-                trControl=myControl1) 
-
-print(model3)
-summary(model3)
-
-#Signifikanzen sind nicht enthalten, daher nachbauen:
-z <- summary(model3)$coefficients/summary(model3)$standard.errors
-p <- (1 - pnorm(abs(z), 0, 1)) * 2
-p
-
-
-varImp(model3)
-
-ImportanceAll3 <- varImp(model3)$importance
-ImportanceAll3 <- arrange(ImportanceAll3, desc(Overall))
-ImportanceAll3
-
-
-# Apply model to test_df --> test_dfGeschlecht
-
-# predict outcome using model from train_df applied to the test_df
-
-predictions3 <- as.factor(predict(model3, newdata=test_dfEinkommen))
-
-
-# Create confusion matrix
-
-confusionMatrix(data=predictions3, as.factor(test_dfEinkommen$Einkommensgruppe))
-
-
-#----------save best regression model----------------------
-
-bestregression_Green1 <- model3
 
 
 #---------------------------------------------------RANDOM FOREST----------------------------------------------------
@@ -363,19 +119,21 @@ myControl1 = trainControl(
   search = "grid"
 )
 
-
-####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
-
-# test of the ideal mtry, splitrule and min-node.size
-#use metric Kappa because of unbalanced dataset
-
-#set random seed again 
+#set tuning grid
 
 set.seed(1997)
 
 myGrid = expand.grid(mtry = c(10:20),
                      splitrule = "extratrees", 
                      min.node.size = c(5,10,15))
+
+
+####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
+
+# test of the ideal mtry, splitrule and min-node.size for 500 trees
+#use metric Kappa because of unbalanced dataset
+
+#set random seed again 
 
 set.seed(1997)
 RFEinkommen_1 <- train(Einkommensgruppe ~ ., 
@@ -410,7 +168,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model1 auc: 0.7018
+#model1 auc: 
 RFEinkommen_1 %>%
   test_roc(data = test_dfEinkommen) %>%
   auc()
@@ -422,13 +180,10 @@ RFEinkommen_1 %>%
 #getunte Werte setzen und num.tree ausprobieren --> ist mehr besser?
 
 set.seed(1997)
-myGrid1 <- expand.grid(mtry = 14, splitrule ="extratrees", min.node.size = 10)
-
-set.seed(1997)
 RFEinkommen_2 <- train(Einkommensgruppe ~ ., 
                           data=train_dfEinkommen, 
                           method="ranger", metric= "Kappa",
-                          tuneGrid = myGrid1,
+                          tuneGrid = myGrid,
                           na.action = na.omit,
                           num.tree = 1000,
                           trControl = myControl1, 
@@ -437,6 +192,7 @@ RFEinkommen_2 <- train(Einkommensgruppe ~ .,
 # Print models
 RFEinkommen_2
 summary(RFEinkommen_2)
+#mtry = xx, extratrees, min.node.size = xx
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -455,7 +211,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0.7069
+#model auc: 
 RFEinkommen_2 %>%
   test_roc(data = test_dfEinkommen) %>%
   auc()
@@ -466,17 +222,10 @@ RFEinkommen_2 %>%
 
 ####-------tree 3: Final --------------------------------------------------
 
-#final getunte Werte einsetzen: grid übernehmen und num.tree anpassen
+#final model
 
 set.seed(1997)
-RFEinkommen_fin <- train(Einkommensgruppe ~ ., 
-                       data=train_dfEinkommen, 
-                       method="ranger", metric= "Kappa",
-                       tuneGrid = myGrid1,
-                       na.action = na.omit,
-                       num.tree = 500,
-                       trControl = myControl1, 
-                       importance = 'impurity')
+RFEinkommen_fin <- RFEinkommen_x
 
 # Print models
 RFEinkommen_fin
@@ -503,7 +252,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0.7054
+#model auc: 
 RFEinkommen_fin %>%
   test_roc(data = test_dfEinkommen) %>%
   auc()
@@ -660,10 +409,6 @@ test_dfDurchschnittseinkommen <- data_Durchschnittseinkommen[-index,]
 
 #--------------------------------------------BUILDING AND TRAINING THE MODEL---------------------------------------------
 
-#---------------------------------------------------RANDOM FOREST----------------------------------------------------
-
-#--------------------------------------------BUILDING AND TRAINING THE MODEL---------------------------------------------
-
 
 # no sampling needed
 
@@ -679,19 +424,19 @@ myControl1 = trainControl(
 )
 
 
-
-
-####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
-
-# test of the ideal mtry, splitrule and min-node.size
-
-#set random seed again 
+#set tuning grid
 
 set.seed(1997)
 
 myGrid = expand.grid(mtry = c(10:20),
                      splitrule = "extratrees", 
                      min.node.size = c(5,10,15))
+
+
+
+####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
+
+# test of the ideal mtry, splitrule and min-node.size for 500 trees
 
 set.seed(1997)
 RFDurchschnittseinkommen1 <- train(Durchschnittseinkommen ~ ., 
@@ -727,13 +472,13 @@ test_roc <- function(model, data) {
   
 }
 
-#model1 auc: 0.7385
+#model1 auc: 
 RFDurchschnittseinkommen1 %>%
   test_roc(data = test_dfDurchschnittseinkommen) %>%
   auc()
 
 
-#check ROC plots
+#check ROC plot
 model_list <- list(Model1 = RFDurchschnittseinkommen1)
 
 model_list_roc <- model_list %>%
@@ -772,17 +517,13 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 ####-------tree 2: num.tree prüfen --------------------------------------------------
 
-#getunte Werte setzen und num.tree ausprobieren --> ist mehr besser?
+#1000 num.tree ausprobieren --> ist mehr besser?
 
-#set random seed again 
-set.seed(1997)
-
-myGrid1 <- expand.grid(mtry = 10, splitrule ="extratrees", min.node.size = 15)
 
 set.seed(1997)
 RFDurchschnittseinkommen2 <- train(Durchschnittseinkommen ~ ., 
                     data=train_dfDurchschnittseinkommen,
-                    tuneGrid = myGrid1,
+                    tuneGrid = myGrid,
                     method="ranger", 
                     metric= "ROC",
                     num.tree = 1000,
@@ -794,6 +535,8 @@ RFDurchschnittseinkommen2 <- train(Durchschnittseinkommen ~ .,
 
 RFDurchschnittseinkommen2
 summary(RFDurchschnittseinkommen2)
+#mtry = xx, extratrees, min.node.size = xx
+
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -811,13 +554,13 @@ test_roc <- function(model, data) {
   
 }
 
-#model1 auc
+#model auc
 RFDurchschnittseinkommen2 %>%
   test_roc(data = test_dfDurchschnittseinkommen) %>%
   auc()
 
 
-#compare different ROC plots
+#ROC plot
 model_list <- list(Model1 = RFDurchschnittseinkommen2)
 
 model_list_roc <- model_list %>%
@@ -842,7 +585,7 @@ for(the_roc in model_list_roc){
 
 results_df_roc <- bind_rows(results_list_roc)
 
-# Plot ROC curve for all 3 models
+# Plot ROC curve
 
 custom_col <- c("#000000", "#009E73", "#0072B2", "#D55E00", "#CC79A7")
 
@@ -852,7 +595,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
 
-#better num.trees: 500 trees --> performs better on testset
+#better num.trees: xx trees 
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -860,14 +603,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 #final getunte Werte einsetzen
 
 set.seed(1997)
-RFDurchschnittseinkommen_fin <- train(Durchschnittseinkommen ~ ., 
-                      data=train_dfDurchschnittseinkommen, 
-                      method="ranger", metric= "ROC",
-                      tuneGrid = myGrid1,
-                      na.action = na.omit,
-                      num.tree = 500,
-                      trControl = myControl1, 
-                      importance = 'impurity')
+RFDurchschnittseinkommen_fin <- RFDurchschnittseinkommen_x
 
 # Print models
 RFDurchschnittseinkommen_fin
@@ -897,7 +633,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0.7436
+#model auc: 
 RFDurchschnittseinkommen_fin %>%
   test_roc(data = test_dfDurchschnittseinkommen) %>%
   auc()

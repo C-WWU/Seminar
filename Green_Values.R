@@ -92,144 +92,6 @@ train_dfGreen1 <- data_Green1[index,]
 test_dfGreen1 <- data_Green1[-index,]
 
 
-#--------------------------------------LOGISTIC REGRESSION/ LINEAR REGRESSION-----------------------------------------------------
-
-
-#-----------------------------------------BUILDING AND TRAINING THE MODEL---------------------------------------------
-
-
-# Specify the type of training method used & number of folds --> bei uns 10-fold Cross-Validation
-
-myControl = trainControl(
-  method = "cv",
-  number = 10, 
-  verboseIter = TRUE,
-  allowParallel=TRUE,
-  search = "grid"
-)
-
-
-
-# Specify linear regression model with most important IV's
-
-#--------------first regression: all parameters-----------------
-
-set.seed(1997)
-
-model1 <- train(Green_Values ~.,
-                data=train_dfGreen1,
-                method = "glm",
-                metric = "RMSE", 
-                na.action = na.omit,
-                trControl=myControl)
-
-print(model1)
-summary(model1)
-
-#variable Importance (predictor variables)
-
-varImp(model1)
-
-#look for most important variables
-ImportanceAll1 <- varImp(model1)$importance
-ImportanceAll1 <- arrange(ImportanceAll1, desc(Overall))
-ImportanceAll1
-
-# Apply model to test_df --> test_dfGeschlecht
-
-# predict outcome using model from train_df applied to the test_df
-
-predictions1 <- predict(model1, newdata=test_dfGreen1)
-
-
-# Create confusion matrix
-
-confusionMatrix(data=predictions1, test_dfGreen1$Green_Values)
-
-
-
-#------second regression: ridge/lasso for shrinking model---------
-
-set.seed(1998)
-
-myGrid <- expand.grid(alpha = 0:1,
-                      lambda = seq(0.0001, 1, length = 100))
-
-model2 <- train(Green_Values ~ .,
-                data=train_dfGreen1,
-                method = "glmnet", 
-                metric = "RMSE", 
-                na.action = na.omit,
-                tuneGrid = myGrid,
-                trControl=myControl) 
-
-print(model2)
-summary(model2)
-coef(model2$finalModel, model2$finalModel$lambdaOpt)
-
-
-varImp(model2)
-
-ImportanceAll2 <- varImp(model2)$importance
-ImportanceAll2 <- arrange(ImportanceAll2, desc(Overall))
-ImportanceAll2
-
-
-# Apply model to test_df --> test_dfGeschlecht
-
-# predict outcome using model from train_df applied to the test_df
-
-### hier auch einmal nach dem testdf der DV umbenennen
-
-predictions2 <- predict(model2, newdata=test_dfGreen1)
-
-
-# Create confusion matrix
-
-confusionMatrix(data=predictions2, test_dfGreen1$Green_Values)
-
-
-#------------third regression: specify ideal model--------------
-
-set.seed(1999)
-
-model3 <- train(Green_Values ~ SimplyV + Alice_Weidel + Mady_Morrison + AfD + Michael_Wendler + Montana_Black + Julien_Co + PETA_Deutschland + Christian_Lindner + Capital_Bra + Pflanzlich_stark + Fridays_for_Future + Evangelisch_de + Inscope21 + Luisa_Neubauer + Mero + Buendnis_90_Die_Gruenen + Lillydoo + Boehse_Onkelz + heute_show + Dein_Beichtstuhl + Dieter_Nuhr + Made_My_Day + Just_Spices + Sallys_Welt + Microsoft_Deutschland + adidas_Deutschland,
-                data = train_dfGreen1,
-                method = "lm", 
-                metric = "RMSE",
-                na.action = na.omit,
-                trControl=myControl) 
-
-print(model3)
-summary(model3)
-
-varImp(model3)
-
-ImportanceAll3 <- varImp(model3)$importance
-ImportanceAll3 <- arrange(ImportanceAll3, desc(Overall))
-ImportanceAll3
-
-
-# Apply model to test_df --> test_dfGeschlecht
-
-# predict outcome using model from train_df applied to the test_df
-
-### hier auch einmal nach dem testdf der DV umbenennen
-
-predictions3 <- predict(model3, newdata=test_dfGreen1)
-
-
-# Create confusion matrix
-
-confusionMatrix(data=predictions3, test_dfGreen1$Green_Values)
-RMSE(predictions3, test_dfGreen1$Green_Values)
-R2(predictions3, test_dfGreen1$Green_Values)
-
-#----------save best regression model----------------------
-
-bestregression_Green1 <- model3
-
-
 #---------------------------------------------------RANDOM FOREST----------------------------------------------------
 
 #--------------------------------------------BUILDING AND TRAINING THE MODEL---------------------------------------------
@@ -245,13 +107,7 @@ myControl = trainControl(
   search = "grid",
 )
 
-
-
-####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
-
-# test of the ideal mtry, splitrule and min-node.size
-
-#set random seed again 
+#set tuning grid
 
 set.seed(1997)
 
@@ -260,6 +116,11 @@ myGrid = expand.grid(mtry = c(10:20),
                      min.node.size = c(5,10,15))
 
 
+####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
+
+# test of the ideal mtry, splitrule and min-node.size for 500 trees
+
+set.seed(1997)
 RFGreen1_1 <- train(Green_Values ~ ., 
                            data=train_dfGreen1,
                            tuneGrid = myGrid,
@@ -300,11 +161,9 @@ spearmanGreen1_1
 
 ####-------tree 2: num.tree prüfen --------------------------------------------------
 
-#getunte Werte setzen und num.tree ausprobieren --> ist mehr besser?
+#1000 num.tree ausprobieren --> ist mehr besser?
 
 set.seed(1997)
-
-myGrid <- expand.grid(mtry = 10, splitrule ="extratrees", min.node.size = 10)
 
 RFGreen1_2 <- train(Green_Values ~ ., 
                     data=train_dfGreen1,
@@ -320,6 +179,9 @@ RFGreen1_2 <- train(Green_Values ~ .,
 
 RFGreen1_2
 summary(RFGreen1_2)
+plot(RFGreen1_2)
+#mtry = xx, extratrees, min.node.size = xx
+
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(RFGreen1_2, newdata=test_dfGreen1)
@@ -338,7 +200,7 @@ pearsonGreen1_2
 spearmanGreen1_2 <- cor.test(predictions, test_dfGreen1$Green_Values, method = "spearman")
 spearmanGreen1_2
 
-#num.trees 1000 performs slightly better
+#num.trees xx performs slightly better
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -347,14 +209,7 @@ spearmanGreen1_2
 
 set.seed(1997)
 
-RFGreen1_fin <- train(Green_Values ~ ., 
-                           data=train_dfGreen1, 
-                           method="ranger", metric= "RMSE",
-                           tuneGrid = myGrid,
-                           na.action = na.omit,
-                           num.tree = 1000,
-                           trControl = myControl, 
-                           importance = 'impurity')
+RFGreen1_fin <- RFGreen1_xx
 
 # Print model
 RFGreen1_fin
@@ -733,19 +588,18 @@ myControl1 = trainControl(
 )
 
 
-
-
-####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
-
-# test of the ideal mtry, splitrule and min-node.size
-
-#set random seed again 
+#set rtuning grid
 
 set.seed(1997)
 
 myGrid = expand.grid(mtry = c(10:20),
                      splitrule = "extratrees", 
                      min.node.size = c(5,10,15))
+
+
+####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
+
+# test of the ideal mtry, splitrule and min-node.size for 500 trees
 
 set.seed(1997)
 RFGreen2_1 <- train(Green2 ~ ., 
@@ -781,13 +635,13 @@ test_roc <- function(model, data) {
   
 }
 
-#model1 auc: 0.6346
+#model auc: 
 RFGreen2_1 %>%
   test_roc(data = test_dfGreen2) %>%
   auc()
 
 
-#check ROC plots
+#check ROC plot
 model_list <- list(Model1 = RFGreen2_1)
 
 model_list_roc <- model_list %>%
@@ -826,17 +680,13 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 ####-------tree 2: num.tree prüfen --------------------------------------------------
 
-#getunte Werte setzen und num.tree ausprobieren --> ist mehr besser?
+#1000 für num.tree ausprobieren --> ist mehr besser?
 
 #set random seed again 
 set.seed(1997)
-
-myGrid1 <- expand.grid(mtry = 13, splitrule ="extratrees", min.node.size = 10)
-
-set.seed(1997)
 RFGreen2_2 <- train(Green2 ~ ., 
                      data=train_dfGreen2,
-                     tuneGrid = myGrid1,
+                     tuneGrid = myGrid,
                      method="ranger", 
                      metric= "ROC",
                      num.tree = 1000,
@@ -848,6 +698,8 @@ RFGreen2_2 <- train(Green2 ~ .,
 
 RFGreen2_2
 summary(RFGreen2_2)
+plot(RFGreen2_2)
+#mtry = xx, extratrees, min.node.size = xx
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -865,13 +717,13 @@ test_roc <- function(model, data) {
   
 }
 
-#model1 auc
+#model auc
 RFGreen2_2 %>%
   test_roc(data = test_dfGreen2) %>%
   auc()
 
 
-#compare different ROC plots
+#ROC plot
 model_list <- list(Model1 = RFGreen2_2)
 
 model_list_roc <- model_list %>%
@@ -896,7 +748,7 @@ for(the_roc in model_list_roc){
 
 results_df_roc <- bind_rows(results_list_roc)
 
-# Plot ROC curve for all 3 models
+# Plot ROC curve
 
 custom_col <- c("#000000", "#009E73", "#0072B2", "#D55E00", "#CC79A7")
 
@@ -914,14 +766,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 #final getunte Werte einsetzen
 
 set.seed(1997)
-RFGreen2_fin <- train(Green2 ~ ., 
-                      data=train_dfGreen2, 
-                      method="ranger", metric= "ROC",
-                      tuneGrid = myGrid1,
-                      na.action = na.omit,
-                      num.tree = 500,
-                      trControl = myControl1, 
-                      importance = 'impurity')
+RFGreen2_fin <- RFGreen2_x
 
 # Print models
 RFGreen2_fin
@@ -959,8 +804,7 @@ RFGreen2_fin %>%
 
 #compare different ROC plots
 model_list <- list(Model1 = RFGreen2_1,
-                   Model2 = RFGreen2_2,
-                   Model3 = RFGreen2_fin)
+                   Model2 = RFGreen2_2)
 
 model_list_roc <- model_list %>%
   map(test_roc, data = test_dfGreen2)
@@ -984,7 +828,7 @@ for(the_roc in model_list_roc){
 
 results_df_roc <- bind_rows(results_list_roc)
 
-# Plot ROC curve for all 3 models
+# Plot ROC curve
 
 custom_col <- c("#000000", "#009E73", "#0072B2", "#D55E00", "#CC79A7")
 

@@ -99,10 +99,6 @@ test_dfHardliner <- data_Hardliner[-index,]
 
 #--------------------------------------------BUILDING AND TRAINING THE MODEL---------------------------------------------
 
-#---------------------------------------------------RANDOM FOREST----------------------------------------------------
-
-#--------------------------------------------BUILDING AND TRAINING THE MODEL---------------------------------------------
-
 
 # no sampling needed
 
@@ -117,6 +113,14 @@ myControl1 = trainControl(
   search = "grid"
 )
 
+#set random seed again 
+set.seed(1997)
+
+#set grid for testing ideal mtry and min.node.size
+myGrid = expand.grid(mtry = c(10:20),
+                     splitrule = "extratrees", 
+                     min.node.size = c(5,10,15))
+
 
 
 
@@ -124,13 +128,6 @@ myControl1 = trainControl(
 
 # test of the ideal mtry, splitrule and min-node.size
 
-#set random seed again 
-
-set.seed(1997)
-
-myGrid = expand.grid(mtry = c(10:20),
-                     splitrule = "extratrees", 
-                     min.node.size = c(5,10,15))
 
 set.seed(1997)
 RFHardliner1 <- train(Corona_Hardliner ~ ., 
@@ -215,13 +212,9 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 #set random seed again 
 set.seed(1997)
-
-myGrid1 <- expand.grid(mtry = 14, splitrule ="extratrees", min.node.size = 5)
-
-set.seed(1997)
 RFHardliner2 <- train(Corona_Hardliner ~ ., 
                                    data=train_dfHardliner,
-                                   tuneGrid = myGrid1,
+                                   tuneGrid = myGrid,
                                    method="ranger", 
                                    metric= "ROC",
                                    num.tree = 1000,
@@ -233,6 +226,8 @@ RFHardliner2 <- train(Corona_Hardliner ~ .,
 
 RFHardliner2
 summary(RFHardliner2)
+plot(RFHardliner2)
+#mtry = 11, extratrees, min.node.size = 15
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -250,7 +245,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model1 auc: 0,572
+#model1 auc: 0,5819
 RFHardliner2 %>%
   test_roc(data = test_dfHardliner) %>%
   auc()
@@ -281,7 +276,7 @@ for(the_roc in model_list_roc){
 
 results_df_roc <- bind_rows(results_list_roc)
 
-# Plot ROC curve for all 3 models
+# Plot ROC curve
 
 custom_col <- c("#000000", "#009E73", "#0072B2", "#D55E00", "#CC79A7")
 
@@ -298,17 +293,8 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 #final getunte Werte einsetzen
 
-myGrid1 <- expand.grid(mtry = 14, splitrule ="extratrees", min.node.size = 5)
-
 set.seed(1997)
-RFHardliner_fin <- train(Corona_Hardliner ~ ., 
-                                      data=train_dfHardliner, 
-                                      method="ranger", metric= "ROC",
-                                      tuneGrid = myGrid1,
-                                      na.action = na.omit,
-                                      num.tree = 500,
-                                      trControl = myControl1, 
-                                      importance = 'impurity')
+RFHardliner_fin <- RFHardliner1
 
 # Print models
 RFHardliner_fin
@@ -338,7 +324,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,5676
+#model auc: 
 RFHardliner_fin %>%
   test_roc(data = test_dfHardliner) %>%
   auc()
@@ -346,8 +332,7 @@ RFHardliner_fin %>%
 
 #compare different ROC plots
 model_list <- list(Model1 = RFHardliner1,
-                   Model2 = RFHardliner2,
-                   Model3 = RFHardliner_fin)
+                   Model2 = RFHardliner2)
 
 model_list_roc <- model_list %>%
   map(test_roc, data = test_dfHardliner)
@@ -371,7 +356,7 @@ for(the_roc in model_list_roc){
 
 results_df_roc <- bind_rows(results_list_roc)
 
-# Plot ROC curve for all 3 models
+# Plot ROC curve for models
 
 custom_col <- c("#000000", "#009E73", "#0072B2", "#D55E00", "#CC79A7")
 
@@ -387,8 +372,6 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 
 #checking direction of the 10 most important variables
-###anpassen: name vom dataset
-
 
 imp <- importance(RFHardliner_fin$finalModel)
 imp <- as.data.frame(imp)
@@ -399,26 +382,26 @@ impvar <- impvar[1:20]
 
 PartialPlots <- RFHardliner_fin
 
-PartialPlots %>% partial(pred.var = impvar[1]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[2]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[3]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[4]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[5]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[6]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[7]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[8]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[9]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[10]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[11]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[12]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[13]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[14]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[15]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[16]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[17]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[18]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[19]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[20]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "Ja") %>%plotPartial
 
 
 #------------------------------------------------WHEN BEST MODEL IS FOUND-----------------------------------------------------
@@ -491,10 +474,6 @@ test_dfSoftliner <- data_Softliner[-index,]
 
 #--------------------------------------------BUILDING AND TRAINING THE MODEL---------------------------------------------
 
-#---------------------------------------------------RANDOM FOREST----------------------------------------------------
-
-#--------------------------------------------BUILDING AND TRAINING THE MODEL---------------------------------------------
-
 
 # apply smote sampling and 10-fold CV
 
@@ -510,20 +489,19 @@ myControl1 = trainControl(
   search = "grid"
 )
 
-
-
-
-####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
-
-# test of the ideal mtry, splitrule and min-node.size
-
-#set random seed again 
+#set tuning grid
 
 set.seed(1997)
 
 myGrid = expand.grid(mtry = c(10:20),
                      splitrule = "extratrees", 
                      min.node.size = c(5,10,15))
+
+
+
+####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
+
+# test of the ideal mtry, splitrule and min-node.size for 500 trees
 
 set.seed(1997)
 RFSoftliner1 <- train(Corona_Softliner ~ ., 
@@ -565,7 +543,7 @@ RFSoftliner1 %>%
   auc()
 
 
-#check ROC plots
+#check ROC plot
 model_list <- list(Model1 = RFSoftliner1)
 
 model_list_roc <- model_list %>%
@@ -606,15 +584,10 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 #getunte Werte setzen und num.tree ausprobieren --> ist mehr besser?
 
-#set random seed again 
-set.seed(1997)
-
-myGrid1 <- expand.grid(mtry = 11, splitrule ="extratrees", min.node.size = 10)
-
 set.seed(1997)
 RFSoftliner2 <- train(Corona_Softliner ~ ., 
                                    data=train_dfSoftliner,
-                                   tuneGrid = myGrid1,
+                                   tuneGrid = myGrid,
                                    method="ranger", 
                                    metric= "ROC",
                                    num.tree = 1000,
@@ -626,6 +599,8 @@ RFSoftliner2 <- train(Corona_Softliner ~ .,
 
 RFSoftliner2
 summary(RFSoftliner2)
+plot(RFSoftliner2)
+#mtry = 11, extratrees, min.node.size = 10
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -643,7 +618,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,6513
+#model auc: 0,6735
 RFSoftliner2 %>%
   test_roc(data = test_dfSoftliner) %>%
   auc()
@@ -674,7 +649,7 @@ for(the_roc in model_list_roc){
 
 results_df_roc <- bind_rows(results_list_roc)
 
-# Plot ROC curve for all 3 models
+# Plot ROC curve 
 
 custom_col <- c("#000000", "#009E73", "#0072B2", "#D55E00", "#CC79A7")
 
@@ -684,25 +659,15 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
 
-#better num.trees: 500 trees 
+#better num.trees: 500 trees ist minimal besser
 
 
 ####-------tree 3: Final --------------------------------------------------
 
-#final getunte Werte einsetzen
+#finales Model
 
 set.seed(1997)
-myGrid1 <- expand.grid(mtry = 11, splitrule ="extratrees", min.node.size = 10)
-set.seed(1997)
-RFSoftliner_fin <- train(Corona_Softliner ~ ., 
-                         data=train_dfSoftliner,
-                         tuneGrid = myGrid1,
-                         method="ranger", 
-                         metric= "ROC",
-                         num.tree = 500,
-                         na.action = na.omit,
-                         trControl = myControl1, 
-                         importance = 'impurity')
+RFSoftliner_fin <- RFSoftliner1
 
 # Print models
 RFSoftliner_fin
@@ -732,7 +697,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,6558
+#model auc: 0,6721
 RFSoftliner_fin %>%
   test_roc(data = test_dfSoftliner) %>%
   auc()
@@ -740,8 +705,7 @@ RFSoftliner_fin %>%
 
 #compare different ROC plots
 model_list <- list(Model1 = RFSoftliner1,
-                   Model2 = RFSoftliner2,
-                   Model3 = RFSoftliner_fin)
+                   Model2 = RFSoftliner2)
 
 model_list_roc <- model_list %>%
   map(test_roc, data = test_dfSoftliner)
@@ -765,7 +729,7 @@ for(the_roc in model_list_roc){
 
 results_df_roc <- bind_rows(results_list_roc)
 
-# Plot ROC curve for all 3 models
+# Plot ROC curve for models
 
 custom_col <- c("#000000", "#009E73", "#0072B2", "#D55E00", "#CC79A7")
 
@@ -781,8 +745,6 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 
 #checking direction of the 10 most important variables
-###anpassen: name vom dataset
-
 
 imp <- importance(RFSoftliner_fin$finalModel)
 imp <- as.data.frame(imp)
@@ -793,26 +755,26 @@ impvar <- impvar[1:20]
 
 PartialPlots <- RFSoftliner_fin
 
-PartialPlots %>% partial(pred.var = impvar[1]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[2]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[3]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[4]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[5]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[6]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[7]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[8]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[9]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[10]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[11]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[12]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[13]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[14]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[15]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[16]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[17]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[18]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[19]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[20]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "Ja") %>%plotPartial
 
 
 #------------------------------------------------WHEN BEST MODEL IS FOUND-----------------------------------------------------
@@ -853,13 +815,13 @@ cols_names
 data_Skeptiker <- data[,c(309, 27:255)]
 
 #Gibt es NAs in der DV?
-sum(is.na(data_Skeptiker$Corona_Skeptiker)) #xx NAs
+sum(is.na(data_Skeptiker$Corona_Skeptiker)) #0 NAs
 data_Skeptiker <- data_Skeptiker %>% subset(data_Skeptiker$Corona_Skeptiker != "NA")
 
 
 #ist die Variable unbalanced?
 table(data_Skeptiker$Corona_Skeptiker) #imbalanced tow. "Nein"
-max(table(data_Skeptiker$Corona_Skeptiker)/sum(table(data_Skeptiker$Corona_Skeptiker))) #no information rate xx%
+max(table(data_Skeptiker$Corona_Skeptiker)/sum(table(data_Skeptiker$Corona_Skeptiker))) #no information rate 85,47%
 
 #IV als Faktor:
 data_Skeptiker$Corona_Skeptiker <- as.factor(data_Skeptiker$Corona_Skeptiker)
@@ -885,10 +847,6 @@ test_dfSkeptiker <- data_Skeptiker[-index,]
 
 #--------------------------------------------BUILDING AND TRAINING THE MODEL---------------------------------------------
 
-#---------------------------------------------------RANDOM FOREST----------------------------------------------------
-
-#--------------------------------------------BUILDING AND TRAINING THE MODEL---------------------------------------------
-
 
 # sample with smote
 
@@ -905,19 +863,18 @@ myControl1 = trainControl(
 )
 
 
-
-
-####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
-
-# test of the ideal mtry, splitrule and min-node.size
-
-#set random seed again 
+#set tuning grid
 
 set.seed(1997)
 
 myGrid = expand.grid(mtry = c(10:20),
                      splitrule = "extratrees", 
                      min.node.size = c(5,10,15))
+
+
+####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
+
+# test for 500 trees
 
 set.seed(1997)
 RFSkeptiker1 <- train(Corona_Skeptiker ~ ., 
@@ -935,7 +892,7 @@ RFSkeptiker1 <- train(Corona_Skeptiker ~ .,
 RFSkeptiker1
 summary(RFSkeptiker1)
 plot(RFSkeptiker1)
-#mtry = xx, extratrees, min.node.size = xx
+#mtry = 19, extratrees, min.node.size = 10
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -949,11 +906,11 @@ confusionMatrix(data=as.factor(predictions1), as.factor(test_dfSkeptiker$Corona_
 test_roc <- function(model, data) {
   
   roc(test_dfSkeptiker$Corona_Skeptiker,
-      predict(model, data, type = "prob")[, "1"])
+      predict(model, data, type = "prob")[, "Ja"])
   
 }
 
-#model1 auc: 0.7385
+#model auc: 0.7532
 RFSkeptiker1 %>%
   test_roc(data = test_dfSkeptiker) %>%
   auc()
@@ -1001,14 +958,11 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 #getunte Werte setzen und num.tree ausprobieren --> ist mehr besser?
 
 #set random seed again 
-set.seed(1997)
-
-myGrid1 <- expand.grid(mtry = xx, splitrule ="extratrees", min.node.size = xx)
 
 set.seed(1997)
 RFSkeptiker2 <- train(Corona_Skeptiker ~ ., 
                                    data=train_dfSkeptiker,
-                                   tuneGrid = myGrid1,
+                                   tuneGrid = myGrid,
                                    method="ranger", 
                                    metric= "ROC",
                                    num.tree = 1000,
@@ -1020,7 +974,8 @@ RFSkeptiker2 <- train(Corona_Skeptiker ~ .,
 
 RFSkeptiker2
 summary(RFSkeptiker2)
-
+plot(RFSkeptiker2)
+#mtry = 11, extratrees, min.node.size = 15
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RFSkeptiker2, newdata=test_dfSkeptiker)
@@ -1033,17 +988,17 @@ confusionMatrix(data=as.factor(predictions2), as.factor(test_dfSkeptiker$Corona_
 test_roc <- function(model, data) {
   
   roc(test_dfSkeptiker$Corona_Skeptiker,
-      predict(model, data, type = "prob")[, "1"])
+      predict(model, data, type = "prob")[, "Ja"])
   
 }
 
-#model1 auc
+#model auc: 0,7689
 RFSkeptiker2 %>%
   test_roc(data = test_dfSkeptiker) %>%
   auc()
 
 
-#compare different ROC plots
+#ROC plots
 model_list <- list(Model1 = RFSkeptiker2)
 
 model_list_roc <- model_list %>%
@@ -1068,7 +1023,7 @@ for(the_roc in model_list_roc){
 
 results_df_roc <- bind_rows(results_list_roc)
 
-# Plot ROC curve for all 3 models
+# Plot ROC curve 
 
 custom_col <- c("#000000", "#009E73", "#0072B2", "#D55E00", "#CC79A7")
 
@@ -1078,22 +1033,15 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
 
-#better num.trees: xx trees 
+#better num.trees: 1000 trees --> better predictions!
 
 
 ####-------tree 3: Final --------------------------------------------------
 
-#final getunte Werte einsetzen
+#finales Model
 
 set.seed(1997)
-RFSkeptiker_fin <- train(Corona_Skeptiker ~ ., 
-                                      data=train_dfSkeptiker, 
-                                      method="ranger", metric= "ROC",
-                                      tuneGrid = myGrid1,
-                                      na.action = na.omit,
-                                      num.tree = 500,
-                                      trControl = myControl1, 
-                                      importance = 'impurity')
+RFSkeptiker_fin <- RFSkeptiker2
 
 # Print models
 RFSkeptiker_fin
@@ -1119,11 +1067,11 @@ confusionMatrix(data=as.factor(predictions3), as.factor(test_dfSkeptiker$Corona_
 test_roc <- function(model, data) {
   
   roc(test_dfSkeptiker$Corona_Skeptiker,
-      predict(model, data, type = "prob")[, "1"])
+      predict(model, data, type = "prob")[, "Ja"])
   
 }
 
-#model auc: 0.7436
+#model auc: 
 RFSkeptiker_fin %>%
   test_roc(data = test_dfSkeptiker) %>%
   auc()
@@ -1131,8 +1079,7 @@ RFSkeptiker_fin %>%
 
 #compare different ROC plots
 model_list <- list(Model1 = RFSkeptiker1,
-                   Model2 = RFSkeptiker2,
-                   Model3 = RFSkeptiker_fin)
+                   Model2 = RFSkeptiker2)
 
 model_list_roc <- model_list %>%
   map(test_roc, data = test_dfSkeptiker)
@@ -1156,7 +1103,7 @@ for(the_roc in model_list_roc){
 
 results_df_roc <- bind_rows(results_list_roc)
 
-# Plot ROC curve for all 3 models
+# Plot ROC curve for models
 
 custom_col <- c("#000000", "#009E73", "#0072B2", "#D55E00", "#CC79A7")
 
@@ -1172,7 +1119,6 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 
 #checking direction of the 10 most important variables
-###anpassen: name vom dataset
 
 
 imp <- importance(RFSkeptiker_fin$finalModel)
@@ -1184,26 +1130,26 @@ impvar <- impvar[1:20]
 
 PartialPlots <- RFSkeptiker_fin
 
-PartialPlots %>% partial(pred.var = impvar[1]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[2]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[3]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[4]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[5]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[6]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[7]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[8]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[9]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[10]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[11]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[12]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[13]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[14]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[15]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[16]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[17]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[18]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[19]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[20]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "Ja") %>%plotPartial
 
 
 #------------------------------------------------WHEN BEST MODEL IS FOUND-----------------------------------------------------
@@ -1246,13 +1192,13 @@ cols_names
 data_Leugner <- data[,c(310, 27:255)]
 
 #Gibt es NAs in der DV?
-sum(is.na(data_Leugner$Corona_Leugner)) #122 NAs
+sum(is.na(data_Leugner$Corona_Leugner)) #0 NAs
 data_Leugner <- data_Leugner %>% subset(data_Leugner$Corona_Leugner != "NA")
 
 
 #ist die Variable unbalanced?
 table(data_Leugner$Corona_Leugner) #very imbalanced!!
-max(table(data_Leugner$Corona_Leugner)/sum(table(data_Leugner$Corona_Leugner))) #no information rate xx%
+max(table(data_Leugner$Corona_Leugner)/sum(table(data_Leugner$Corona_Leugner))) #no information rate 0,9385%
 
 #IV als Faktor:
 data_Leugner$Corona_Leugner <- as.factor(data_Leugner$Corona_Leugner)
@@ -1278,10 +1224,6 @@ test_dfLeugner <- data_Leugner[-index,]
 
 #--------------------------------------------BUILDING AND TRAINING THE MODEL---------------------------------------------
 
-#---------------------------------------------------RANDOM FOREST----------------------------------------------------
-
-#--------------------------------------------BUILDING AND TRAINING THE MODEL---------------------------------------------
-
 
 # 10-fold CV + resampling
 
@@ -1297,20 +1239,18 @@ myControl1 = trainControl(
   search = "grid"
 )
 
-
-
-
-####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
-
-# test of the ideal mtry, splitrule and min-node.size
-
-#set random seed again 
+#set tuning grid 
 
 set.seed(1997)
 
 myGrid = expand.grid(mtry = c(10:20),
                      splitrule = "extratrees", 
                      min.node.size = c(5,10,15))
+
+
+####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
+
+# test of 500 trees
 
 set.seed(1997)
 RFLeugner1 <- train(Corona_Leugner ~ ., 
@@ -1328,7 +1268,7 @@ RFLeugner1 <- train(Corona_Leugner ~ .,
 RFLeugner1
 summary(RFLeugner1)
 plot(RFLeugner1)
-#mtry = xx, extratrees, min.node.size = xx
+#mtry = 13, extratrees, min.node.size = 10
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -1342,17 +1282,17 @@ confusionMatrix(data=as.factor(predictions1), as.factor(test_dfLeugner$Corona_Le
 test_roc <- function(model, data) {
   
   roc(test_dfLeugner$Corona_Leugner,
-      predict(model, data, type = "prob")[, "1"])
+      predict(model, data, type = "prob")[, "Ja"])
   
 }
 
-#model1 auc: 
+#model1 auc: 0,6736
 RFLeugner1 %>%
   test_roc(data = test_dfLeugner) %>%
   auc()
 
 
-#check ROC plots
+#check ROC plot
 model_list <- list(Model1 = RFLeugner1)
 
 model_list_roc <- model_list %>%
@@ -1393,15 +1333,10 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 #getunte Werte setzen und num.tree ausprobieren --> ist mehr besser?
 
-#set random seed again 
-set.seed(1997)
-
-myGrid1 <- expand.grid(mtry = xx, splitrule ="extratrees", min.node.size = xx)
-
 set.seed(1997)
 RFLeugner2 <- train(Corona_Leugner ~ ., 
                                    data=train_dfLeugner,
-                                   tuneGrid = myGrid1,
+                                   tuneGrid = myGrid,
                                    method="ranger", 
                                    metric= "ROC",
                                    num.tree = 1000,
@@ -1413,7 +1348,8 @@ RFLeugner2 <- train(Corona_Leugner ~ .,
 
 RFLeugner2
 summary(RFLeugner2)
-
+plot(RFLeugner2)
+#mtry = 13, extratrees, min.node.size = 10
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RFLeugner2, newdata=test_dfLeugner)
@@ -1426,17 +1362,17 @@ confusionMatrix(data=as.factor(predictions2), as.factor(test_dfLeugner$Corona_Le
 test_roc <- function(model, data) {
   
   roc(test_dfLeugner$Corona_Leugner,
-      predict(model, data, type = "prob")[, "1"])
+      predict(model, data, type = "prob")[, "Ja"])
   
 }
 
-#model auc
+#model auc: 0,6743
 RFLeugner2 %>%
   test_roc(data = test_dfLeugner) %>%
   auc()
 
 
-#compare different ROC plots
+#ROC plot
 model_list <- list(Model1 = RFLeugner2)
 
 model_list_roc <- model_list %>%
@@ -1471,7 +1407,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
 
-#better num.trees: xx trees 
+#better num.trees: 1000 trees --> better predictions
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -1479,14 +1415,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 #final getunte Werte einsetzen
 
 set.seed(1997)
-RFLeugner_fin <- train(Corona_Leugner ~ ., 
-                                      data=train_dfLeugner, 
-                                      method="ranger", metric= "ROC",
-                                      tuneGrid = myGrid1,
-                                      na.action = na.omit,
-                                      num.tree = 500,
-                                      trControl = myControl1, 
-                                      importance = 'impurity')
+RFLeugner_fin <- RFLeugner2
 
 # Print models
 RFLeugner_fin
@@ -1503,7 +1432,6 @@ plot(varImp(RFLeugner_fin), 20, main = "Corona_Leugner")
 # predict outcome using model from train_df applied to the test_df
 predictions3 <- predict(RFLeugner_fin, newdata=test_dfLeugner)
 
-
 # Create confusion matrix
 confusionMatrix(data=as.factor(predictions3), as.factor(test_dfLeugner$Corona_Leugner))
 
@@ -1512,7 +1440,7 @@ confusionMatrix(data=as.factor(predictions3), as.factor(test_dfLeugner$Corona_Le
 test_roc <- function(model, data) {
   
   roc(test_dfLeugner$Corona_Leugner,
-      predict(model, data, type = "prob")[, "1"])
+      predict(model, data, type = "prob")[, "Ja"])
   
 }
 
@@ -1524,8 +1452,7 @@ RFLeugner_fin %>%
 
 #compare different ROC plots
 model_list <- list(Model1 = RFLeugner1,
-                   Model2 = RFLeugner2,
-                   Model3 = RFLeugner_fin)
+                   Model2 = RFLeugner2)
 
 model_list_roc <- model_list %>%
   map(test_roc, data = test_dfLeugner)
@@ -1565,8 +1492,6 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 
 #checking direction of the 10 most important variables
-###anpassen: name vom dataset
-
 
 imp <- importance(RFLeugner_fin$finalModel)
 imp <- as.data.frame(imp)
@@ -1577,26 +1502,26 @@ impvar <- impvar[1:20]
 
 PartialPlots <- RFLeugner_fin
 
-PartialPlots %>% partial(pred.var = impvar[1]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[2]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[3]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[4]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[5]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[6]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[7]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[8]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[9]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[10]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[11]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[12]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[13]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[14]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[15]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[16]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[17]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[18]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[19]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[20]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "Ja") %>%plotPartial
 
 
 #------------------------------------------------WHEN BEST MODEL IS FOUND-----------------------------------------------------
@@ -1639,11 +1564,11 @@ cols_names
 data_Hardliner_num <- data[,c(278, 27:255)]
 
 #Gibt es NAs in der DV?
-sum(is.na(data_Hardliner_num$Corona_Massnahmen_muessten_haerter_sein)) #xx NAs
+sum(is.na(data_Hardliner_num$Corona_Massnahmen_muessten_haerter_sein)) #0 NAs
 
 #ist die Variable unbalanced?
-table(data_Hardliner_num$Corona_Massnahmen_muessten_haerter_sein) #xx
-max(table(data_Hardliner_num$Corona_Massnahmen_muessten_haerter_sein)/sum(table(data_Hardliner_num$Corona_Massnahmen_muessten_haerter_sein))) #no information rate xx%
+table(data_Hardliner_num$Corona_Massnahmen_muessten_haerter_sein) #okay
+max(table(data_Hardliner_num$Corona_Massnahmen_muessten_haerter_sein)/sum(table(data_Hardliner_num$Corona_Massnahmen_muessten_haerter_sein))) #no information rate 26,82%
 
 
 #----------------------------------------DATA PARTITIONING------------------------------------
@@ -1677,12 +1602,6 @@ myControl = trainControl(
   search = "grid",
 )
 
-
-
-####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
-
-# test of the ideal mtry, splitrule and min-node.size
-
 #set random seed again 
 
 set.seed(1997)
@@ -1691,7 +1610,11 @@ myGrid = expand.grid(mtry = c(10:20),
                      splitrule = "extratrees", 
                      min.node.size = c(5,10,15))
 
+####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
 
+# test of the ideal mtry, splitrule and min-node.size for 500 trees
+
+set.seed(1997)
 RFHard_num1 <- train(Corona_Massnahmen_muessten_haerter_sein ~ ., 
                     data=train_dfHard_num,
                     tuneGrid = myGrid,
@@ -1708,9 +1631,9 @@ RFHard_num1
 summary(RFHard_num1)
 plot(RFHard_num1)
 
-#best mtry:xx
+#best mtry:11
 #splitrule: extratrees
-#min.node.size used: xx
+#min.node.size used: 10
 
 # predict outcome using model from train_df applied to the test_df
 predictions1 <- predict(RFHard_num1, newdata=test_dfHard_num)
@@ -1736,8 +1659,6 @@ spearmanHard1
 
 set.seed(1997)
 
-myGrid <- expand.grid(mtry = xx, splitrule ="extratrees", min.node.size = xx)
-
 RFHard_num2 <- train(Corona_Massnahmen_muessten_haerter_sein ~ ., 
                     data=train_dfHard_num,
                     tuneGrid = myGrid,
@@ -1752,6 +1673,10 @@ RFHard_num2 <- train(Corona_Massnahmen_muessten_haerter_sein ~ .,
 
 RFHard_num2
 summary(RFHard_num2)
+plot(RFHard_num2)
+#best mtry:10
+#splitrule: extratrees
+#min.node.size used: 15
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RFHard_num2, newdata=test_dfHard_num)
@@ -1770,7 +1695,7 @@ pearsonHard2
 spearmanHard2 <- cor.test(predictions2, test_dfHard_num$Corona_Massnahmen_muessten_haerter_sein, method = "spearman")
 spearmanHard2
 
-#num.trees xx performs better
+#both quite bad but 1000 is a bit better
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -1779,14 +1704,7 @@ spearmanHard2
 
 set.seed(1997)
 
-RFHard_num_fin <- train(Corona_Massnahmen_muessten_haerter_sein ~ ., 
-                      data=train_dfHard_num, 
-                      method="ranger", metric= "RMSE",
-                      tuneGrid = myGrid,
-                      na.action = na.omit,
-                      num.tree = xx,
-                      trControl = myControl, 
-                      importance = 'impurity')
+RFHard_num_fin <- RFHard_num2
 
 # Print model
 RFHard_num_fin
@@ -1819,8 +1737,6 @@ spearmanHard3
 #--------------Variable Direction: Partial Plots-----------------------------------------
 
 #checking direction of the 10 most important variables
-###anpassen: name vom dataset
-
 
 imp <- importance(RFHard_num_fin$finalModel)
 imp <- as.data.frame(imp)
@@ -1891,11 +1807,11 @@ cols_names
 data_Softliner_num <- data[,c(277, 27:255)]
 
 #Gibt es NAs in der DV?
-sum(is.na(data_Softliner_num$Corona_Massnahmen_uebertrieben)) #xx NAs
+sum(is.na(data_Softliner_num$Corona_Massnahmen_uebertrieben)) #0 NAs
 
 #ist die Variable unbalanced?
-table(data_Softliner_num$Corona_Massnahmen_uebertrieben) #xx
-max(table(data_Softliner_num$Corona_Massnahmen_uebertrieben)/sum(table(data_Softliner_num$Corona_Massnahmen_uebertrieben))) #no information rate xx%
+table(data_Softliner_num$Corona_Massnahmen_uebertrieben) #Überhang zu niedrigeren Werten, aber noch ok
+max(table(data_Softliner_num$Corona_Massnahmen_uebertrieben)/sum(table(data_Softliner_num$Corona_Massnahmen_uebertrieben))) #no information rate 34,22%
 
 
 #----------------------------------------DATA PARTITIONING------------------------------------
@@ -1926,16 +1842,11 @@ myControl = trainControl(
   number = 10, 
   verboseIter = TRUE,
   allowParallel=TRUE,
+  sampling = "smote",
   search = "grid",
 )
 
-
-
-####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
-
-# test of the ideal mtry, splitrule and min-node.size
-
-#set random seed again 
+#set tuning grid
 
 set.seed(1997)
 
@@ -1944,6 +1855,11 @@ myGrid = expand.grid(mtry = c(10:20),
                      min.node.size = c(5,10,15))
 
 
+####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
+
+# test of the ideal mtry, splitrule and min-node.size for 500 trees
+
+set.seed(1997)
 RFSoft_num1 <- train(Corona_Massnahmen_uebertrieben ~ ., 
                     data=train_dfSoft_num,
                     tuneGrid = myGrid,
@@ -1960,9 +1876,9 @@ RFSoft_num1
 summary(RFSoft_num1)
 plot(RFSoft_num1)
 
-#best mtry:xx
+#best mtry:13
 #splitrule: extratrees
-#min.node.size used: xx
+#min.node.size used: 10
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(RFSoft_num1, newdata=test_dfSoft_num)
@@ -1984,12 +1900,9 @@ spearmanSoft1
 
 ####-------tree 2: num.tree prüfen --------------------------------------------------
 
-#getunte Werte setzen und num.tree ausprobieren --> ist mehr besser?
+#getunte Werte und num.tree ausprobieren --> ist mehr besser?
 
 set.seed(1997)
-
-myGrid <- expand.grid(mtry = xx, splitrule ="extratrees", min.node.size = xx)
-
 RFSoft_num2 <- train(Corona_Massnahmen_uebertrieben ~ ., 
                     data=train_dfSoft_num,
                     tuneGrid = myGrid,
@@ -2004,6 +1917,10 @@ RFSoft_num2 <- train(Corona_Massnahmen_uebertrieben ~ .,
 
 RFSoft_num2
 summary(RFSoft_num2)
+plot(RFSoft_num2)
+#best mtry:10
+#splitrule: extratrees
+#min.node.size used: 10
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RFSoft_num2, newdata=test_dfSoft_num)
@@ -2022,23 +1939,16 @@ pearsonSoft2
 spearmanSoft2 <- cor.test(predictions2, test_dfSoft_num$Corona_Massnahmen_uebertrieben, method = "spearman")
 spearmanSoft2
 
-#num.trees xx performs better
+#num.trees 1000 performs slightly better
 
 
 ####-------tree 3: Final --------------------------------------------------
 
-#final getunte Werte einsetzen
+#finales Model
 
 set.seed(1997)
 
-RFSoft_num_fin <- train(Corona_Massnahmen_uebertrieben ~ ., 
-                      data=train_dfSoft_num, 
-                      method="ranger", metric= "RMSE",
-                      tuneGrid = myGrid,
-                      na.action = na.omit,
-                      num.tree = 1000,
-                      trControl = myControl, 
-                      importance = 'impurity')
+RFSoft_num_fin <- RFSoft_num2
 
 # Print model
 RFSoft_num_fin
@@ -2071,8 +1981,6 @@ spearmanSoft3
 #--------------Variable Direction: Partial Plots-----------------------------------------
 
 #checking direction of the 10 most important variables
-###anpassen: name vom dataset
-
 
 imp <- importance(RFSoft_num_fin$finalModel)
 imp <- as.data.frame(imp)
@@ -2144,11 +2052,11 @@ cols_names
 data_Skeptik_num <- data[,c(279, 27:255)]
 
 #Gibt es NAs in der DV?
-sum(is.na(data_Skeptik_num$Corona_ist_harmlos_gleich_Grippe)) #xx NAs
+sum(is.na(data_Skeptik_num$Corona_ist_harmlos_gleich_Grippe)) #0 NAs
 
 #ist die Variable unbalanced?
-table(data_Skeptik_num$Corona_ist_harmlos_gleich_Grippe) #xx
-max(table(data_Skeptik_num$Corona_ist_harmlos_gleich_Grippe)/sum(table(data_Skeptik_num$Corona_ist_harmlos_gleich_Grippe))) #no information rate xx%
+table(data_Skeptik_num$Corona_ist_harmlos_gleich_Grippe) #Überhang zu 1
+max(table(data_Skeptik_num$Corona_ist_harmlos_gleich_Grippe)/sum(table(data_Skeptik_num$Corona_ist_harmlos_gleich_Grippe))) #no information rate 52%
 
 
 #----------------------------------------DATA PARTITIONING------------------------------------
@@ -2179,16 +2087,12 @@ myControl = trainControl(
   number = 10, 
   verboseIter = TRUE,
   allowParallel=TRUE,
+  sampling = "smote",
   search = "grid",
 )
 
 
-
-####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
-
-# test of the ideal mtry, splitrule and min-node.size
-
-#set random seed again 
+#set tuning grid
 
 set.seed(1997)
 
@@ -2197,6 +2101,11 @@ myGrid = expand.grid(mtry = c(10:20),
                      min.node.size = c(5,10,15))
 
 
+####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
+
+# test of the ideal mtry, splitrule and min-node.size for 500 trees
+
+set.seed(1997)
 RFSkeptiker_num1 <- train(Corona_ist_harmlos_gleich_Grippe ~ ., 
                     data=train_Skeptiker_num,
                     tuneGrid = myGrid,
@@ -2213,9 +2122,9 @@ RFSkeptiker_num1
 summary(RFSkeptiker_num1)
 plot(RFSkeptiker_num1)
 
-#best mtry:xx
+#best mtry:10
 #splitrule: extratrees
-#min.node.size used: xx
+#min.node.size used: 15
 
 # predict outcome using model from train_df applied to the test_df
 predictions1 <- predict(RFSkeptiker_num1, newdata=test_Skeptiker_num)
@@ -2241,8 +2150,6 @@ spearmanSkeptiker1
 
 set.seed(1997)
 
-myGrid <- expand.grid(mtry = xx, splitrule ="extratrees", min.node.size = xx)
-
 RFSkeptikernum_2 <- train(Corona_ist_harmlos_gleich_Grippe ~ ., 
                     data=train_Skeptiker_num,
                     tuneGrid = myGrid,
@@ -2257,6 +2164,11 @@ RFSkeptikernum_2 <- train(Corona_ist_harmlos_gleich_Grippe ~ .,
 
 RFSkeptikernum_2
 summary(RFSkeptikernum_2)
+plot(RFSkeptiker_num2)
+
+#best mtry:10
+#splitrule: extratrees
+#min.node.size used: 15
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RFSkeptikernum_2, newdata=test_Skeptiker_num)
@@ -2275,23 +2187,16 @@ pearsonSkeptiker2
 spearmanSkeptiker2 <- cor.test(predictions2, test_Skeptiker_num$Corona_ist_harmlos_gleich_Grippe, method = "spearman")
 spearmanSkeptiker2
 
-#num.trees xx performs better
+#num.trees 1000 performs better
 
 
 ####-------tree 3: Final --------------------------------------------------
 
-#final getunte Werte einsetzen
+#final Model
 
 set.seed(1997)
 
-RFSkeptikernum_fin <- train(Corona_ist_harmlos_gleich_Grippe ~ ., 
-                      data=train_Skeptiker_num, 
-                      method="ranger", metric= "RMSE",
-                      tuneGrid = myGrid,
-                      na.action = na.omit,
-                      num.tree = 1000,
-                      trControl = myControl, 
-                      importance = 'impurity')
+RFSkeptikernum_fin <- RFSkeptikernum_2
 
 # Print model
 RFSkeptikernum_fin
@@ -2324,7 +2229,6 @@ spearmanSkeptiker_fin
 #--------------Variable Direction: Partial Plots-----------------------------------------
 
 #checking direction of the 10 most important variables
-
 
 imp <- importance(RFSkeptikernum_fin$finalModel)
 imp <- as.data.frame(imp)
@@ -2396,11 +2300,11 @@ cols_names
 data_Leugner_num <- data[,c(280, 27:255)]
 
 #Gibt es NAs in der DV?
-sum(is.na(data_Leugner_num$Glaube_nicht_an_Corona)) #xx NAs
+sum(is.na(data_Leugner_num$Glaube_nicht_an_Corona)) #0 NAs
 
 #ist die Variable unbalanced?
-table(data_Leugner_num$Glaube_nicht_an_Corona) #xx
-max(table(data_Leugner_num$Glaube_nicht_an_Corona)/sum(table(data_Leugner_num$Glaube_nicht_an_Corona))) #no information rate xx%
+table(data_Leugner_num$Glaube_nicht_an_Corona) #imbalanced!
+max(table(data_Leugner_num$Glaube_nicht_an_Corona)/sum(table(data_Leugner_num$Glaube_nicht_an_Corona))) #no information rate 76%
 
 
 #----------------------------------------DATA PARTITIONING------------------------------------
@@ -2431,14 +2335,9 @@ myControl = trainControl(
   number = 10, 
   verboseIter = TRUE,
   allowParallel=TRUE,
+  sampling = "smote",
   search = "grid",
 )
-
-
-
-####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
-
-# test of the ideal mtry, splitrule and min-node.size
 
 #set random seed again 
 
@@ -2449,6 +2348,11 @@ myGrid = expand.grid(mtry = c(10:20),
                      min.node.size = c(5,10,15))
 
 
+####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
+
+# test of the ideal mtry, splitrule and min-node.size for 500 trees
+
+set.seed(1997)
 RFLeugner_num1 <- train(Glaube_nicht_an_Corona ~ ., 
                     data=train_dfLeugner_num,
                     tuneGrid = myGrid,
@@ -2465,9 +2369,9 @@ RFLeugner_num1
 summary(RFLeugner_num1)
 plot(RFLeugner_num1)
 
-#best mtry:xx
+#best mtry:11
 #splitrule: extratrees
-#min.node.size used: xx
+#min.node.size used: 15
 
 # predict outcome using model from train_df applied to the test_df
 predictions1 <- predict(RFLeugner_num1, newdata=test_dfLeugner_num)
@@ -2492,9 +2396,6 @@ spearmanLeugner1
 #getunte Werte setzen und num.tree ausprobieren --> ist mehr besser?
 
 set.seed(1997)
-
-myGrid <- expand.grid(mtry = xx, splitrule ="extratrees", min.node.size = xx)
-
 RFLeugner_num2 <- train(Glaube_nicht_an_Corona ~ ., 
                     data=train_dfLeugner_num,
                     tuneGrid = myGrid,
@@ -2509,6 +2410,11 @@ RFLeugner_num2 <- train(Glaube_nicht_an_Corona ~ .,
 
 RFLeugner_num2
 summary(RFLeugner_num2)
+plot(RFLeugner_num2)
+
+#best mtry:10
+#splitrule: extratrees
+#min.node.size used: 15
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RFLeugner_num2, newdata=test_dfLeugner_num)
@@ -2527,7 +2433,7 @@ pearsonLeugner2
 spearmanLeugner2 <- cor.test(predictions2, test_dfLeugner_num$Glaube_nicht_an_Corona, method = "spearman")
 spearmanLeugner2
 
-#num.trees xx performs better
+#num.trees 500 performs better
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -2536,14 +2442,7 @@ spearmanLeugner2
 
 set.seed(1997)
 
-RFLeugner_num_fin <- train(Glaube_nicht_an_Corona ~ ., 
-                      data=train_dfLeugner_num, 
-                      method="ranger", metric= "RMSE",
-                      tuneGrid = myGrid,
-                      na.action = na.omit,
-                      num.tree = 1000,
-                      trControl = myControl, 
-                      importance = 'impurity')
+RFLeugner_num_fin <- RFLeugner_num1
 
 # Print model
 RFLeugner_num_fin
@@ -2581,8 +2480,6 @@ imp <- importance(RFLeugner_num_fin$finalModel)
 imp <- as.data.frame(imp)
 impvar <- rownames(imp)[order(imp[1], decreasing=TRUE)]
 impvar <- impvar[1:20]
-
-#Model umbenennen
 
 PartialPlots <- RFLeugner_num_fin
 
