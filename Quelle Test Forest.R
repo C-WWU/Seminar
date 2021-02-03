@@ -186,7 +186,8 @@ RFQuelle2 <- train(Quelle ~ .,
 # Print models
 RFQuelle2
 summary(RFQuelle2)
-#mtry = xx, extratrees, min.node.size = x
+plot(RFQuelle2)
+#mtry = 20, extratrees, min.node.size = 10
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -197,7 +198,7 @@ predictions2 <- predict(RFQuelle2, newdata=test_dfQuelle)
 confusionMatrix(data=as.factor(predictions2), as.factor(test_dfQuelle$Quelle))
 
 
-#check for auc: 0,7522
+#check for auc:
 test_roc <- function(model, data) {
   
   multiclass.roc(test_dfQuelle$Quelle,
@@ -205,7 +206,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 
+#model auc: 0,7335
 RFQuelle2 %>%
   test_roc(data = test_dfQuelle) %>%
   auc()
@@ -216,17 +217,10 @@ RFQuelle2 %>%
 
 ####-------tree 3: Final --------------------------------------------------
 
-#final getunte Werte einsetzen: grid übernehmen und num.tree anpassen
+#finales Model
 
 set.seed(1997)
-RFQuelle_fin <- train(Quelle ~ ., 
-                         data=train_dfQuelle, 
-                         method="ranger", metric= "Kappa",
-                         tuneGrid = myGrid1,
-                         na.action = na.omit,
-                         num.tree = 1000,
-                         trControl = myControl1, 
-                         importance = 'impurity')
+RFQuelle_fin <- RFQuelle2
 
 # Print models
 RFQuelle_fin
@@ -253,7 +247,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc:
+#model auc: 0,7335
 RFQuelle_fin %>%
   test_roc(data = test_dfQuelle) %>%
   auc()
@@ -271,73 +265,71 @@ imp <- as.data.frame(imp)
 impvar <- rownames(imp)[order(imp[1], decreasing=TRUE)]
 impvar <- impvar[1:20]
 
-#Model umbenennen
-
 PartialPlots <- RFQuelle_fin
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "Privat") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "Privat") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "Privat") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "Privat") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "Privat") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "Privat") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "Privat") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "Privat") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "Privat") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "Privat") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "Privat") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "Privat") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "Privat") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "Privat") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "Privat") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "Privat") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "Privat") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "Privat") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "Privat") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "Privat") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "Privat") %>%plotPartial(main = "Privat")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "Privat") %>%plotPartial(main = "Privat")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "Privat") %>%plotPartial(main = "Privat")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "Privat") %>%plotPartial(main = "Privat")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "Privat") %>%plotPartial(main = "Privat")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "Privat") %>%plotPartial(main = "Privat")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "Privat") %>%plotPartial(main = "Privat")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "Privat") %>%plotPartial(main = "Privat")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "Privat") %>%plotPartial(main = "Privat")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "Privat") %>%plotPartial(main = "Privat")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "Privat") %>%plotPartial(main = "Privat")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "Privat") %>%plotPartial(main = "Privat")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "Privat") %>%plotPartial(main = "Privat")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "Privat") %>%plotPartial(main = "Privat")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "Privat") %>%plotPartial(main = "Privat")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "Privat") %>%plotPartial(main = "Privat")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "Privat") %>%plotPartial(main = "Privat")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "Privat") %>%plotPartial(main = "Privat")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "Privat") %>%plotPartial(main = "Privat")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "Privat") %>%plotPartial(main = "Privat")
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "Surveycircle") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "Surveycircle") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "Surveycircle") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "Surveycircle") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "Surveycircle") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "Surveycircle") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "Surveycircle") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "Surveycircle") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "Surveycircle") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "Surveycircle") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "Surveycircle") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "Surveycircle") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "Surveycircle") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "Surveycircle") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "Surveycircle") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "Surveycircle") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "Surveycircle") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "Surveycircle") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "Surveycircle") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "Surveycircle") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "Surveycircle") %>%plotPartial(main = "Surveycircle")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "Surveycircle") %>%plotPartial(main = "Surveycircle")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "Surveycircle") %>%plotPartial(main = "Surveycircle")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "Surveycircle") %>%plotPartial(main = "Surveycircle")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "Surveycircle") %>%plotPartial(main = "Surveycircle")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "Surveycircle") %>%plotPartial(main = "Surveycircle")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "Surveycircle") %>%plotPartial(main = "Surveycircle")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "Surveycircle") %>%plotPartial(main = "Surveycircle")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "Surveycircle") %>%plotPartial(main = "Surveycircle")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "Surveycircle") %>%plotPartial(main = "Surveycircle")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "Surveycircle") %>%plotPartial(main = "Surveycircle")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "Surveycircle") %>%plotPartial(main = "Surveycircle")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "Surveycircle") %>%plotPartial(main = "Surveycircle")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "Surveycircle") %>%plotPartial(main = "Surveycircle")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "Surveycircle") %>%plotPartial(main = "Surveycircle")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "Surveycircle") %>%plotPartial(main = "Surveycircle")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "Surveycircle") %>%plotPartial(main = "Surveycircle")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "Surveycircle") %>%plotPartial(main = "Surveycircle")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "Surveycircle") %>%plotPartial(main = "Surveycircle")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "Surveycircle") %>%plotPartial(main = "Surveycircle")
 
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "Gapfish") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "Gapfish") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "Gapfish") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "Gapfish") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "Gapfish") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "Gapfish") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "Gapfish") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "Gapfish") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "Gapfish") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "Gapfish") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "Gapfish") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "Gapfish") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "Gapfish") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "Gapfish") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "Gapfish") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "Gapfish") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "Gapfish") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "Gapfish") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "Gapfish") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "Gapfish") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "Gapfish") %>%plotPartial(main = "Gapfish")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "Gapfish") %>%plotPartial(main = "Gapfish")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "Gapfish") %>%plotPartial(main = "Gapfish")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "Gapfish") %>%plotPartial(main = "Gapfish")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "Gapfish") %>%plotPartial(main = "Gapfish")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "Gapfish") %>%plotPartial(main = "Gapfish")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "Gapfish") %>%plotPartial(main = "Gapfish")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "Gapfish") %>%plotPartial(main = "Gapfish")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "Gapfish") %>%plotPartial(main = "Gapfish")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "Gapfish") %>%plotPartial(main = "Gapfish")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "Gapfish") %>%plotPartial(main = "Gapfish")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "Gapfish") %>%plotPartial(main = "Gapfish")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "Gapfish") %>%plotPartial(main = "Gapfish")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "Gapfish") %>%plotPartial(main = "Gapfish")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "Gapfish") %>%plotPartial(main = "Gapfish")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "Gapfish") %>%plotPartial(main = "Gapfish")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "Gapfish") %>%plotPartial(main = "Gapfish")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "Gapfish") %>%plotPartial(main = "Gapfish")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "Gapfish") %>%plotPartial(main = "Gapfish")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "Gapfish") %>%plotPartial(main = "Gapfish")
 
 
 
