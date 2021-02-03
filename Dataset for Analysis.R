@@ -794,9 +794,9 @@ data <- data %>% mutate(Ost_West = case_when(PLZ <= 19 ~ 'Osten',
                                                       PLZ >= 40 & PLZ <= 97 ~ 'Westen',
                                                       PLZ >= 98 ~ 'Osten'))
 #Altersgruppe: jung, mittel, alt
-data <- data %>% mutate(Age_Range = case_when(Alter >= 45 ~ 'hohes Alter',
-                                                      Alter >= 30  & Alter <= 44 ~ 'mittleres Alter',
-                                                      Alter <= 29 ~ 'niedriges Alter'))
+data <- data %>% mutate(Age_Range = case_when(Alter >= 45 ~ 'hohes.Alter',
+                                                      Alter >= 30  & Alter <= 44 ~ 'mittleres.Alter',
+                                                      Alter <= 29 ~ 'niedriges.Alter'))
 
 #Geschlecht: nur weiblich und männlich
 data <- data %>% mutate(weiblich_maennlich = case_when(Geschlecht == 1 ~ 'weiblich',
