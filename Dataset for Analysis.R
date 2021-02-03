@@ -1008,7 +1008,7 @@ ggplot(data, aes(x = Alter))+
 #Age range
 
 table(data$Age_Range)
-Ordered_ranges <- c('niedriges Alter', 'mittleres Alter', 'hohes Alter')
+Ordered_ranges <- c('niedriges.Alter', 'mittleres.Alter', 'hohes.Alter')
 
 ggplot(data, aes(x = factor(Age_Range, levels = Ordered_ranges)))+
   geom_bar()+
