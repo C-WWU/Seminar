@@ -72,7 +72,7 @@ data_Alter$Alter <- as.numeric(data_Alter$Alter)
 sum(is.na(data_Alter$Alter)) #keine NAs
 ###folgende Kommentierung und Code nur drin lassen und anpassen, wenn es NAs gibt --> bitte prüfen, dass der Code auch das richtige macht :)
 #Respondents mit NAs für diese Variable löschen (NAs stehen nur, wenn Respondent "Keine Angabe" gemacht hat, daher bedeutet löschen keinen Informationsverlust)
-data_Geschlecht <- data_Alter%>% filter(Alter != "NA")
+#data_Alter <- data_Alter%>% filter(Alter != "NA")
 
 
 
@@ -146,7 +146,7 @@ summary(modelAlterRF)
 plot(modelAlterRF)
 
 
-#best mtry = 13, splitrule = extratrees, min.node.size = 5
+#best mtry = 14, splitrule = extratrees, min.node.size = 5
 
 # Apply model to test_df --> test_dfGeschlecht
 
@@ -167,8 +167,8 @@ R2(predictions, test_dfAlter$Alter)
 pearsonAlterRF <- cor.test(predictions, test_dfAlter$Alter, method = "pearson")
 pearsonAlterRF
 
-spearmanGreen1_1 <- cor.test(predictions, test_dfAlter$Alter, method = "spearman")
-spearmanGreen1_1
+spearmanAlterRF <- cor.test(predictions, test_dfAlter$Alter, method = "spearman")
+spearmanAlterRF
 
 
 #save the best mtry 
@@ -179,14 +179,7 @@ bestmtry <- modelAlterRF$bestTune$mtry
 
 # test of ideal num.tree --> try if numtree 1000 leads to better results!
 ###mtry, splitrule und min.node.size zu dem anpassen, was tree 1 gefunden hat!
-
 set.seed(1997)
-
-myGrid = expand.grid(mtry = 13,   #anpassen!
-                     splitrule = "extratrees", #anpassen!
-                     min.node.size = 5)   #anpassen!
-
-
 modelAlterRF1 <- train(Alter ~ ., 
                            data=train_dfAlter,
                            tuneGrid = myGrid,
@@ -201,7 +194,7 @@ modelAlterRF1 <- train(Alter ~ .,
 
 modelAlterRF1
 summary(modelAlterRF1)
-
+plot(modelAlterRF1)
 
 # Apply model to test_df --> test_dfGeschlecht
 
@@ -235,16 +228,7 @@ spearmanAlter1
 ### hier das finale model mit bestmtry und node size einfügen , auch best num.tree anpassen
 
 set.seed(1997)
-myGrid <- expand.grid(mtry = 13, splitrule ="extratrees", min.node.size = 5)
-modelAlterfinal <- train(Alter ~ ., 
-                           data=train_dfAlter, 
-                           method="ranger", 
-                           metric= "RMSE", # hier bei metric kann man sich auch die Accuracy ausgeben lassen
-                           tuneGrid = myGrid,
-                           na.action = na.omit,
-                           num.tree = 500,
-                           trControl = myControl, 
-                           importance = 'impurity')
+modelAlterfinal <- modelAlterRF1
 
 # Print model
 ### hier den Model namen ändern
@@ -258,7 +242,7 @@ summary(modelAlterfinal)
 ### hier auch den model namen ändern
 
 varImp(modelAlterfinal)
-plot(varImp(modelAlterfinal), 20, main = "weiblich_maennlich")
+plot(varImp(modelAlterfinal), 20, main = "Alter")
 
 # Apply model to test_df --> test_dfGeschlecht
 
@@ -299,26 +283,26 @@ impvar <- impvar[1:20]
 
 PartialPlots <- modelAlterfinal
 
-PartialPlots %>% partial(pred.var = impvar[1]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[2]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[3]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[4]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[5]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[6]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[7]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[8]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[9]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[10]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[11]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[12]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[13]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[14]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[15]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[16]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[17]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[18]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[19]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[20]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[1]) %>%plotPartial(main = "Alter")
+PartialPlots %>% partial(pred.var = impvar[2]) %>%plotPartial(main = "Alter")
+PartialPlots %>% partial(pred.var = impvar[3]) %>%plotPartial(main = "Alter")
+PartialPlots %>% partial(pred.var = impvar[4]) %>%plotPartial(main = "Alter")
+PartialPlots %>% partial(pred.var = impvar[5]) %>%plotPartial(main = "Alter")
+PartialPlots %>% partial(pred.var = impvar[6]) %>%plotPartial(main = "Alter")
+PartialPlots %>% partial(pred.var = impvar[7]) %>%plotPartial(main = "Alter")
+PartialPlots %>% partial(pred.var = impvar[8]) %>%plotPartial(main = "Alter")
+PartialPlots %>% partial(pred.var = impvar[9]) %>%plotPartial(main = "Alter")
+PartialPlots %>% partial(pred.var = impvar[10]) %>%plotPartial(main = "Alter")
+PartialPlots %>% partial(pred.var = impvar[11]) %>%plotPartial(main = "Alter")
+PartialPlots %>% partial(pred.var = impvar[12]) %>%plotPartial(main = "Alter")
+PartialPlots %>% partial(pred.var = impvar[13]) %>%plotPartial(main = "Alter")
+PartialPlots %>% partial(pred.var = impvar[14]) %>%plotPartial(main = "Alter")
+PartialPlots %>% partial(pred.var = impvar[15]) %>%plotPartial(main = "Alter")
+PartialPlots %>% partial(pred.var = impvar[16]) %>%plotPartial(main = "Alter")
+PartialPlots %>% partial(pred.var = impvar[17]) %>%plotPartial(main = "Alter")
+PartialPlots %>% partial(pred.var = impvar[18]) %>%plotPartial(main = "Alter")
+PartialPlots %>% partial(pred.var = impvar[19]) %>%plotPartial(main = "Alter")
+PartialPlots %>% partial(pred.var = impvar[20]) %>%plotPartial(main = "Alter")
 
 
 #------------------------------------------------WHEN BEST MODEL IS FOUND-----------------------------------------------------
