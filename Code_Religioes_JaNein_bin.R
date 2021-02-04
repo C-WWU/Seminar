@@ -61,28 +61,28 @@ cols_names
 
 # c(313 --> das ist hier die column wo die Dv drin ist, in dem Fall weiblich_maennlich)
 # c(27:255 --> das sind unsere IV's, sprich die Accounts)
-data_IslamChrist <- data[,c(334, 27:255)]
+data_Religioes <- data[,c(333, 27:255)]
 
 
 ### es ist besonders wichtig die gewünschte DV in einen Faktor zu transformieren, da "caret" nicht mit 0/1 ausprägungen umgehen kann, wenn das model trainiert werden soll. 
 ###nur für binär/categorical
-cols_IslamChrist <- names(data_IslamChrist)
+cols_Religioes <- names(data_Religioes)
 
 
 # Convert factor names of trial to caret compatible format (1 and 0 as numbers are not allowed)
-data_IslamChrist$Islam_oder_Christ = as.factor(data_IslamChrist$Islam_oder_Christ)
+data_Religioes$Religioes = as.factor(data_Religioes$Religioes)
 
 
 #Gibt es NAs in der DV?
-sum(is.na(data_IslamChrist$Islam_oder_Christ)) #keine NAs
+sum(is.na(data_Religioes$Religioes)) #keine NAs
 ###folgende Kommentierung und Code nur drin lassen und anpassen, wenn es NAs gibt --> bitte prüfen, dass der Code auch das richtige macht :)
 #Respondents mit NAs für diese Variable löschen (NAs stehen nur, wenn Respondent "Keine Angabe" gemacht hat, daher bedeutet löschen keinen Informationsverlust)
-data_IslamChrist <- data_IslamChrist %>% subset(data_IslamChrist$Islam_oder_Christ != "NA")
+data_Religioes <- data_Religioes %>% subset(data_Religioes$Religioes != "NA")
 
 
 #ist die Variable unbalanced?
-table(data_IslamChrist$Islam_oder_Christ) #Verteilung in Ordnung
-max(table(data_IslamChrist$Islam_oder_Christ)/sum(table(data_IslamChrist$Islam_oder_Christ))) #no information rate 61%
+table(data_Religioes$Religioes) #Verteilung in Ordnung
+max(table(data_Religioes$Religioes)/sum(table(data_Religioes$Religioes))) #no information rate 61%
 
 
 
@@ -101,14 +101,14 @@ set.seed(1997)
 ### p=0.8 heißt das data set wird nach der 80/20 regel in training und test data set geteilt. 
 ### Könnte  man auch anpassen in 70/30 oder 75/25 wie Kübler das in seinem Buch geschrieben hat. 
 
-index <- createDataPartition(data_IslamChrist$Islam_oder_Christ, p=.8, list= FALSE, times= 1)
+index <- createDataPartition(data_Religioes$Religioes, p=.8, list= FALSE, times= 1)
 
 # Create train_dfGeschlecht & test_dfGeschlecht
 
 ### name anpassen an DV
 
-train_dfIslamChrist <- data_IslamChrist[index,]
-test_dfIslamChrist <- data_IslamChrist[-index,]
+train_dfReligioes <- data_Religioes[index,]
+test_dfReligioes <- data_Religioes[-index,]
 
 
 #---------------------------------------------------RANDOM FOREST----------------------------------------------------
@@ -141,21 +141,21 @@ myGrid = expand.grid(mtry = c(10:20),
                      min.node.size = c(5,10,15))
 
 
-modelIslamChristRF <- train(Islam_oder_Christ ~ ., 
-                       data=train_dfIslamChrist,
-                       tuneGrid = myGrid,
-                       method="ranger",
-                       metric= "ROC", # numeric: RMSE; categorical: Kappa; binary: ROC
-                       na.action = na.omit,
-                       num.tree = 500,
-                       trControl = myControl, 
-                       importance = 'impurity')
+modelReligioesRF <- train(Religioes ~ ., 
+                            data=train_dfReligioes,
+                            tuneGrid = myGrid,
+                            method="ranger",
+                            metric= "ROC", # numeric: RMSE; categorical: Kappa; binary: ROC
+                            na.action = na.omit,
+                            num.tree = 500,
+                            trControl = myControl, 
+                            importance = 'impurity')
 
 # Print model to console
 
-modelIslamChristRF
-summary(modelIslamChristRF)
-plot(modelIslamChristRF)
+modelReligioesRF
+summary(modelReligioesRF)
+plot(modelReligioesRF)
 
 #best mtry = 18, splitrule = extratrees, min.node.size = 10
 
@@ -164,34 +164,34 @@ plot(modelIslamChristRF)
 # predict outcome using model from train_df applied to the test_df
 
 ### hier auch einmal nach dem testdf der DV umbenennen
-predictions <- predict(modelIslamChristRF, newdata=test_dfIslamChrist)
+predictions <- predict(modelReligioesRF, newdata=test_dfReligioes)
 
 # Create confusion matrix --> nur für classification (binär oder categorical)
-confusionMatrix(data=predictions, test_dfIslamChrist$Islam_oder_Christ)
+confusionMatrix(data=predictions, test_dfReligioes$Religioes)
 
 #save the best mtry 
 
-bestmtry <- modelIslamChristRF$bestTune$mtry
+bestmtry <- modelReligioesRF$bestTune$mtry
 
 #check for AUC 
 #####(nur binär und kategorisch)
 test_roc <- function(model, data) {
   
-  roc(test_dfIslamChrist$Islam_oder_Christ,
-      predict(model, data, type = "prob")[, "Christentum"])
+  roc(test_dfReligioes$Religioes,
+      predict(model, data, type = "prob")[, "Ja"])
   
 }
 
-modelIslamChristRF %>%
-  test_roc(data = test_dfIslamChrist) %>%
+modelReligioesRF %>%
+  test_roc(data = test_dfReligioes) %>%
   auc()
 
 ###nur für binär (von hier bis Ende des Abschnitts)
 #compare different ROC-plots
-model_list <- list(M1 = modelIslamChristRF)
+model_list <- list(M1 = modelReligioesRF)
 
 model_list_roc <- model_list %>%
-  map(test_roc, data = test_dfIslamChrist)
+  map(test_roc, data = test_dfReligioes)
 
 model_list_roc %>%
   map(auc)
@@ -230,52 +230,52 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 ###mtry, splitrule und min.node.size zu dem anpassen, was tree 1 gefunden hat!
 
 set.seed(1997)
-modelIslamChristRF1 <- train(Islam_oder_Christ ~ ., 
-                        data=train_dfIslamChrist,
-                        tuneGrid = myGrid,
-                        method="ranger", 
-                        metric= "ROC", 
-                        na.action = na.omit,
-                        num.tree = 1000,
-                        trControl = myControl, 
-                        importance = 'impurity')
+modelReligioesRF1 <- train(Religioes ~ ., 
+                             data=train_dfReligioes,
+                             tuneGrid = myGrid,
+                             method="ranger", 
+                             metric= "ROC", 
+                             na.action = na.omit,
+                             num.tree = 1000,
+                             trControl = myControl, 
+                             importance = 'impurity')
 
 # Print model to console
 
-modelIslamChristRF1
-summary(modelIslamChristRF1)
-plot(modelIslamChristRF1)
+modelReligioesRF1
+summary(modelReligioesRF1)
+plot(modelReligioesRF1)
 
 # Apply model to test_df --> test_dfGeschlecht
 
 # predict outcome using model from train_df applied to the test_df
 
 ### hier auch einmal nach dem testdf der DV umbenennen
-predictions <- predict(modelIslamChristRF1, newdata=test_dfIslamChrist)
+predictions <- predict(modelReligioesRF1, newdata=test_dfReligioes)
 
 # Create confusion matrix --> nur für classification
-confusionMatrix(data=predictions, test_dfIslamChrist$Islam_oder_Christ)
+confusionMatrix(data=predictions, test_dfReligioes$Religioes)
 
 
 #check for AUC 
 #####(nur binär und kategorisch) (von hier bis Ende des Abschnitts)
 test_roc <- function(model, data) {
   
-  roc(test_dfIslamChrist$Islam_oder_Christ,
-      predict(model, data, type = "prob")[, "Christentum"])
+  roc(test_dfReligioes$Religioes,
+      predict(model, data, type = "prob")[, "Ja"])
   
 }
 
-modelIslamChristRF1 %>%
-  test_roc(data = test_dfIslamChrist) %>%
+modelReligioesRF1 %>%
+  test_roc(data = test_dfReligioes) %>%
   auc()
 
 ###nur für binär
 #compare different ROC-plots
-model_list <- list(M1 = modelIslamChristRF1)
+model_list <- list(M1 = modelReligioesRF1)
 
 model_list_roc <- model_list %>%
-  map(test_roc, data = test_dfIslamChrist)
+  map(test_roc, data = test_dfReligioes)
 
 model_list_roc %>%
   map(auc)
@@ -315,51 +315,51 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 ### hier das finale model mit bestmtry und node size einfügen , auch best num.tree anpassen
 
-modelIslamChristfinal <- modelIslamChristXX
+modelReligioesfinal <- modelReligioesXX
 # Print model
 ### hier den Model namen ändern
-print(modelIslamChristfinal)
+print(modelReligioesfinal)
 
 #output in terms of regression coefficients
-summary(modelIslamChristfinal)
+summary(modelReligioesfinal)
 
 #evaluate variable importance 
 # Mean Decrease Gini - Measure of variable importance based on the Gini impurity index used for the calculation of splits in trees.
 ### hier auch den model namen ändern
 
-varImp(modelIslamChristfinal)
-plot(varImp(modelIslamChristfinal), 20, main = "Islam_oder_Christ")
+varImp(modelReligioesfinal)
+plot(varImp(modelReligioesfinal), 20, main = "Religioes")
 
 # Apply model to test_df --> test_dfGeschlecht
 
 # predict outcome using model from train_df applied to the test_df
 
 ### hier auch einmal nach dem testdf der DV umbenennen
-predictions <- predict(modelIslamChristfinal, newdata=test_dfIslamChrist)
+predictions <- predict(modelReligioesfinal, newdata=test_dfReligioes)
 
 # Create confusion matrix --> nur für classification
-confusionMatrix(data=predictions, test_dfIslamChrist$Islam_oder_Christ)
+confusionMatrix(data=predictions, test_dfReligioes$Religioes)
 
 
 #check for AUC 
 #####(nur binär und kategorisch)
 test_roc <- function(model, data) {
   
-  roc(test_dfIslamChrist$Islam_oder_Christ,
-      predict(model, data, type = "prob")[, "Christentum"])
+  roc(test_dfReligioes$Religioes,
+      predict(model, data, type = "prob")[, "Ja"])
   
 }
 
-modelIslamChristfinal %>%
-  test_roc(data = test_dfIslamChrist) %>%
+modelReligioesfinal %>%
+  test_roc(data = test_dfReligioes) %>%
   auc()
 
 ###nur für binär (von hier bis Ende des Abschnitts)
 #compare different ROC-plots
-model_list <- list(M1 = modelIslamChristfinal)
+model_list <- list(M1 = modelReligioesfinal)
 
 model_list_roc <- model_list %>%
-  map(test_roc, data = test_dfIslamChrist)
+  map(test_roc, data = test_dfReligioes)
 
 model_list_roc %>%
   map(auc)
@@ -398,35 +398,35 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 ###anpassen: name vom dataset
 
-imp <- importance(modelIslamChristfinal$finalModel)
+imp <- importance(modelReligioesfinal$finalModel)
 imp <- as.data.frame(imp)
 impvar <- rownames(imp)[order(imp[1], decreasing=TRUE)]
 impvar <- impvar[1:20]
 
 ###Model umbenennen
 
-PartialPlots <- modelIslamChristfinal
+PartialPlots <- modelReligioesfinal
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "Islam") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "Islam") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "Islam") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "Islam") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "Islam") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "Islam") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "Islam") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "Islam") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "Islam") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "Islam") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "Islam") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "Islam") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "Islam") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "Islam") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "Islam") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "Islam") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "Islam") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "Islam") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "Islam") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "Islam") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "Ja") %>%plotPartial
 
 
 #------------------------------------------------WHEN BEST MODEL IS FOUND-----------------------------------------------------

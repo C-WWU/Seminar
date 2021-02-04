@@ -268,7 +268,7 @@ test_roc <- function(model, data) {
 }
 
 modelHeteroRF1 %>%
-  test_roc(data = test_dfGreen2) %>%
+  test_roc(data = test_dfHetero) %>%
   auc()
 
 ###nur für binär
