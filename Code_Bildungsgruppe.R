@@ -114,7 +114,7 @@ myControl1 = trainControl(
   summaryFunction = defaultSummary, 
   classProbs = TRUE, 
   allowParallel=TRUE,
-  sampling = "smote", 
+  #sampling = "smote", 
   search = "grid"
 )
 
@@ -150,7 +150,7 @@ RFBildungsgruppe <- train(Bildungsgruppe ~ .,
 RFBildungsgruppe
 summary(RFBildungsgruppe)
 plot(RFBildungsgruppe)
-#mtry = 14, extratrees, min.node.size = 10
+#mtry = 15, extratrees, min.node.size = 5
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -172,7 +172,7 @@ RFBildungsgruppe %>%
   test_roc(data = test_dfBildungsgruppe) %>%
   auc()
 
-
+# AUC model 1 0.744
 
 ####-------tree 2: num.tree prüfen --------------------------------------------------
 
