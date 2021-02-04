@@ -224,7 +224,7 @@ RFBildungsgruppe1 %>%
 #final model
 
 set.seed(1997)
-RFBildungsgruppeFinal <- RFEinkommen_x
+RFBildungsgruppeFinal <- RFBildungsgruppeXX
 
 # Print models
 RFBildungsgruppeFinal 
@@ -234,7 +234,7 @@ summary(RFBildungsgruppeFinal )
 # Mean Decrease Gini - Measure of variable importance based on the Gini impurity index used for the calculation of splits in trees.
 
 varImp(RFBildungsgruppeFinal )
-plot(varImp(RFBildungsgruppeFinal ), 20, main = "Einkommensgruppe")
+plot(varImp(RFBildungsgruppeFinal ), 20, main = "Bildungsgruppe")
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -294,7 +294,7 @@ PartialPlots %>% partial(pred.var = impvar[18], which.class = "hoch") %>%plotPar
 PartialPlots %>% partial(pred.var = impvar[19], which.class = "hoch") %>%plotPartial(main = "hoher Bildungsstand")
 PartialPlots %>% partial(pred.var = impvar[20], which.class = "hoch") %>%plotPartial(main = "hoher Bildungsstand")
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "mittlel") %>%plotPartial(main = "mittlerer Bildungsstand")
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "mittel") %>%plotPartial(main = "mittlerer Bildungsstand")
 PartialPlots %>% partial(pred.var = impvar[2], which.class = "mittel") %>%plotPartial(main = "mittlerer Bildungsstand")
 PartialPlots %>% partial(pred.var = impvar[3], which.class = "mittel") %>%plotPartial(main = "mittlerer Bildungsstand")
 PartialPlots %>% partial(pred.var = impvar[4], which.class = "mittel") %>%plotPartial(main = "mittlerer Bildungsstand")
