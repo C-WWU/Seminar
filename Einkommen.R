@@ -168,7 +168,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model1 auc: 
+#model1 auc: 0,7018
 RFEinkommen_1 %>%
   test_roc(data = test_dfEinkommen) %>%
   auc()
@@ -192,7 +192,8 @@ RFEinkommen_2 <- train(Einkommensgruppe ~ .,
 # Print models
 RFEinkommen_2
 summary(RFEinkommen_2)
-#mtry = xx, extratrees, min.node.size = xx
+plot(RFEinkommen_2)
+#mtry = 17, extratrees, min.node.size = 15
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -203,7 +204,7 @@ predictions2 <- predict(RFEinkommen_2, newdata=test_dfEinkommen)
 confusionMatrix(data=as.factor(predictions2), as.factor(test_dfEinkommen$Einkommensgruppe))
 
 
-#check for auc
+#check for auc: 0,7056
 test_roc <- function(model, data) {
   
   multiclass.roc(test_dfEinkommen$Einkommensgruppe,
@@ -217,7 +218,7 @@ RFEinkommen_2 %>%
   auc()
 
 
-#model1: 500 trees performs better
+#model1: 1000 trees performs better on predictions
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -225,7 +226,7 @@ RFEinkommen_2 %>%
 #final model
 
 set.seed(1997)
-RFEinkommen_fin <- RFEinkommen_x
+RFEinkommen_fin <- RFEinkommen_2
 
 # Print models
 RFEinkommen_fin
@@ -252,7 +253,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 
+#model auc: 0,7056
 RFEinkommen_fin %>%
   test_roc(data = test_dfEinkommen) %>%
   auc()
@@ -270,73 +271,71 @@ imp <- as.data.frame(imp)
 impvar <- rownames(imp)[order(imp[1], decreasing=TRUE)]
 impvar <- impvar[1:20]
 
-#Model umbenennen
-
 PartialPlots <- RFEinkommen_fin
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "niedrig") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "niedrig") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "niedrig") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "niedrig") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "niedrig") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "niedrig") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "niedrig") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "niedrig") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "niedrig") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "niedrig") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "niedrig") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "niedrig") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "niedrig") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "niedrig") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "niedrig") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "niedrig") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "niedrig") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "niedrig") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "niedrig") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "niedrig") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "niedrig") %>%plotPartial(main = "niedrig")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "niedrig") %>%plotPartial(main = "niedrig")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "niedrig") %>%plotPartial(main = "niedrig")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "niedrig") %>%plotPartial(main = "niedrig")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "niedrig") %>%plotPartial(main = "niedrig")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "niedrig") %>%plotPartial(main = "niedrig")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "niedrig") %>%plotPartial(main = "niedrig")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "niedrig") %>%plotPartial(main = "niedrig")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "niedrig") %>%plotPartial(main = "niedrig")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "niedrig") %>%plotPartial(main = "niedrig")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "niedrig") %>%plotPartial(main = "niedrig")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "niedrig") %>%plotPartial(main = "niedrig")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "niedrig") %>%plotPartial(main = "niedrig")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "niedrig") %>%plotPartial(main = "niedrig")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "niedrig") %>%plotPartial(main = "niedrig")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "niedrig") %>%plotPartial(main = "niedrig")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "niedrig") %>%plotPartial(main = "niedrig")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "niedrig") %>%plotPartial(main = "niedrig")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "niedrig") %>%plotPartial(main = "niedrig")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "niedrig") %>%plotPartial(main = "niedrig")
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "mittel") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "mittel") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "mittel") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "mittel") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "mittel") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "mittel") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "mittel") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "mittel") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "mittel") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "mittel") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "mittel") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "mittel") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "mittel") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "mittel") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "mittel") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "mittel") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "mittel") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "mittel") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "mittel") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "mittel") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "mittel") %>%plotPartial(main = "mittel")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "mittel") %>%plotPartial(main = "mittel")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "mittel") %>%plotPartial(main = "mittel")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "mittel") %>%plotPartial(main = "mittel")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "mittel") %>%plotPartial(main = "mittel")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "mittel") %>%plotPartial(main = "mittel")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "mittel") %>%plotPartial(main = "mittel")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "mittel") %>%plotPartial(main = "mittel")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "mittel") %>%plotPartial(main = "mittel")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "mittel") %>%plotPartial(main = "mittel")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "mittel") %>%plotPartial(main = "mittel")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "mittel") %>%plotPartial(main = "mittel")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "mittel") %>%plotPartial(main = "mittel")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "mittel") %>%plotPartial(main = "mittel")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "mittel") %>%plotPartial(main = "mittel")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "mittel") %>%plotPartial(main = "mittel")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "mittel") %>%plotPartial(main = "mittel")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "mittel") %>%plotPartial(main = "mittel")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "mittel") %>%plotPartial(main = "mittel")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "mittel") %>%plotPartial(main = "mittel")
 
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "hoch") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "hoch") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "hoch") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "hoch") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "hoch") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "hoch") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "hoch") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "hoch") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "hoch") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "hoch") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "hoch") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "hoch") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "hoch") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "hoch") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "hoch") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "hoch") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "hoch") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "hoch") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "hoch") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "hoch") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "hoch") %>%plotPartial(main = "hoch")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "hoch") %>%plotPartial(main = "hoch")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "hoch") %>%plotPartial(main = "hoch")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "hoch") %>%plotPartial(main = "hoch")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "hoch") %>%plotPartial(main = "hoch")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "hoch") %>%plotPartial(main = "hoch")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "hoch") %>%plotPartial(main = "hoch")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "hoch") %>%plotPartial(main = "hoch")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "hoch") %>%plotPartial(main = "hoch")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "hoch") %>%plotPartial(main = "hoch")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "hoch") %>%plotPartial(main = "hoch")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "hoch") %>%plotPartial(main = "hoch")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "hoch") %>%plotPartial(main = "hoch")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "hoch") %>%plotPartial(main = "hoch")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "hoch") %>%plotPartial(main = "hoch")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "hoch") %>%plotPartial(main = "hoch")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "hoch") %>%plotPartial(main = "hoch")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "hoch") %>%plotPartial(main = "hoch")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "hoch") %>%plotPartial(main = "hoch")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "hoch") %>%plotPartial(main = "hoch")
 
 
 
@@ -472,7 +471,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model1 auc: 
+#model1 auc: 0,7385
 RFDurchschnittseinkommen1 %>%
   test_roc(data = test_dfDurchschnittseinkommen) %>%
   auc()
@@ -535,7 +534,8 @@ RFDurchschnittseinkommen2 <- train(Durchschnittseinkommen ~ .,
 
 RFDurchschnittseinkommen2
 summary(RFDurchschnittseinkommen2)
-#mtry = xx, extratrees, min.node.size = xx
+pot(RFDurchschnittseinkommen2)
+#mtry = 10, extratrees, min.node.size = 15
 
 
 
@@ -554,7 +554,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc
+#model auc: 0,7407
 RFDurchschnittseinkommen2 %>%
   test_roc(data = test_dfDurchschnittseinkommen) %>%
   auc()
@@ -595,7 +595,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
 
-#better num.trees: xx trees 
+#grows very similar trees, thus keep 500 --> we don't need to grow 1000
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -603,7 +603,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 #final getunte Werte einsetzen
 
 set.seed(1997)
-RFDurchschnittseinkommen_fin <- RFDurchschnittseinkommen_x
+RFDurchschnittseinkommen_fin <- RFDurchschnittseinkommen1
 
 # Print models
 RFDurchschnittseinkommen_fin
@@ -619,7 +619,6 @@ plot(varImp(RFDurchschnittseinkommen_fin), 20, main = "Durchschnittseinkommen")
 
 # predict outcome using model from train_df applied to the test_df
 predictions3 <- predict(RFDurchschnittseinkommen_fin, newdata=test_dfDurchschnittseinkommen)
-
 
 # Create confusion matrix
 confusionMatrix(data=as.factor(predictions3), as.factor(test_dfDurchschnittseinkommen$Durchschnittseinkommen))
@@ -641,8 +640,7 @@ RFDurchschnittseinkommen_fin %>%
 
 #compare different ROC plots
 model_list <- list(Model1 = RFDurchschnittseinkommen1,
-                   Model2 = RFDurchschnittseinkommen2,
-                   Model3 = RFDurchschnittseinkommen_fin)
+                   Model2 = RFDurchschnittseinkommen2)
 
 model_list_roc <- model_list %>%
   map(test_roc, data = test_dfDurchschnittseinkommen)
@@ -682,38 +680,34 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 
 #checking direction of the 10 most important variables
-###anpassen: name vom dataset
-
 
 imp <- importance(RFDurchschnittseinkommen_fin$finalModel)
 imp <- as.data.frame(imp)
 impvar <- rownames(imp)[order(imp[1], decreasing=TRUE)]
 impvar <- impvar[1:20]
 
-#Model umbenennen
-
 PartialPlots <- RFDurchschnittseinkommen_fin
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "mehr2000") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "mehr2000") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "mehr2000") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "mehr2000") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "mehr2000") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "mehr2000") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "mehr2000") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "mehr2000") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "mehr2000") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "mehr2000") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "mehr2000") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "mehr2000") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "mehr2000") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "mehr2000") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "mehr2000") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "mehr2000") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "mehr2000") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "mehr2000") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "mehr2000") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "mehr2000") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "mehr2000") %>%plotPartial(main = "Einfluss auf über Durchschnitt")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "mehr2000") %>%plotPartial(main = "Einfluss auf über Durchschnitt")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "mehr2000") %>%plotPartial(main = "Einfluss auf über Durchschnitt")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "mehr2000") %>%plotPartial(main = "Einfluss auf über Durchschnitt")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "mehr2000") %>%plotPartial(main = "Einfluss auf über Durchschnitt")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "mehr2000") %>%plotPartial(main = "Einfluss auf über Durchschnitt")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "mehr2000") %>%plotPartial(main = "Einfluss auf über Durchschnitt")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "mehr2000") %>%plotPartial(main = "Einfluss auf über Durchschnitt")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "mehr2000") %>%plotPartial(main = "Einfluss auf über Durchschnitt")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "mehr2000") %>%plotPartial(main = "Einfluss auf über Durchschnitt")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "mehr2000") %>%plotPartial(main = "Einfluss auf über Durchschnitt")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "mehr2000") %>%plotPartial(main = "Einfluss auf über Durchschnitt")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "mehr2000") %>%plotPartial(main = "Einfluss auf über Durchschnitt")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "mehr2000") %>%plotPartial(main = "Einfluss auf über Durchschnitt")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "mehr2000") %>%plotPartial(main = "Einfluss auf über Durchschnitt")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "mehr2000") %>%plotPartial(main = "Einfluss auf über Durchschnitt")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "mehr2000") %>%plotPartial(main = "Einfluss auf über Durchschnitt")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "mehr2000") %>%plotPartial(main = "Einfluss auf über Durchschnitt")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "mehr2000") %>%plotPartial(main = "Einfluss auf über Durchschnitt")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "mehr2000") %>%plotPartial(main = "Einfluss auf über Durchschnitt")
 
 
 #------------------------------------------------WHEN BEST MODEL IS FOUND-----------------------------------------------------

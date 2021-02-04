@@ -1842,7 +1842,6 @@ myControl = trainControl(
   number = 10, 
   verboseIter = TRUE,
   allowParallel=TRUE,
-  sampling = "smote",
   search = "grid",
 )
 
@@ -2087,7 +2086,6 @@ myControl = trainControl(
   number = 10, 
   verboseIter = TRUE,
   allowParallel=TRUE,
-  sampling = "smote",
   search = "grid",
 )
 
@@ -2335,7 +2333,6 @@ myControl = trainControl(
   number = 10, 
   verboseIter = TRUE,
   allowParallel=TRUE,
-  sampling = "smote",
   search = "grid",
 )
 

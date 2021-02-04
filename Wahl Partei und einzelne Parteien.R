@@ -42,6 +42,7 @@ library(pdp)
 library(elasticnet)
 library(glmnet)
 library(Matrix)
+library(naniar)
 
 options(max.print = 100000)
 
@@ -67,7 +68,7 @@ cols_names
 data_Partei <- data[,c(7, 27:255)]
 
 #Gibt es NAs in der DV?
-sum(is.na(data_Partei$Wahl_Partei)) #181 NAs
+sum(is.na(data_Partei$Wahl_Partei)) #0 NAs
 #Sonstige auch als NA, um sie aus Analyse auszuschließen:
 data_Partei <- data_Partei %>% replace_with_na_all(condition = ~.x == "Sonstige:")
 #Datenset ohne NAs
@@ -198,7 +199,8 @@ RFPartei_2 <- train(Wahl_Partei ~ .,
 # Print models
 RFPartei_2
 summary(RFPartei_2)
-#mtry = xx, extratrees, min.node.size = xx
+plot(RFPartei_2)
+#mtry = 15, extratrees, min.node.size = 5
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RFPartei_2, newdata=test_dfPartei)
@@ -206,7 +208,7 @@ predictions2 <- predict(RFPartei_2, newdata=test_dfPartei)
 # Create confusion matrix
 confusionMatrix(data=as.factor(predictions2), as.factor(test_dfPartei$Wahl_Partei))
 
-#check for auc
+#check for auc: 0,6421
 test_roc <- function(model, data) {
   
   multiclass.roc(test_dfPartei$Wahl_Partei,
@@ -220,7 +222,7 @@ RFPartei_2 %>%
   auc()
 
 
-#model: xx trees performs better
+#model: 1000 trees performs better at predicting correctly
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -228,7 +230,7 @@ RFPartei_2 %>%
 #final Model
 
 set.seed(1997)
-RFPartei_fin <- RFPartei_xx
+RFPartei_fin <- RFPartei_2
 
 # Print models
 RFPartei_fin
@@ -249,7 +251,7 @@ predictions3 <- predict(RFPartei_fin, newdata=test_dfPartei)
 confusionMatrix(data=as.factor(predictions3), as.factor(test_dfPartei$Wahl_Partei))
 
 
-#check for auc
+#check for auc: 0,6421
 test_roc <- function(model, data) {
   
   multiclass.roc(test_dfPartei$Wahl_Partei,
@@ -269,192 +271,188 @@ RFPartei_fin %>%
 
 
 #checking direction of the 10 most important variables
-###anpassen: name vom dataset
-
 
 imp <- importance(RFPartei_fin$finalModel)
 imp <- as.data.frame(imp)
 impvar <- rownames(imp)[order(imp[1], decreasing=TRUE)]
 impvar <- impvar[1:20]
 
-#Model umbenennen
-
 PartialPlots <- RFPartei_fin
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "AfD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "AfD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "AfD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "AfD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "AfD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "AfD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "AfD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "AfD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "AfD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "AfD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "AfD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "AfD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "AfD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "AfD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "AfD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "AfD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "AfD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "AfD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "AfD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "AfD") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "AfD") %>%plotPartial(main = "AfD")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "AfD") %>%plotPartial(main = "AfD")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "AfD") %>%plotPartial(main = "AfD")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "AfD") %>%plotPartial(main = "AfD")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "AfD") %>%plotPartial(main = "AfD")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "AfD") %>%plotPartial(main = "AfD")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "AfD") %>%plotPartial(main = "AfD")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "AfD") %>%plotPartial(main = "AfD")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "AfD") %>%plotPartial(main = "AfD")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "AfD") %>%plotPartial(main = "AfD")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "AfD") %>%plotPartial(main = "AfD")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "AfD") %>%plotPartial(main = "AfD")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "AfD") %>%plotPartial(main = "AfD")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "AfD") %>%plotPartial(main = "AfD")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "AfD") %>%plotPartial(main = "AfD")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "AfD") %>%plotPartial(main = "AfD")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "AfD") %>%plotPartial(main = "AfD")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "AfD") %>%plotPartial(main = "AfD")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "AfD") %>%plotPartial(main = "AfD")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "AfD") %>%plotPartial(main = "AfD")
 
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "CDU_CSU") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "CDU_CSU") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "CDU_CSU") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "CDU_CSU") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "CDU_CSU") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "CDU_CSU") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "CDU_CSU") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "CDU_CSU") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "CDU_CSU") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "CDU_CSU") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "CDU_CSU") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "CDU_CSU") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "CDU_CSU") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "CDU_CSU") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "CDU_CSU") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "CDU_CSU") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "CDU_CSU") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "CDU_CSU") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "CDU_CSU") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "CDU_CSU") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "CDU_CSU") %>%plotPartial(main = "CDU/CSU")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "CDU_CSU") %>%plotPartial(main = "CDU/CSU")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "CDU_CSU") %>%plotPartial(main = "CDU/CSU")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "CDU_CSU") %>%plotPartial(main = "CDU/CSU")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "CDU_CSU") %>%plotPartial(main = "CDU/CSU")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "CDU_CSU") %>%plotPartial(main = "CDU/CSU")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "CDU_CSU") %>%plotPartial(main = "CDU/CSU")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "CDU_CSU") %>%plotPartial(main = "CDU/CSU")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "CDU_CSU") %>%plotPartial(main = "CDU/CSU")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "CDU_CSU") %>%plotPartial(main = "CDU/CSU")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "CDU_CSU") %>%plotPartial(main = "CDU/CSU")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "CDU_CSU") %>%plotPartial(main = "CDU/CSU")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "CDU_CSU") %>%plotPartial(main = "CDU/CSU")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "CDU_CSU") %>%plotPartial(main = "CDU/CSU")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "CDU_CSU") %>%plotPartial(main = "CDU/CSU")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "CDU_CSU") %>%plotPartial(main = "CDU/CSU")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "CDU_CSU") %>%plotPartial(main = "CDU/CSU")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "CDU_CSU") %>%plotPartial(main = "CDU/CSU")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "CDU_CSU") %>%plotPartial(main = "CDU/CSU")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "CDU_CSU") %>%plotPartial(main = "CDU/CSU")
 
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "Die_Gruenen") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "Die_Gruenen") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "Die_Gruenen") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "Die_Gruenen") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "Die_Gruenen") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "Die_Gruenen") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "Die_Gruenen") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "Die_Gruenen") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "Die_Gruenen") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "Die_Gruenen") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "Die_Gruenen") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "Die_Gruenen") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "Die_Gruenen") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "Die_Gruenen") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "Die_Gruenen") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "Die_Gruenen") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "Die_Gruenen") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "Die_Gruenen") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "Die_Gruenen") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "Die_Gruenen") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "Die_Gruenen") %>%plotPartial(main = "Die Grünen")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "Die_Gruenen") %>%plotPartial(main = "Die Grünen")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "Die_Gruenen") %>%plotPartial(main = "Die Grünen")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "Die_Gruenen") %>%plotPartial(main = "Die Grünen")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "Die_Gruenen") %>%plotPartial(main = "Die Grünen")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "Die_Gruenen") %>%plotPartial(main = "Die Grünen")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "Die_Gruenen") %>%plotPartial(main = "Die Grünen")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "Die_Gruenen") %>%plotPartial(main = "Die Grünen")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "Die_Gruenen") %>%plotPartial(main = "Die Grünen")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "Die_Gruenen") %>%plotPartial(main = "Die Grünen")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "Die_Gruenen") %>%plotPartial(main = "Die Grünen")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "Die_Gruenen") %>%plotPartial(main = "Die Grünen")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "Die_Gruenen") %>%plotPartial(main = "Die Grünen")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "Die_Gruenen") %>%plotPartial(main = "Die Grünen")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "Die_Gruenen") %>%plotPartial(main = "Die Grünen")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "Die_Gruenen") %>%plotPartial(main = "Die Grünen")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "Die_Gruenen") %>%plotPartial(main = "Die Grünen")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "Die_Gruenen") %>%plotPartial(main = "Die Grünen")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "Die_Gruenen") %>%plotPartial(main = "Die Grünen")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "Die_Gruenen") %>%plotPartial(main = "Die Grünen")
 
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "Die_Linke") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "Die_Linke") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "Die_Linke") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "Die_Linke") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "Die_Linke") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "Die_Linke") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "Die_Linke") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "Die_Linke") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "Die_Linke") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "Die_Linke") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "Die_Linke") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "Die_Linke") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "Die_Linke") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "Die_Linke") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "Die_Linke") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "Die_Linke") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "Die_Linke") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "Die_Linke") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "Die_Linke") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "Die_Linke") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "Die_Linke") %>%plotPartial(main = "Die Linke")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "Die_Linke") %>%plotPartial(main = "Die Linke")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "Die_Linke") %>%plotPartial(main = "Die Linke")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "Die_Linke") %>%plotPartial(main = "Die Linke")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "Die_Linke") %>%plotPartial(main = "Die Linke")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "Die_Linke") %>%plotPartial(main = "Die Linke")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "Die_Linke") %>%plotPartial(main = "Die Linke")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "Die_Linke") %>%plotPartial(main = "Die Linke")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "Die_Linke") %>%plotPartial(main = "Die Linke")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "Die_Linke") %>%plotPartial(main = "Die Linke")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "Die_Linke") %>%plotPartial(main = "Die Linke")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "Die_Linke") %>%plotPartial(main = "Die Linke")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "Die_Linke") %>%plotPartial(main = "Die Linke")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "Die_Linke") %>%plotPartial(main = "Die Linke")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "Die_Linke") %>%plotPartial(main = "Die Linke")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "Die_Linke") %>%plotPartial(main = "Die Linke")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "Die_Linke") %>%plotPartial(main = "Die Linke")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "Die_Linke") %>%plotPartial(main = "Die Linke")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "Die_Linke") %>%plotPartial(main = "Die Linke")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "Die_Linke") %>%plotPartial(main = "Die Linke")
 
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "Die_Partei") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "Die_Partei") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "Die_Partei") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "Die_Partei") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "Die_Partei") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "Die_Partei") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "Die_Partei") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "Die_Partei") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "Die_Partei") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "Die_Partei") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "Die_Partei") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "Die_Partei") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "Die_Partei") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "Die_Partei") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "Die_Partei") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "Die_Partei") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "Die_Partei") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "Die_Partei") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "Die_Partei") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "Die_Partei") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "Die_Partei") %>%plotPartial(main = "Die Partei")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "Die_Partei") %>%plotPartial(main = "Die Partei")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "Die_Partei") %>%plotPartial(main = "Die Partei")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "Die_Partei") %>%plotPartial(main = "Die Partei")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "Die_Partei") %>%plotPartial(main = "Die Partei")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "Die_Partei") %>%plotPartial(main = "Die Partei")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "Die_Partei") %>%plotPartial(main = "Die Partei")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "Die_Partei") %>%plotPartial(main = "Die Partei")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "Die_Partei") %>%plotPartial(main = "Die Partei")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "Die_Partei") %>%plotPartial(main = "Die Partei")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "Die_Partei") %>%plotPartial(main = "Die Partei")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "Die_Partei") %>%plotPartial(main = "Die Partei")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "Die_Partei") %>%plotPartial(main = "Die Partei")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "Die_Partei") %>%plotPartial(main = "Die Partei")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "Die_Partei") %>%plotPartial(main = "Die Partei")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "Die_Partei") %>%plotPartial(main = "Die Partei")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "Die_Partei") %>%plotPartial(main = "Die Partei")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "Die_Partei") %>%plotPartial(main = "Die Partei")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "Die_Partei") %>%plotPartial(main = "Die Partei")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "Die_Partei") %>%plotPartial(main = "Die Partei")
 
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "FDP") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "FDP") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "FDP") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "FDP") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "FDP") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "FDP") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "FDP") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "FDP") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "FDP") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "FDP") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "FDP") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "FDP") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "FDP") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "FDP") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "FDP") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "FDP") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "FDP") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "FDP") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "FDP") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "FDP") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "FDP") %>%plotPartial(main = "FDP")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "FDP") %>%plotPartial(main = "FDP")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "FDP") %>%plotPartial(main = "FDP")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "FDP") %>%plotPartial(main = "FDP")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "FDP") %>%plotPartial(main = "FDP")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "FDP") %>%plotPartial(main = "FDP")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "FDP") %>%plotPartial(main = "FDP")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "FDP") %>%plotPartial(main = "FDP")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "FDP") %>%plotPartial(main = "FDP")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "FDP") %>%plotPartial(main = "FDP")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "FDP") %>%plotPartial(main = "FDP")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "FDP") %>%plotPartial(main = "FDP")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "FDP") %>%plotPartial(main = "FDP")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "FDP") %>%plotPartial(main = "FDP")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "FDP") %>%plotPartial(main = "FDP")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "FDP") %>%plotPartial(main = "FDP")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "FDP") %>%plotPartial(main = "FDP")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "FDP") %>%plotPartial(main = "FDP")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "FDP") %>%plotPartial(main = "FDP")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "FDP") %>%plotPartial(main = "FDP")
 
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "Nichtwaehler") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "Nichtwaehler") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "Nichtwaehler") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "Nichtwaehler") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "Nichtwaehler") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "Nichtwaehler") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "Nichtwaehler") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "Nichtwaehler") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "Nichtwaehler") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "Nichtwaehler") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "Nichtwaehler") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "Nichtwaehler") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "Nichtwaehler") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "Nichtwaehler") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "Nichtwaehler") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "Nichtwaehler") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "Nichtwaehler") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "Nichtwaehler") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "Nichtwaehler") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "Nichtwaehler") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "Nichtwaehler") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "Nichtwaehler") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "Nichtwaehler") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "Nichtwaehler") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "Nichtwaehler") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "Nichtwaehler") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "Nichtwaehler") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "Nichtwaehler") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "Nichtwaehler") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "Nichtwaehler") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "Nichtwaehler") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "Nichtwaehler") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "Nichtwaehler") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "Nichtwaehler") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "Nichtwaehler") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "Nichtwaehler") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "Nichtwaehler") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "Nichtwaehler") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "Nichtwaehler") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "Nichtwaehler") %>%plotPartial(main = "Nichtwähler")
 
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "SPD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "SPD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "SPD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "SPD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "SPD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "SPD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "SPD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "SPD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "SPD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "SPD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "SPD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "SPD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "SPD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "SPD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "SPD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "SPD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "SPD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "SPD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "SPD") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "SPD") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "SPD") %>%plotPartial(main = "SPD")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "SPD") %>%plotPartial(main = "SPD")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "SPD") %>%plotPartial(main = "SPD")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "SPD") %>%plotPartial(main = "SPD")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "SPD") %>%plotPartial(main = "SPD")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "SPD") %>%plotPartial(main = "SPD")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "SPD") %>%plotPartial(main = "SPD")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "SPD") %>%plotPartial(main = "SPD")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "SPD") %>%plotPartial(main = "SPD")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "SPD") %>%plotPartial(main = "SPD")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "SPD") %>%plotPartial(main = "SPD")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "SPD") %>%plotPartial(main = "SPD")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "SPD") %>%plotPartial(main = "SPD")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "SPD") %>%plotPartial(main = "SPD")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "SPD") %>%plotPartial(main = "SPD")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "SPD") %>%plotPartial(main = "SPD")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "SPD") %>%plotPartial(main = "SPD")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "SPD") %>%plotPartial(main = "SPD")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "SPD") %>%plotPartial(main = "SPD")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "SPD") %>%plotPartial(main = "SPD")
 
 
 
@@ -495,7 +493,7 @@ cols_names
 data_AfD <- data[,c(341, 27:255)]
 
 #Gibt es NAs in der DV?
-sum(is.na(data_AfD$AfD_Waehler)) #181 NAs
+sum(is.na(data_AfD$AfD_Waehler)) #0 NAs
 data_AfD <- data_AfD %>% subset(data_AfD$AfD_Waehler != "NA")
 
 
@@ -578,7 +576,7 @@ predictions <- predict(RfAfD_1, newdata=test_dfAfD)
 confusionMatrix(data=as.factor(predictions), as.factor(test_dfAfD$AfD_Waehler))
 
 
-#check for auc
+#check for auc: 0,8374
 test_roc <- function(model, data) {
   
   roc(test_dfAfD$AfD_Waehler,
@@ -650,7 +648,8 @@ RfAfD_2 <- train(AfD_Waehler ~ .,
 
 RfAfD_2
 summary(RfAfD_2)
-#mtry = xx, extratrees, min.node.size = xx
+plot(RfAfD_2)
+#mtry = 11, extratrees, min.node.size = 5
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -668,7 +667,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 
+#model auc: 0,8363
 RfAfD_2 %>%
   test_roc(data = test_dfAfD) %>%
   auc()
@@ -709,7 +708,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
 
-#better num.trees: xxx trees (performs better in predicting Afd Voters)
+#better num.trees: 1000 trees (performs 1 person better in predicting Afd Voters)
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -717,7 +716,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 #final Model
 
 set.seed(1997)
-RFAfD_fin <- RFAfd_x
+RFAfD_fin <- RfAfD_2
 
 # Print models
 RFAfD_fin
@@ -802,30 +801,28 @@ imp <- as.data.frame(imp)
 impvar <- rownames(imp)[order(imp[1], decreasing=TRUE)]
 impvar <- impvar[1:20]
 
-#Model umbenennen
-
 PartialPlots <- RFAfD_fin
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "Ja") %>%plotPartial(main = "AfD Wähler")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "Ja") %>%plotPartial(main = "AfD Wähler")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "Ja") %>%plotPartial(main = "AfD Wähler")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "Ja") %>%plotPartial(main = "AfD Wähler")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "Ja") %>%plotPartial(main = "AfD Wähler")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "Ja") %>%plotPartial(main = "AfD Wähler")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "Ja") %>%plotPartial(main = "AfD Wähler")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "Ja") %>%plotPartial(main = "AfD Wähler")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "Ja") %>%plotPartial(main = "AfD Wähler")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "Ja") %>%plotPartial(main = "AfD Wähler")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "Ja") %>%plotPartial(main = "AfD Wähler")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "Ja") %>%plotPartial(main = "AfD Wähler")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "Ja") %>%plotPartial(main = "AfD Wähler")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "Ja") %>%plotPartial(main = "AfD Wähler")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "Ja") %>%plotPartial(main = "AfD Wähler")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "Ja") %>%plotPartial(main = "AfD Wähler")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "Ja") %>%plotPartial(main = "AfD Wähler")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "Ja") %>%plotPartial(main = "AfD Wähler")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "Ja") %>%plotPartial(main = "AfD Wähler")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "Ja") %>%plotPartial(main = "AfD Wähler")
 
 
 #------------------------------------------------WHEN BEST MODEL IS FOUND-----------------------------------------------------
@@ -864,7 +861,7 @@ cols_names
 data_Gruen <- data[,c(339, 27:255)]
 
 #Gibt es NAs in der DV?
-sum(is.na(data_Gruen$Gruene_Waehler)) #181 NAs
+sum(is.na(data_Gruen$Gruene_Waehler)) #0 NAs
 data_Gruen <- data_Gruen %>% subset(data_Gruen$Gruene_Waehler != "NA")
 
 
@@ -1019,7 +1016,8 @@ RF_Gruene2 <- train(Gruene_Waehler ~ .,
 
 RF_Gruene2
 summary(RF_Gruene2)
-#mtry = xx, extratrees, min.node.size = xx
+plot(RF_Gruene2)
+#mtry = 12, extratrees, min.node.size = 15
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -1036,7 +1034,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 
+#model auc: 0,7619
 RF_Gruene2 %>%
   test_roc(data = test_dfGruen) %>%
   auc()
@@ -1077,7 +1075,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
 
-#better num.trees: xxx trees
+#better num.trees: 500 trees --> better at classifying voters correctly
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -1085,7 +1083,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 #final getunte Werte einsetzen
 
 set.seed(1997)
-RFGruene_fin <- RF_Gruene_x
+RFGruene_fin <- RF_Gruene1
 
 # Print models
 RFGruene_fin
@@ -1114,7 +1112,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc
+#model auc: 0,7591
 RFGruene_fin %>%
   test_roc(data = test_dfGruen) %>%
   auc()
@@ -1162,38 +1160,35 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 
 #checking direction of the 10 most important variables
-###anpassen: name vom dataset
-
 
 imp <- importance(RFGruene_fin$finalModel)
 imp <- as.data.frame(imp)
 impvar <- rownames(imp)[order(imp[1], decreasing=TRUE)]
 impvar <- impvar[1:20]
 
-#Model umbenennen
 
 PartialPlots <- RFGruene_fin
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "Ja") %>%plotPartial(main = "Grüne Wähler")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "Ja") %>%plotPartial(main = "Grüne Wähler")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "Ja") %>%plotPartial(main = "Grüne Wähler")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "Ja") %>%plotPartial(main = "Grüne Wähler")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "Ja") %>%plotPartial(main = "Grüne Wähler")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "Ja") %>%plotPartial(main = "Grüne Wähler")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "Ja") %>%plotPartial(main = "Grüne Wähler")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "Ja") %>%plotPartial(main = "Grüne Wähler")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "Ja") %>%plotPartial(main = "Grüne Wähler")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "Ja") %>%plotPartial(main = "Grüne Wähler")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "Ja") %>%plotPartial(main = "Grüne Wähler")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "Ja") %>%plotPartial(main = "Grüne Wähler")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "Ja") %>%plotPartial(main = "Grüne Wähler")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "Ja") %>%plotPartial(main = "Grüne Wähler")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "Ja") %>%plotPartial(main = "Grüne Wähler")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "Ja") %>%plotPartial(main = "Grüne Wähler")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "Ja") %>%plotPartial(main = "Grüne Wähler")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "Ja") %>%plotPartial(main = "Grüne Wähler")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "Ja") %>%plotPartial(main = "Grüne Wähler")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "Ja") %>%plotPartial(main = "Grüne Wähler")
 
 
 #------------------------------------------------WHEN BEST MODEL IS FOUND-----------------------------------------------------
@@ -1230,7 +1225,7 @@ cols_names
 data_CDU <- data[,c(337, 27:255)]
 
 #Gibt es NAs in der DV?
-sum(is.na(data_CDU$CDU_CSU_Waehler)) #181 NAs
+sum(is.na(data_CDU$CDU_CSU_Waehler)) #0 NAs
 data_CDU <- data_CDU %>% subset(data_CDU$CDU_CSU_Waehler != "NA")
 data_CDU$CDU_CSU_Waehler <- as.factor(data_CDU$CDU_CSU_Waehler)
 
@@ -1383,7 +1378,8 @@ RF_CDU2 <- train(CDU_CSU_Waehler ~ .,
 
 RF_CDU2
 summary(RF_CDU2)
-#mtry = xx, extratrees, min.node.size = xx
+plot(RF_CDU2)
+#mtry = 16, extratrees, min.node.size = 10
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RF_CDU2, newdata=test_dfCDU)
@@ -1399,7 +1395,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 
+#model auc: 0,6278
 RF_CDU2 %>%
   test_roc(data = test_dfCDU) %>%
   auc()
@@ -1440,7 +1436,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
 
-#better num.trees: 500 trees
+#better num.trees: 500 trees (model converges afterwards)
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -1448,7 +1444,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 #final getunte Werte einsetzen
 
 set.seed(1997)
-RF_CDU_fin <- RD_CDU_x
+RF_CDU_fin <- RF_CDU1
 
 # Print models
 RF_CDU_fin
@@ -1523,38 +1519,34 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 
 #checking direction of the 10 most important variables
-###anpassen: name vom dataset
-
 
 imp <- importance(RF_CDU_fin$finalModel)
 imp <- as.data.frame(imp)
 impvar <- rownames(imp)[order(imp[1], decreasing=TRUE)]
 impvar <- impvar[1:20]
 
-#Model umbenennen
-
 PartialPlots <- RF_CDU_fin
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "Ja") %>%plotPartial(main = "CDU Wähler")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "Ja") %>%plotPartial(main = "CDU Wähler")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "Ja") %>%plotPartial(main = "CDU Wähler")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "Ja") %>%plotPartial(main = "CDU Wähler")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "Ja") %>%plotPartial(main = "CDU Wähler")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "Ja") %>%plotPartial(main = "CDU Wähler")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "Ja") %>%plotPartial(main = "CDU Wähler")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "Ja") %>%plotPartial(main = "CDU Wähler")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "Ja") %>%plotPartial(main = "CDU Wähler")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "Ja") %>%plotPartial(main = "CDU Wähler")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "Ja") %>%plotPartial(main = "CDU Wähler")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "Ja") %>%plotPartial(main = "CDU Wähler")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "Ja") %>%plotPartial(main = "CDU Wähler")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "Ja") %>%plotPartial(main = "CDU Wähler")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "Ja") %>%plotPartial(main = "CDU Wähler")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "Ja") %>%plotPartial(main = "CDU Wähler")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "Ja") %>%plotPartial(main = "CDU Wähler")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "Ja") %>%plotPartial(main = "CDU Wähler")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "Ja") %>%plotPartial(main = "CDU Wähler")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "Ja") %>%plotPartial(main = "CDU Wähler")
 
 
 #------------------------------------------------WHEN BEST MODEL IS FOUND-----------------------------------------------------
@@ -1589,7 +1581,7 @@ cols_names
 data_Linke <- data[,c(342, 27:255)]
 
 #Gibt es NAs in der DV?
-sum(is.na(data_Linke$Linke_Waehler)) #181 NAs
+sum(is.na(data_Linke$Linke_Waehler)) #0 NAs
 data_Linke <- data_Linke %>% subset(data_Linke$Linke_Waehler != "NA")
 data_Linke$Linke_Waehler <- as.factor(data_Linke$Linke_Waehler)
 
@@ -1744,7 +1736,7 @@ RF_Linke2 <- train(Linke_Waehler ~ .,
 
 RF_Linke2
 summary(RF_Linke2)
-#mtry = xx, extratrees, min.node.size = xx
+#mtry = 11, extratrees, min.node.size = 10
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -1761,7 +1753,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc
+#model auc: 0,7459
 RF_Linke2 %>%
   test_roc(data = test_dfLinke) %>%
   auc()
@@ -1802,7 +1794,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
 
-#better num.trees: xx trees performs better to predict Linke-Wähler, even though overall acuracy is worse
+#better num.trees: 500 trees has slightly better auc, the rest is similar
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -1810,7 +1802,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 #final getunte Werte einsetzen
 
 set.seed(1997)
-RF_Linke_fin <- RFLinke_x
+RF_Linke_fin <- RF_Linke1
 
 
 # Print models
@@ -1893,30 +1885,28 @@ imp <- as.data.frame(imp)
 impvar <- rownames(imp)[order(imp[1], decreasing=TRUE)]
 impvar <- impvar[1:20]
 
-#Model umbenennen
-
 PartialPlots <- RF_Linke_fin
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "Ja") %>%plotPartial(main = "Linke Wähler")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "Ja") %>%plotPartial(main = "Linke Wähler")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "Ja") %>%plotPartial(main = "Linke Wähler")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "Ja") %>%plotPartial(main = "Linke Wähler")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "Ja") %>%plotPartial(main = "Linke Wähler")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "Ja") %>%plotPartial(main = "Linke Wähler")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "Ja") %>%plotPartial(main = "Linke Wähler")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "Ja") %>%plotPartial(main = "Linke Wähler")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "Ja") %>%plotPartial(main = "Linke Wähler")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "Ja") %>%plotPartial(main = "Linke Wähler")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "Ja") %>%plotPartial(main = "Linke Wähler")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "Ja") %>%plotPartial(main = "Linke Wähler")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "Ja") %>%plotPartial(main = "Linke Wähler")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "Ja") %>%plotPartial(main = "Linke Wähler")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "Ja") %>%plotPartial(main = "Linke Wähler")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "Ja") %>%plotPartial(main = "Linke Wähler")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "Ja") %>%plotPartial(main = "Linke Wähler")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "Ja") %>%plotPartial(main = "Linke Wähler")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "Ja") %>%plotPartial(main = "Linke Wähler")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "Ja") %>%plotPartial(main = "Linke Wähler")
 
 
 #------------------------------------------------WHEN BEST MODEL IS FOUND-----------------------------------------------------
@@ -1952,7 +1942,7 @@ cols_names
 data_SPD <- data[,c(338, 27:255)]
 
 #Gibt es NAs in der DV?
-sum(is.na(data_SPD$SPD_Waehler)) #181 NAs
+sum(is.na(data_SPD$SPD_Waehler)) #0 NAs
 data_SPD <- data_SPD %>% subset(data_SPD$SPD_Waehler != "NA")
 data_SPD$SPD_Waehler <- as.factor(data_SPD$SPD_Waehler)
 
@@ -2026,7 +2016,7 @@ RF_SPD1 <- train(SPD_Waehler ~ .,
 RF_SPD1
 summary(RF_SPD1)
 plot(RF_SPD1)
-#mtry = xx, extratrees, min.node.size = xx
+#mtry = 18, extratrees, min.node.size = 10
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -2108,7 +2098,8 @@ RF_SPD2 <- train(SPD_Waehler ~ .,
 
 RF_SPD2
 summary(RF_SPD2)
-#mtry = xx, extratrees, min.node.size = xx
+plot(RF_SPD2)
+#mtry = 18, extratrees, min.node.size = 10
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -2125,7 +2116,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 
+#model auc: 0,5879
 RF_SPD2 %>%
   test_roc(data = test_dfSPD) %>%
   auc()
@@ -2166,7 +2157,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
 
-#better num.trees: xx trees
+#better num.trees: 500 trees because of better sensitivity and AUC
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -2174,7 +2165,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 #final Model
 
 set.seed(1997)
-RF_SPD_fin <- RF_SPD_x
+RF_SPD_fin <- RF_SPD1
 
 # Print models
 RF_SPD_fin
@@ -2203,7 +2194,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model1 auc: 
+#model1 auc: 0,5921
 RF_SPD_fin %>%
   test_roc(data = test_dfSPD) %>%
   auc()
@@ -2258,26 +2249,26 @@ impvar <- impvar[1:20]
 
 PartialPlots <- RF_SPD_fin
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "Ja") %>%plotPartial(main = "SPD Wähler")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "Ja") %>%plotPartial(main = "SPD Wähler")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "Ja") %>%plotPartial(main = "SPD Wähler")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "Ja") %>%plotPartial(main = "SPD Wähler")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "Ja") %>%plotPartial(main = "SPD Wähler")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "Ja") %>%plotPartial(main = "SPD Wähler")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "Ja") %>%plotPartial(main = "SPD Wähler")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "Ja") %>%plotPartial(main = "SPD Wähler")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "Ja") %>%plotPartial(main = "SPD Wähler")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "Ja") %>%plotPartial(main = "SPD Wähler")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "Ja") %>%plotPartial(main = "SPD Wähler")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "Ja") %>%plotPartial(main = "SPD Wähler")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "Ja") %>%plotPartial(main = "SPD Wähler")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "Ja") %>%plotPartial(main = "SPD Wähler")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "Ja") %>%plotPartial(main = "SPD Wähler")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "Ja") %>%plotPartial(main = "SPD Wähler")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "Ja") %>%plotPartial(main = "SPD Wähler")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "Ja") %>%plotPartial(main = "SPD Wähler")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "Ja") %>%plotPartial(main = "SPD Wähler")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "Ja") %>%plotPartial(main = "SPD Wähler")
 
 
 #------------------------------------------------WHEN BEST MODEL IS FOUND-----------------------------------------------------
@@ -2312,7 +2303,7 @@ cols_names
 data_FDP <- data[,c(340, 27:255)]
 
 #Gibt es NAs in der DV?
-sum(is.na(data_FDP$FDP_Waehler)) #181 NAs
+sum(is.na(data_FDP$FDP_Waehler)) #0 NAs
 data_FDP <- data_FDP %>% subset(data_FDP$FDP_Waehler != "NA")
 data_FDP$FDP_Waehler <- as.factor(data_FDP$FDP_Waehler)
 
@@ -2455,7 +2446,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 set.seed(1997)
 RF_FDP2 <- train(FDP_Waehler ~ ., 
                  data=train_dfFDP,
-                 tuneGrid = myGrid1,
+                 tuneGrid = myGrid,
                  method="ranger", 
                  metric= "ROC",
                  num.tree = 1000,
@@ -2467,7 +2458,8 @@ RF_FDP2 <- train(FDP_Waehler ~ .,
 
 RF_FDP2
 summary(RF_FDP2)
-#mtry = xx, extratrees, min.node.size = xx
+plot(RF_FDP2)
+#mtry = 13, extratrees, min.node.size = 5
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -2484,7 +2476,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 
+#model auc: 0,6319
 RF_FDP2 %>%
   test_roc(data = test_dfFDP) %>%
   auc()
@@ -2525,7 +2517,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
 
-#better num.trees: xx trees --> worse in accuracy but better to predict FDP
+#better num.trees: 1000 trees 
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -2533,7 +2525,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 #final getunte Werte einsetzen
 
 set.seed(1997)
-RF_FDP_fin <- RF_FDP_x
+RF_FDP_fin <- RF_FDP2
 
 
 # Print models
@@ -2562,7 +2554,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: x
+#model auc: 0,6319
 RF_FDP_fin %>%
   test_roc(data = test_dfFDP) %>%
   auc()
@@ -2617,26 +2609,26 @@ impvar <- impvar[1:20]
 
 PartialPlots <- RF_FDP_fin
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "Ja") %>%plotPartial(main = "FDP Wähler")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "Ja") %>%plotPartial(main = "FDP Wähler")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "Ja") %>%plotPartial(main = "FDP Wähler")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "Ja") %>%plotPartial(main = "FDP Wähler")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "Ja") %>%plotPartial(main = "FDP Wähler")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "Ja") %>%plotPartial(main = "FDP Wähler")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "Ja") %>%plotPartial(main = "FDP Wähler")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "Ja") %>%plotPartial(main = "FDP Wähler")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "Ja") %>%plotPartial(main = "FDP Wähler")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "Ja") %>%plotPartial(main = "FDP Wähler")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "Ja") %>%plotPartial(main = "FDP Wähler")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "Ja") %>%plotPartial(main = "FDP Wähler")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "Ja") %>%plotPartial(main = "FDP Wähler")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "Ja") %>%plotPartial(main = "FDP Wähler")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "Ja") %>%plotPartial(main = "FDP Wähler")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "Ja") %>%plotPartial(main = "FDP Wähler")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "Ja") %>%plotPartial(main = "FDP Wähler")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "Ja") %>%plotPartial(main = "FDP Wähler")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "Ja") %>%plotPartial(main = "FDP Wähler")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "Ja") %>%plotPartial(main = "FDP Wähler")
 
 
 #------------------------------------------------WHEN BEST MODEL IS FOUND-----------------------------------------------------
@@ -2669,17 +2661,17 @@ cols_names <- names(data)
 cols_names
 
 #define data for analysis
-data_Nichtwahler <- data[,c(x, 27:255)]
+data_Nichtwahler <- data[,c(343, 27:255)]
 
 #Gibt es NAs in der DV?
-sum(is.na(data_Nichtwahler$Nichtwaehler)) #181 NAs
-data_Nichtwahler <- data_Nichtwahler %>% subset(data_Nichtwahler$Nichtwaehler != "NA")
-data_Nichtwahler$Nichtwaehler <- as.factor(data_Nichtwahler$Nichtwaehler)
+sum(is.na(data_Nichtwahler$Nichtwahler)) #0 NAs
+data_Nichtwahler <- data_Nichtwahler %>% subset(data_Nichtwahler$Nichtwahler != "NA")
+data_Nichtwahler$Nichtwahler <- as.factor(data_Nichtwahler$Nichtwahler)
 
 
 #ist die Variable unbalanced?
-table(data_Nichtwahler$Nichtwaehler) #very imbalanced
-max(table(data_Nichtwahler$Nichtwaehler)/sum(table(data_Nichtwahler$Nichtwaehler))) #no information rate xx%%
+table(data_Nichtwahler$Nichtwahler) #very imbalanced
+max(table(data_Nichtwahler$Nichtwahler)/sum(table(data_Nichtwahler$Nichtwahler))) #no information rate 0,8913%
 
 
 #----------------------------------------DATA PARTITIONING------------------------------------
@@ -2689,12 +2681,12 @@ set.seed(1997)
 
 # Partitioning of the data: Create index matrix of selected values
 
-index <- createDataPartition(data_FDP$Nichtwaehler, p=.8, list= FALSE, times= 1)
+index <- createDataPartition(data_Nichtwahler$Nichtwahler, p=.8, list= FALSE, times= 1)
 
 # Create train_dfGeschlecht & test_dfGeschlecht
 
-train_dfNichtwahler <- data_FDP[index,]
-test_dfNichtwahler <- data_FDP[-index,]
+train_dfNichtwahler <- data_Nichtwahler[index,]
+test_dfNichtwahler <- data_Nichtwahler[-index,]
 
 
 #---------------------------------------------------RANDOM FOREST----------------------------------------------------
@@ -2731,7 +2723,7 @@ myGrid = expand.grid(mtry = c(10:20),
 # test of the ideal mtry, splitrule and min-node.size for 500 trees
 
 set.seed(1997)
-RF_Nichtwahler1 <- train(Nichtwaehler ~ ., 
+RF_Nichtwahler1 <- train(Nichtwahler ~ ., 
                  data=train_dfNichtwahler,
                  tuneGrid = myGrid,
                  method="ranger", 
@@ -2746,25 +2738,25 @@ RF_Nichtwahler1 <- train(Nichtwaehler ~ .,
 RF_Nichtwahler1
 summary(RF_Nichtwahler1)
 plot(RF_Nichtwahler1)
-#mtry = xx, extratrees, min.node.size = x
+#mtry = 12, extratrees, min.node.size = 5
 
 
 # predict outcome using model from train_df applied to the test_df
 predictions1 <- predict(RF_Nichtwahler1, newdata=test_dfNichtwahler)
 
 # Create confusion matrix
-confusionMatrix(data=as.factor(predictions1), as.factor(test_dfNichtwahler$Nichtwaehler))
+confusionMatrix(data=as.factor(predictions1), as.factor(test_dfNichtwahler$Nichtwahler))
 
 
 #check for auc
 test_roc <- function(model, data) {
   
-  roc(test_dfNichtwahler$Nichtwaehler,
+  roc(test_dfNichtwahler$Nichtwahler,
       predict(model, data, type = "prob")[, "Ja"])
   
 }
 
-#model auc: 
+#model auc: 0,6801
 RF_Nichtwahler1 %>%
   test_roc(data = test_dfNichtwahler) %>%
   auc()
@@ -2813,9 +2805,9 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 #set random seed again 
 set.seed(1997)
-RF_Nichtwahler2 <- train(Nichtwaehler ~ ., 
+RF_Nichtwahler2 <- train(Nichtwahler ~ ., 
                  data=train_dfNichtwahler,
-                 tuneGrid = myGrid1,
+                 tuneGrid = myGrid,
                  method="ranger", 
                  metric= "ROC",
                  num.tree = 1000,
@@ -2827,24 +2819,25 @@ RF_Nichtwahler2 <- train(Nichtwaehler ~ .,
 
 RF_Nichtwahler2
 summary(RF_Nichtwahler2)
-#mtry = xx, extratrees, min.node.size = xx
+plot(RF_Nichtwahler2)
+#mtry = 12, extratrees, min.node.size = 5
 
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RF_Nichtwahler2, newdata=test_dfNichtwahler)
 
 # Create confusion matrix
-confusionMatrix(data=as.factor(predictions2), as.factor(test_dfNichtwahler$Nichtwaehler))
+confusionMatrix(data=as.factor(predictions2), as.factor(test_dfNichtwahler$Nichtwahler))
 
 #check for auc
 test_roc <- function(model, data) {
   
-  roc(test_dfNichtwahler$Nichtwaehler,
+  roc(test_dfNichtwahler$Nichtwahler,
       predict(model, data, type = "prob")[, "Ja"])
   
 }
 
-#model auc: 
+#model auc: 0,6804
 RF_Nichtwahler2 %>%
   test_roc(data = test_dfNichtwahler) %>%
   auc()
@@ -2885,7 +2878,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
 
-#better num.trees: xx trees 
+#better num.trees: 500 trees --> worse overall accuracy but better for predicting Nichtwähler 
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -2893,7 +2886,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 #final getunte Werte einsetzen
 
 set.seed(1997)
-RF_Nichtwahler_fin <- RF_Nichtwahlerx
+RF_Nichtwahler_fin <- RF_Nichtwahler1
 
 
 # Print models
@@ -2905,24 +2898,24 @@ summary(RF_Nichtwahler_fin)
 # Mean Decrease Gini - Measure of variable importance based on the Gini impurity index used for the calculation of splits in trees.
 
 varImp(RF_Nichtwahler_fin)
-plot(varImp(RF_Nichtwahler_fin), 20, main = "Nichtwaehler")
+plot(varImp(RF_Nichtwahler_fin), 20, main = "Nichtwahler")
 
 
 # predict outcome using model from train_df applied to the test_df
 predictions3 <- predict(RF_Nichtwahler_fin, newdata=test_dfNichtwahler)
 
 # Create confusion matrix
-confusionMatrix(data=as.factor(predictions3), as.factor(test_dfNichtwahler$Nichtwaehler))
+confusionMatrix(data=as.factor(predictions3), as.factor(test_dfNichtwahler$Nichtwahler))
 
 #check for auc
 test_roc <- function(model, data) {
   
-  roc(test_dfNichtwahler$Nichtwaehler,
+  roc(test_dfNichtwahler$Nichtwahler,
       predict(model, data, type = "prob")[, "Ja"])
   
 }
 
-#model auc: x
+#model auc: 0,6804
 RF_Nichtwahler_fin %>%
   test_roc(data = test_dfNichtwahler) %>%
   auc()
@@ -2977,26 +2970,26 @@ impvar <- impvar[1:20]
 
 PartialPlots <- RF_Nichtwahler_fin
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "Ja") %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "Ja") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "Ja") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "Ja") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "Ja") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "Ja") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "Ja") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "Ja") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "Ja") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "Ja") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "Ja") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "Ja") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "Ja") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "Ja") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "Ja") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "Ja") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "Ja") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "Ja") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "Ja") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "Ja") %>%plotPartial(main = "Nichtwähler")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "Ja") %>%plotPartial(main = "Nichtwähler")
 
 
 #------------------------------------------------WHEN BEST MODEL IS FOUND-----------------------------------------------------
