@@ -823,7 +823,7 @@ data <- data %>% mutate(Einkommensgruppe = case_when(Nettoeinkommen == "0 € - 
 data <- data %>% mutate(Allein_vs_Beziehung = case_when(Beziehungsstatus == "Single" ~ 'Allein',
                                                     Beziehungsstatus == "Geschieden" ~ 'Allein',
                                                     Beziehungsstatus == "Verwitwet" ~ 'Allein',
-                                                    Beziehungsstatus == "In einer Beziehung" ~ 'Beziehung',
+                                                    Beziehungsstatus == "In_einer_Beziehung" ~ 'Beziehung',
                                                     Beziehungsstatus == "Verheiratet" ~ 'Beziehung'))
 
 #Beschäftigung: arbeitend oder nicht arbeitend
@@ -892,7 +892,7 @@ data <- data %>% mutate(Erfolg_wichtig = case_when(Gefuehl_von_Erfolg <=4 ~ 'Nei
 data <- data %>% mutate(Religioes = case_when(Religion == "Christentum" ~ 'Ja',
                                               Religion == "Islam" ~ 'Ja',
                                               Religion == "Judentum" ~ 'Ja',
-                                              Religion == "Ich fühle mich keiner Religion zugehörig" ~ 'Nein'))
+                                              Religion == "Ich_fühle_mich_keiner_Religion_zugehörig" ~ 'Nein'))
 
 data <- data %>% mutate(Islam_oder_Christ = case_when(Religion == "Christentum" ~ 'Christentum',
                                                       Religion == "Islam" ~ 'Islam'))
