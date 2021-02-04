@@ -73,14 +73,14 @@ cols_Kinder <- names(data_Kinder)
 
 # Convert factor names of trial to caret compatible format (1 and 0 as numbers are not allowed)
 data_Kinder$Kinder = as.character(data_Kinder$Kinder)
-data_Kinder$Kinder[data_Kinder$Kinder == "2"] = "No"
-data_Kinder$Kinder[data_Kinder$Kinder == "1"] = "Yes"
+data_Kinder$Kinder[data_Kinder$Kinder == "2"] = "Nein"
+data_Kinder$Kinder[data_Kinder$Kinder == "1"] = "Ja"
 data_Kinder$Kinder = as.factor(data_Kinder$Kinder)
 
 
 # Change order of factor levels such that "Yes" is interpreted as positive and "No" is interpreted as negative
 levels(data_Kinder$Kinder)
-data_Kinder$Kinder = factor(data_Kinder$Kinder, levels = c("Yes", "No"))
+data_Kinder$Kinder = factor(data_Kinder$Kinder, levels = c("Ja", "Nein"))
 levels(data_Kinder$Kinder)
 
 
@@ -136,7 +136,7 @@ myControl = trainControl(
   summaryFunction = twoClassSummary, #nur für binär; Wenn das benutzt wird, auch ClassProbs = True setzen!
   classProbs = TRUE,
   allowParallel=TRUE,
-  #sampling = "smote", #wenn sampling, dann hier anpassen und für alle drei Varianten ausprobieren!! (up, down, smote)
+  sampling = "smote", #wenn sampling, dann hier anpassen und für alle drei Varianten ausprobieren!! (up, down, smote)
   search = "grid",
 )
 
@@ -189,7 +189,7 @@ bestmtry <- modelKinderRF$bestTune$mtry
 test_roc <- function(model, data) {
   
   roc(test_dfKinder$Kinder,
-      predict(model, data, type = "prob")[, "Yes"])
+      predict(model, data, type = "prob")[, "Ja"])
   
 }
 
@@ -233,116 +233,6 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
 
-#------------------------------------------------Mit Resampling SMOTE-------------------------------------------------
-
-
-# Specify the type of training method used & number of folds --> bei uns 10-fold Cross-Validation
-set.seed(1997)
-myControl = trainControl(
-  method = "cv",
-  number = 10, 
-  verboseIter = TRUE,
-  summaryFunction = twoClassSummary, #nur für binär; Wenn das benutzt wird, auch ClassProbs = True setzen!
-  classProbs = TRUE,
-  allowParallel=TRUE,
-  sampling = "smote", #wenn sampling, dann hier anpassen und für alle drei Varianten ausprobieren!! (up, down, smote)
-  search = "grid",
-)
-
-
-####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
-
-# test of the ideal mtry, splitrule and min-node.size
-
-set.seed(1997)
-
-myGrid = expand.grid(mtry = c(10:20),
-                     splitrule = "extratrees", 
-                     min.node.size = c(5,10,15))
-
-
-modelKinderRFSMOTE <- train(Kinder ~ ., 
-                       data=train_dfKinder,
-                       tuneGrid = myGrid,
-                       method="ranger",
-                       metric= "ROC", # numeric: RMSE; categorical: Kappa; binary: ROC
-                       na.action = na.omit,
-                       num.tree = 500,
-                       trControl = myControl, 
-                       importance = 'impurity')
-
-# Print model to console
-
-modelKinderRFSMOTE
-summary(modelKinderRFSMOTE)
-plot(modelKinderRFSMOTE)
-
-#best mtry = xx, splitrule = xx, min.node.size = xx
-
-# Apply model to test_df --> test_dfGeschlecht
-
-# predict outcome using model from train_df applied to the test_df
-
-### hier auch einmal nach dem testdf der DV umbenennen
-predictions <- predict(modelKinderRFSMOTE, newdata=test_dfKinder)
-
-# Create confusion matrix --> nur für classification (binär oder categorical)
-confusionMatrix(data=predictions, test_dfKinder$Kinder)
-
-#save the best mtry 
-
-bestmtry <- modelGeschlechtRF$bestTune$mtry
-
-#check for AUC 
-#####(nur binär und kategorisch)
-test_roc <- function(model, data) {
-  
-  roc(test_dfKinder$Kinder,
-      predict(model, data, type = "prob")[, "Yes"])
-  
-}
-
-modelKinderRFSMOTE %>%
-  test_roc(data = test_dfKinder) %>%
-  auc()
-
-###nur für binär (von hier bis Ende des Abschnitts)
-#compare different ROC-plots
-model_list <- list(M1 = modelKinderRF,
-                   M2 = modelKinderRFSMOTE)
-
-model_list_roc <- model_list %>%
-  map(test_roc, data = test_dfGreen2)
-
-model_list_roc %>%
-  map(auc)
-
-results_list_roc <- list(NA)
-num_mod <- 1
-
-for(the_roc in model_list_roc){
-  
-  results_list_roc[[num_mod]] <- 
-    tibble(tpr = the_roc$sensitivities,
-           fpr = 1 - the_roc$specificities,
-           model = names(model_list)[num_mod])
-  
-  num_mod <- num_mod + 1
-  
-}
-
-results_df_roc <- bind_rows(results_list_roc)
-
-# Plot ROC curve for all 5 models
-
-custom_col <- c("#000000", "#009E73", "#0072B2", "#D55E00", "#CC79A7")
-
-ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
-  geom_line(aes(color = model), size = 1) +
-  scale_color_manual(values = custom_col) +
-  geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
-  theme_bw(base_size = 18)
-
 
 ####-------tree 2: num.tree prüfen --------------------------------------------------
 
@@ -350,12 +240,6 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 ###mtry, splitrule und min.node.size zu dem anpassen, was tree 1 gefunden hat!
 
 set.seed(1997)
-
-myGrid = expand.grid(mtry = 10,   #anpassen!
-                     splitrule = "extratrees", #anpassen!
-                     min.node.size = 15)   #anpassen!
-
-
 modelKinderRF1 <- train(Kinder ~ ., 
                            data=train_dfKinder,
                            tuneGrid = myGrid,
@@ -377,10 +261,10 @@ plot(modelKinderRF1)
 # predict outcome using model from train_df applied to the test_df
 
 ### hier auch einmal nach dem testdf der DV umbenennen
-predictions <- predict(modelKinderRF1, newdata=test_dfKinder)
+predictions1 <- predict(modelKinderRF1, newdata=test_dfKinder)
 
 # Create confusion matrix --> nur für classification
-confusionMatrix(data=predictions, test_dfKinder$Kinder)
+confusionMatrix(data=predictions1, test_dfKinder$Kinder)
 
 
 #check for AUC 
@@ -393,7 +277,7 @@ test_roc <- function(model, data) {
 }
 
 modelKinderRF1 %>%
-  test_roc(data = test_dfGreen2) %>%
+  test_roc(data = test_dfKinder) %>%
   auc()
 
 ###nur für binär
@@ -401,7 +285,7 @@ modelKinderRF1 %>%
 model_list <- list(M1 = modelKinderRF1)
 
 model_list_roc <- model_list %>%
-  map(test_roc, data = test_dfGreen2)
+  map(test_roc, data = test_dfKinder)
 
 model_list_roc %>%
   map(auc)
@@ -441,56 +325,31 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 ### hier das finale model mit bestmtry und node size einfügen , auch best num.tree anpassen
 
-set.seed(1997)
-myGrid <- expand.grid(mtry = 10, splitrule ="extratrees", min.node.size = 15)
-modelGeschlechtRF <- train(weiblich_maennlich ~ ., 
-                           data=train_dfGeschlechtMW, 
-                           method="ranger", metric= "ROC", # hier bei metric kann man sich auch die Accuracy ausgeben lassen
-                           tuneGrid = myGrid,
-                           na.action = na.omit,
-                           num.tree = 500,
-                           trControl = myControl, 
-                           importance = 'impurity')
+modelKinderFinal <- modelKinderXX
 
 # Print model
 ### hier den Model namen ändern
-print(modelGeschlechtRF)
+print(modelKinderFinal)
 
 #output in terms of regression coefficients
-summary(modelGeschlechtRF)
+summary(modelKinderFinal)
 
 #evaluate variable importance 
 # Mean Decrease Gini - Measure of variable importance based on the Gini impurity index used for the calculation of splits in trees.
 ### hier auch den model namen ändern
 
-varImp(modelGeschlechtRF)
-plot(varImp(modelGeschlechtRF), 20, main = "weiblich_maennlich")
+varImp(modelKinderFinal)
+plot(varImp(modelKinderFinal), 20, main = "weiblich_maennlich")
 
 # Apply model to test_df --> test_dfGeschlecht
 
 # predict outcome using model from train_df applied to the test_df
 
 ### hier auch einmal nach dem testdf der DV umbenennen
-predictions <- predict(modelGeschlechtRF, newdata=test_dfGeschlechtMW)
+predictions3 <- predict(modelKinderFinal, newdata=test_dfKinder)
 
 # Create confusion matrix --> nur für classification
-confusionMatrix(data=predictions, test_dfGeschlechtMW$weiblich_maennlich)
-
-#check performance measures --> für numerisch
-MAE(predictions, test_dfGreen1$Green_Values)
-RMSE(predictions, test_dfGreen1$Green_Values)
-R2(predictions, test_dfGreen1$Green_Values)
-
-###numeric only:
-#calculate Pearson coefficient for predictions and actual values
-# Correlations with significance levels
-
-pearsonGreen1_1 <- cor.test(predictions, test_dfGreen1$Green_Values, method = "pearson")
-pearsonGreen1_1
-
-spearmanGreen1_1 <- cor.test(predictions, test_dfGreen1$Green_Values, method = "spearman")
-spearmanGreen1_1
-
+confusionMatrix(data=predictions3, test_dfKinder$Kinder)
 
 #check for AUC 
 #####(nur binär und kategorisch)
@@ -501,15 +360,13 @@ test_roc <- function(model, data) {
   
 }
 
-RFGreen2_11 %>%
-  test_roc(data = test_dfGreen2) %>%
+modelKinderFinal %>%
+  test_roc(data = test_dfKinder) %>%
   auc()
 
 ###nur für binär (von hier bis Ende des Abschnitts)
 #compare different ROC-plots
-model_list <- list(M1 = RFGreen2_11,
-                   M2 = RFGreen2_11,
-                   M3 = RFGreen2_11)
+model_list <- list(ModelFinal = modelKinderFinal)
 
 model_list_roc <- model_list %>%
   map(test_roc, data = test_dfGreen2)
@@ -551,35 +408,35 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 ###anpassen: name vom dataset
 
-imp <- importance(modelGeschlechtRF$finalModel)
+imp <- importance(modelKinderFinal$finalModel)
 imp <- as.data.frame(imp)
 impvar <- rownames(imp)[order(imp[1], decreasing=TRUE)]
 impvar <- impvar[1:20]
 
 ###Model umbenennen
 
-PartialPlots <- modelGeschlechtRF
+PartialPlots <- modelKinderFinal
 
-PartialPlots %>% partial(pred.var = impvar[1]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[2]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[3]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[4]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[5]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[6]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[7]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[8]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[9]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[10]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[11]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[12]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[13]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[14]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[15]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[16]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[17]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[18]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[19]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[20]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "Ja") %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "Ja") %>%plotPartial
 
 
 #------------------------------------------------WHEN BEST MODEL IS FOUND-----------------------------------------------------

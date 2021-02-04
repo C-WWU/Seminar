@@ -1,4 +1,5 @@
 #----------------------FINAL CODE IN SOCIALLY IRRESPONSIBLE ALGORITHMS------------------------------
+
 #install and load relevant packages
 
 install.packages("cowplot")
@@ -47,57 +48,55 @@ library(Hmisc)
 
 options(max.print = 100000)
 
+
+#######################
+#Einkommensgruppe: Categorical (3 Gruppen: hoch, mittel, niedrig)
+######################
+
 #--------------------------------------DATA PRE-PROCESSING------------------------------------------
+
 
 # load data 
 
 load("data_for_analysis.RData")
 
+#data <- full  #oder ändern zu data <- reduced_set
+
 cols_names <- names(data)  
 cols_names
 
-###hier: Zeilen anpassen, die wir auswählen, und Dateienname ändern zu jew. Variable
 
-# c(313 --> das ist hier die column wo die Dv drin ist, in dem Fall weiblich_maennlich)
-# c(27:255 --> das sind unsere IV's, sprich die Accounts)
-data_Alter<- data[,c(312, 27:255)]
-
-### es ist besonders wichtig die gewünschte DV in einen Faktor zu transformieren, da "caret" nicht mit 0/1 ausprägungen umgehen kann, wenn das model trainiert werden soll. 
-
-cols_Alter <- names(data_Alter)
-data_Alter$Alter <- as.factor(data_Alter$Age_Range)
+#define data for analysis
+data_AgeRange <- data[,c(312, 27:255)]
 
 #Gibt es NAs in der DV?
-sum(is.na(data_Alter$Age_Range)) #keine NAs
-###folgende Kommentierung und Code nur drin lassen und anpassen, wenn es NAs gibt --> bitte prüfen, dass der Code auch das richtige macht :)
-#Respondents mit NAs für diese Variable löschen (NAs stehen nur, wenn Respondent "Keine Angabe" gemacht hat, daher bedeutet löschen keinen Informationsverlust)
-data_Alter <- data_Alter%>% filter(Age_Range != "NA")
+sum(is.na(data_AgeRange$Age_Range)) #122 NAs
+data_AgeRange <- data_AgeRange %>% subset(data_AgeRange$Age_Range != "NA")
+
+
+#ist die Variable unbalanced?
+table(data_AgeRange$Age_Range) #hohes Einkommen ist unterrepräsentiert, verhältnis ca. 1:6:10 --> Korrektur notwendig!
+max(table(data_AgeRange$Age_Range)/sum(table(data_AgeRange$Age_Range))) #no information rate 61%
+
+#IV als Faktor:
+data_AgeRange$Age_Range <- as.factor(data_AgeRange$Age_Range)
 
 
 
 #----------------------------------------DATA PARTITIONING------------------------------------
-
-
-
-### ACHTUNG DAS DATA SET NUR SPLITTEN WENN NOCH NICHT VORHER FÜR DIE DV GEMACHT. ANSONSTEN STEP ÜBERSPRINGEN
 
 #Training und Test Dataset
 set.seed(1997)
 
 # Partitioning of the data: Create index matrix of selected values
 
-### hier einmal das vorhin definierte dataframe auswählen und nach dem $ die gewünschte DV eintragen. 
-### p=0.8 heißt das data set wird nach der 80/20 regel in training und test data set geteilt. 
-### Könnte  man auch anpassen in 70/30 oder 75/25 wie Kübler das in seinem Buch geschrieben hat. 
-
-index <- createDataPartition(data_Alter$Age_Range, p=.8, list= FALSE, times= 1)
+index <- createDataPartition(data_AgeRange$Age_Range, p=.8, list= FALSE, times= 1)
 
 # Create train_dfGeschlecht & test_dfGeschlecht
 
-### name anpassen an DV
+train_dfAgeRange <- data_AgeRange[index,]
+test_dfAgeRange <- data_AgeRange[-index,]
 
-train_dfAlter <- data_Alter[index,]
-test_dfAlter <- data_Alter[-index,]
 
 
 #---------------------------------------------------RANDOM FOREST----------------------------------------------------
@@ -106,22 +105,20 @@ test_dfAlter <- data_Alter[-index,]
 
 
 # Specify the type of training method used & number of folds --> bei uns 10-fold Cross-Validation
+
 set.seed(1997)
-myControl = trainControl(
+myControl1 = trainControl(
   method = "cv",
   number = 10, 
   verboseIter = TRUE,
-  summaryFunction = twoClassSummary, #nur für binär; Wenn das benutzt wird, auch ClassProbs = True setzen!
-  classProbs = TRUE,
+  summaryFunction = defaultSummary, 
+  classProbs = TRUE, 
   allowParallel=TRUE,
-  #sampling = "smote", #wenn sampling, dann hier anpassen und für alle drei Varianten ausprobieren!! (up, down, smote)
-  search = "grid",
+  sampling = "smote", 
+  search = "grid"
 )
 
-
-####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
-
-# test of the ideal mtry, splitrule and min-node.size
+#set tuning grid
 
 set.seed(1997)
 
@@ -130,318 +127,234 @@ myGrid = expand.grid(mtry = c(10:20),
                      min.node.size = c(5,10,15))
 
 
-modelAlterRF <- train(Age_Range ~ ., 
-                      data=train_dfAlter,
-                      tuneGrid = myGrid,
-                      method="ranger",
-                      metric= "ROC", # numeric: RMSE; categorical: Kappa; binary: ROC
-                      na.action = na.omit,
-                      num.tree = 500,
-                      trControl = myControl, 
-                      importance = 'impurity')
+####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
 
-# Print model to console
+# test of the ideal mtry, splitrule and min-node.size for 500 trees
+#use metric Kappa because of unbalanced dataset
 
-modelAlterRF
-summary(modelAlterRF)
-plot(modelAlterRF)
+#set random seed again 
 
+set.seed(1997)
+RFAgeRange <- train(Age_Range ~ ., 
+                       data=train_dfAgeRange,
+                       tuneGrid = myGrid,
+                       method="ranger", 
+                       metric= "Kappa",
+                       num.tree = 500,
+                       trControl = myControl1, 
+                       na.action = na.omit,
+                       importance = 'impurity')
 
-#best mtry = 13, splitrule = extratrees, min.node.size = 5
+# Print models to console
 
-# Apply model to test_df --> test_dfGeschlecht
+RFAgeRange
+summary(RFAgeRange)
+plot(RFAgeRange)
+#mtry = 14, extratrees, min.node.size = 10
+
 
 # predict outcome using model from train_df applied to the test_df
+predictions <- predict(RFAgeRange, newdata=test_dfAgeRange)
 
-### hier auch einmal nach dem testdf der DV umbenennen
-predictions <- predict(modelAlterRF, newdata=test_dfAlter)
+# Create confusion matrix
+confusionMatrix(data=as.factor(predictions), as.factor(test_dfAgeRange$Age_Range))
 
-# Create confusion matrix --> nur für classification (binär oder categorical)
-confusionMatrix(data=predictions, test_dfAlter$Alter)
-
-#save the best mtry 
-
-bestmtry <- modelAlterRF$bestTune$mtry
-
-#check for AUC 
-#####(nur binär und kategorisch)
+#check for auc
 test_roc <- function(model, data) {
   
-  roc(test_dfAlter$Age_Range,
-      predict(model, data, type = "prob")[, "hohes_Alter"])
+  multiclass.roc(test_dfAgeRange$Age_Range,
+                 predict(model, data, type = "prob")[, "niedrig"])
   
 }
 
-modelAlterRF %>%
-  test_roc(data = test_dfAlter) %>%
+#model1 auc: 
+RFAgeRange %>%
+  test_roc(data = test_dfAgeRange) %>%
   auc()
 
-###nur für binär (von hier bis Ende des Abschnitts)
-#compare different ROC-plots
-model_list <- list(M1 = modelAlterRF)
-
-model_list_roc <- model_list %>%
-  map(test_roc, data = test_dfAlter)
-
-model_list_roc %>%
-  map(auc)
-
-results_list_roc <- list(NA)
-num_mod <- 1
-
-for(the_roc in model_list_roc){
-  
-  results_list_roc[[num_mod]] <- 
-    tibble(tpr = the_roc$sensitivities,
-           fpr = 1 - the_roc$specificities,
-           model = names(model_list)[num_mod])
-  
-  num_mod <- num_mod + 1
-  
-}
-
-results_df_roc <- bind_rows(results_list_roc)
-
-# Plot ROC curve for all 5 models
-
-custom_col <- c("#000000", "#009E73", "#0072B2", "#D55E00", "#CC79A7")
-
-ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
-  geom_line(aes(color = model), size = 1) +
-  scale_color_manual(values = custom_col) +
-  geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
-  theme_bw(base_size = 18)
 
 
 ####-------tree 2: num.tree prüfen --------------------------------------------------
 
-# test of ideal num.tree --> try if numtree 1000 leads to better results!
-###mtry, splitrule und min.node.size zu dem anpassen, was tree 1 gefunden hat!
+#getunte Werte setzen und num.tree ausprobieren --> ist mehr besser?
 
 set.seed(1997)
+RFAgeRange1 <- train(Age_Range ~ ., 
+                       data=train_dfAgeRange, 
+                       method="ranger", metric= "Kappa",
+                       tuneGrid = myGrid,
+                       na.action = na.omit,
+                       num.tree = 1000,
+                       trControl = myControl1, 
+                       importance = 'impurity')
 
-myGrid = expand.grid(mtry = 10,   #anpassen!
-                     splitrule = "extratrees", #anpassen!
-                     min.node.size = 15)   #anpassen!
+# Print models
+RFAgeRange1
+summary(RFAgeRange1)
+#mtry = xx, extratrees, min.node.size = xx
 
-
-modelAlterRF1 <- train(Age_Range ~ ., 
-                           data=train_dfAlter,
-                           tuneGrid = myGrid,
-                           method="ranger", 
-                           metric= "ROC", 
-                           na.action = na.omit,
-                           num.tree = 1000,
-                           trControl = myControl, 
-                           importance = 'impurity')
-
-# Print model to console
-
-modelAlterRF1
-summary(modelAlterRF1)
-plot(modelAlterRF1)
-
-# Apply model to test_df --> test_dfGeschlecht
 
 # predict outcome using model from train_df applied to the test_df
-
-### hier auch einmal nach dem testdf der DV umbenennen
-predictions <- predict(modelAlterRF1, newdata=test_dfAlter)
-
-# Create confusion matrix --> nur für classification
-confusionMatrix(data=predictions, test_dfAlter$Age_Range)
+predictions2 <- predict(RFAgeRange1, newdata=test_dfAgeRange)
 
 
-#check for AUC 
-#####(nur binär und kategorisch) (von hier bis Ende des Abschnitts)
+# Create confusion matrix
+confusionMatrix(data=as.factor(predictions2), as.factor(test_dfAgeRange$Age_Range))
+
+
+#check for auc
 test_roc <- function(model, data) {
   
-  roc(test_dfAlter$Age_Range,
-      predict(model, data, type = "prob")[, "hohes_Alter"])
+  multiclass.roc(test_dfAgeRange$Age_Range,
+                 predict(model, data, type = "prob")[, "niedrig"])
   
 }
 
-modelAlterRF1 %>%
-  test_roc(data = test_dfGreen2) %>%
+#model auc: 
+RFAgeRange1 %>%
+  test_roc(data = test_dfAgeRange) %>%
   auc()
 
-###nur für binär
-#compare different ROC-plots
-model_list <- list(M1 = modelAlterRF,
-                   M2 = modelAlterRF1)
 
-model_list_roc <- model_list %>%
-  map(test_roc, data = test_dfAlter)
+#model1: 500 trees performs better
 
-model_list_roc %>%
-  map(auc)
-
-results_list_roc <- list(NA)
-num_mod <- 1
-
-for(the_roc in model_list_roc){
-  
-  results_list_roc[[num_mod]] <- 
-    tibble(tpr = the_roc$sensitivities,
-           fpr = 1 - the_roc$specificities,
-           model = names(model_list)[num_mod])
-  
-  num_mod <- num_mod + 1
-  
-}
-
-results_df_roc <- bind_rows(results_list_roc)
-
-# Plot ROC curve for all 5 models
-
-custom_col <- c("#000000", "#009E73", "#0072B2", "#D55E00", "#CC79A7")
-
-ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
-  geom_line(aes(color = model), size = 1) +
-  scale_color_manual(values = custom_col) +
-  geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
-  theme_bw(base_size = 18)
-
-
-
-
-#fit model with num.trees = xx trees (better performance)
 
 ####-------tree 3: Final --------------------------------------------------
 
-### hier das finale model mit bestmtry und node size einfügen , auch best num.tree anpassen
+#final model
 
 set.seed(1997)
-myGrid <- expand.grid(mtry = 10, splitrule ="extratrees", min.node.size = 15)
-modelAlterfinal <- train(Age_Range ~ ., 
-                           data=train_dfAlter, 
-                           method="ranger", metric= "ROC", # hier bei metric kann man sich auch die Accuracy ausgeben lassen
-                           tuneGrid = myGrid,
-                           na.action = na.omit,
-                           num.tree = 500,
-                           trControl = myControl, 
-                           importance = 'impurity')
+RFAgeRangeFinal <- RFEinkommen_x
 
-# Print model
-### hier den Model namen ändern
-print(modelAlterfinal)
-
-#output in terms of regression coefficients
-summary(modelAlterfinal)
+# Print models
+RFAgeRangeFinal 
+summary(RFAgeRangeFinal )
 
 #evaluate variable importance 
 # Mean Decrease Gini - Measure of variable importance based on the Gini impurity index used for the calculation of splits in trees.
-### hier auch den model namen ändern
 
-varImp(modelmodelAlterfinal)
-plot(varImp(modelAlterfinal), 20, main = "Age_Range")
+varImp(RFAgeRangeFinal )
+plot(varImp(RFAgeRangeFinal ), 20, main = "Einkommensgruppe")
 
-# Apply model to test_df --> test_dfGeschlecht
 
 # predict outcome using model from train_df applied to the test_df
+predictions3 <- predict(RFAgeRangeFinal , newdata=test_dfAgeRange)
 
-### hier auch einmal nach dem testdf der DV umbenennen
-predictions <- predict(modelAlterfinal, newdata=test_dfAlter)
+# Create confusion matrix
+confusionMatrix(data=as.factor(predictions3), as.factor(test_dfAgeRange$Age_Range))
 
-# Create confusion matrix --> nur für classification
-confusionMatrix(data=predictions, test_dfAlter$Age_Range)
-
-#check for AUC 
-#####(nur binär und kategorisch)
+#check for auc
 test_roc <- function(model, data) {
   
-  roc(test_dfAlter$Age_Range,
-      predict(model, data, type = "prob")[, "hohes Alter"])
+  multiclass.roc(test_dfAgeRange$Age_Range,
+                 predict(model, data, type = "prob")[, "niedriges.Alter"])
   
 }
 
-modelAlterfinal %>%
-  test_roc(data = test_dfAlter) %>%
+#model auc: 
+RFAgeRangeFinal %>%
+  test_roc(data = test_dfAge_Range) %>%
   auc()
 
-###nur für binär (von hier bis Ende des Abschnitts)
-#compare different ROC-plots
-model_list <- list(M1 = modelAlterfinal)
-
-model_list_roc <- model_list %>%
-  map(test_roc, data = test_dfAlter)
-
-model_list_roc %>%
-  map(auc)
-
-results_list_roc <- list(NA)
-num_mod <- 1
-
-for(the_roc in model_list_roc){
-  
-  results_list_roc[[num_mod]] <- 
-    tibble(tpr = the_roc$sensitivities,
-           fpr = 1 - the_roc$specificities,
-           model = names(model_list)[num_mod])
-  
-  num_mod <- num_mod + 1
-  
-}
-
-results_df_roc <- bind_rows(results_list_roc)
-
-# Plot ROC curve for all 5 models
-custom_col <- c("#000000", "#009E73", "#0072B2", "#D55E00", "#CC79A7")
-
-ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
-  geom_line(aes(color = model), size = 1) +
-  scale_color_manual(values = custom_col) +
-  geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
-  theme_bw(base_size = 18)
 
 
 
 #--------------Variable Direction: Partial Plots-----------------------------------------
 
 
-#checking direction of the 10 most important variables
+#checking direction of the 20 most important variables
 
-###anpassen: name vom dataset
-
-imp <- importance(modelGeschlechtRF$finalModel)
+imp <- importance(RFAgeRangeFinal$finalModel)
 imp <- as.data.frame(imp)
 impvar <- rownames(imp)[order(imp[1], decreasing=TRUE)]
 impvar <- impvar[1:20]
 
-###Model umbenennen
+#Model umbenennen
 
-PartialPlots <- modelGeschlechtRF
+PartialPlots <- RFAgeRangeFinal 
 
-PartialPlots %>% partial(pred.var = impvar[1]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[2]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[3]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[4]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[5]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[6]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[7]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[8]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[9]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[10]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[11]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[12]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[13]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[14]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[15]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[16]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[17]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[18]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[19]) %>%plotPartial
-PartialPlots %>% partial(pred.var = impvar[20]) %>%plotPartial
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "hohes.Alter") %>%plotPartial (main = "hohes Alter")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "hohes.Alter") %>%plotPartial(main = "hohes Alter")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "hohes.Alter") %>%plotPartial(main = "hohes Alter")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "hohes.Alter") %>%plotPartial(main = "hohes Alter")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "hohes.Alter") %>%plotPartial(main = "hohes Alter")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "hohes.Alter") %>%plotPartial(main = "hohes Alter")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "hohes.Alter") %>%plotPartial(main = "hohes Alter")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "hohes.Alter") %>%plotPartial(main = "hohes Alter")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "hohes.Alter") %>%plotPartial(main = "hohes Alter")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "hohes.Alter") %>%plotPartial(main = "hohes Alter")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "hohes.Alter") %>%plotPartial(main = "hohes Alter")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "hohes.Alter") %>%plotPartial(main = "hohes Alter")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "hohes.Alter") %>%plotPartial(main = "hohes Alter")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "hohes.Alter") %>%plotPartial(main = "hohes Alter")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "hohes.Alter") %>%plotPartial(main = "hohes Alter")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "hohes.Alter") %>%plotPartial(main = "hohes Alter")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "hohes.Alter") %>%plotPartial(main = "hohes Alter")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "hohes.Alter") %>%plotPartial(main = "hohes Alter")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "hohes.Alter") %>%plotPartial(main = "hohes Alter")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "hohes.Alter") %>%plotPartial(main = "hohes Alter")
+
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "mittleres.Alter") %>%plotPartial(main = "mittleres Alter")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "mittleres.Alter") %>%plotPartial(main = "mittleres Alter")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "mittleres.Alter") %>%plotPartial(main = "mittleres Alter")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "mittleres.Alter") %>%plotPartial(main = "mittleres Alter")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "mittleres.Alter") %>%plotPartial(main = "mittleres Alter")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "mittleres.Alter") %>%plotPartial(main = "mittleres Alter")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "mittleres.Alter") %>%plotPartial(main = "mittleres Alter")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "mittleres.Alter") %>%plotPartial(main = "mittleres Alter")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "mittleres.Alter") %>%plotPartial(main = "mittleres Alter")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "mittleres.Alter") %>%plotPartial(main = "mittleres Alter")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "mittleres.Alter") %>%plotPartial(main = "mittleres Alter")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "mittleres.Alter") %>%plotPartial(main = "mittleres Alter")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "mittleres.Alter") %>%plotPartial(main = "mittleres Alter")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "mittleres.Alter") %>%plotPartial(main = "mittleres Alter")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "mittleres.Alter") %>%plotPartial(main = "mittleres Alter")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "mittleres.Alter") %>%plotPartial(main = "mittleres Alter")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "mittleres.Alter") %>%plotPartial(main = "mittleres Alter")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "mittleres.Alter") %>%plotPartial(main = "mittleres Alter")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "mittleres.Alter") %>%plotPartial(main = "mittleres Alter")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "mittleres.Alter") %>%plotPartial(main = "mittleres Alter")
+
+
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "niedriges.Alter") %>%plotPartial(main = "niedriges Alter")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "niedriges.Alter") %>%plotPartial(main = "niedriges Alter")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "niedriges.Alter") %>%plotPartial(main = "niedriges Alter")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "niedriges.Alter") %>%plotPartial(main = "niedriges Alter")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "niedriges.Alter") %>%plotPartial(main = "niedriges Alter")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "niedriges.Alter") %>%plotPartial(main = "niedriges Alter")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "niedriges.Alter") %>%plotPartial(main = "niedriges Alter")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "niedriges.Alter") %>%plotPartial(main = "niedriges Alter")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "niedriges.Alter") %>%plotPartial(main = "niedriges Alter")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "niedriges.Alter") %>%plotPartial(main = "niedriges Alter")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "niedriges.Alter") %>%plotPartial(main = "niedriges Alter")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "niedriges.Alter") %>%plotPartial(main = "niedriges Alter")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "niedriges.Alter") %>%plotPartial(main = "niedriges Alter")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "niedriges.Alter") %>%plotPartial(main = "niedriges Alter")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "niedriges.Alter") %>%plotPartial(main = "niedriges Alter")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "niedriges.Alter") %>%plotPartial(main = "niedriges Alter")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "niedriges.Alter") %>%plotPartial(main = "niedriges Alter")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "niedriges.Alter") %>%plotPartial(main = "niedriges Alter")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "niedriges.Alter") %>%plotPartial(main = "niedriges Alter")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "niedriges.Alter") %>%plotPartial(main = "niedriges Alter")
 
 
 #------------------------------------------------WHEN BEST MODEL IS FOUND-----------------------------------------------------
 
 #save model to disk 
 
-final_model <- model
-saveRDS(final_model, "./final_model.rds")
+besttree_Einkommen <- RFEinkommen_fin
+saveRDS(besttree_Einkommen, "./tree_Einkommen.rds")
 
 #load the model
 
-super_model <- readRDS("./final_model.rds")
-print(super_model)
+besttree_Einkommen <- readRDS("./tree_Einkommen.rds")
+print(besttree_Einkommen)
+
+
+
+
+
+#######################
+#über oder unter Durchschnittseinkommen (2000€): binär
+######################
+
