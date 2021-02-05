@@ -786,8 +786,8 @@ saveRDS(besttree_Softliner, "./tree_Softlinerjanein.rds")
 
 #load the model
 
-besttree_Softliner <- readRDS("./tree_Softlinerjanein.rds")
-print(besttree_Softliner)
+RFSoftliner_fin <- readRDS("./tree_Softlinerjanein.rds")
+print(RFSoftliner_fin)
 
 
 
