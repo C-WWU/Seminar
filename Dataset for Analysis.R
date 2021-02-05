@@ -823,7 +823,7 @@ data <- data %>% mutate(Einkommensgruppe = case_when(Nettoeinkommen == "0 € - 
 data <- data %>% mutate(Allein_vs_Beziehung = case_when(Beziehungsstatus == "Single" ~ 'Allein',
                                                     Beziehungsstatus == "Geschieden" ~ 'Allein',
                                                     Beziehungsstatus == "Verwitwet" ~ 'Allein',
-                                                    Beziehungsstatus == "In_einer_Beziehung" ~ 'Beziehung',
+                                                    Beziehungsstatus == "In einer Beziehung" ~ 'Beziehung',
                                                     Beziehungsstatus == "Verheiratet" ~ 'Beziehung'))
 
 #Beschäftigung: arbeitend oder nicht arbeitend
