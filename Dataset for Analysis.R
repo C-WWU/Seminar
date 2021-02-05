@@ -892,7 +892,7 @@ data <- data %>% mutate(Erfolg_wichtig = case_when(Gefuehl_von_Erfolg <=4 ~ 'Nei
 data <- data %>% mutate(Religioes = case_when(Religion == "Christentum" ~ 'Ja',
                                               Religion == "Islam" ~ 'Ja',
                                               Religion == "Judentum" ~ 'Ja',
-                                              Religion == "Ich_fühle_mich_keiner_Religion_zugehörig" ~ 'Nein'))
+                                              Religion == "Ich fühle mich keiner Religion zugehörig" ~ 'Nein'))
 
 data <- data %>% mutate(Islam_oder_Christ = case_when(Religion == "Christentum" ~ 'Christentum',
                                                       Religion == "Islam" ~ 'Islam'))
