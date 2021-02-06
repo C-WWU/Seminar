@@ -315,7 +315,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 ### hier das finale model mit bestmtry und node size einfügen , auch best num.tree anpassen
 
-modelIslamChristfinal <- modelIslamChristXX
+modelIslamChristfinal <- modelIslamChristRF
 # Print model
 ### hier den Model namen ändern
 print(modelIslamChristfinal)
@@ -328,7 +328,7 @@ summary(modelIslamChristfinal)
 ### hier auch den model namen ändern
 
 varImp(modelIslamChristfinal)
-plot(varImp(modelIslamChristfinal), 20, main = "Islam_oder_Christ")
+plot(varImp(modelIslamChristfinal), 50, main = "Islam_oder_Christ")
 
 # Apply model to test_df --> test_dfGeschlecht
 

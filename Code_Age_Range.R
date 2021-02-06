@@ -150,7 +150,7 @@ RFAgeRange <- train(Age_Range ~ .,
 RFAgeRange
 summary(RFAgeRange)
 plot(RFAgeRange)
-#mtry = 14, extratrees, min.node.size = 10
+#mtry = 13, extratrees, min.node.size = 5
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -163,7 +163,7 @@ confusionMatrix(data=as.factor(predictions), as.factor(test_dfAgeRange$Age_Range
 test_roc <- function(model, data) {
   
   multiclass.roc(test_dfAgeRange$Age_Range,
-                 predict(model, data, type = "prob")[, "niedrig"])
+                 predict(model, data, type = "prob")[, "niedriges.Alter"])
   
 }
 
@@ -172,7 +172,8 @@ RFAgeRange %>%
   test_roc(data = test_dfAgeRange) %>%
   auc()
 
-
+#AUC 0.7889
+#Accuracy 0.6554
 
 ####-------tree 2: num.tree prüfen --------------------------------------------------
 
@@ -206,7 +207,7 @@ confusionMatrix(data=as.factor(predictions2), as.factor(test_dfAgeRange$Age_Rang
 test_roc <- function(model, data) {
   
   multiclass.roc(test_dfAgeRange$Age_Range,
-                 predict(model, data, type = "prob")[, "niedrig"])
+                 predict(model, data, type = "prob")[, "niedriges.Alter"])
   
 }
 
@@ -217,14 +218,14 @@ RFAgeRange1 %>%
 
 
 #model1: 500 trees performs better
-
+#AUC
 
 ####-------tree 3: Final --------------------------------------------------
 
 #final model
 
 set.seed(1997)
-RFAgeRangeFinal <- RFEinkommen_x
+RFAgeRangeFinal <- RFAgeRange1
 
 # Print models
 RFAgeRangeFinal 
@@ -234,7 +235,7 @@ summary(RFAgeRangeFinal )
 # Mean Decrease Gini - Measure of variable importance based on the Gini impurity index used for the calculation of splits in trees.
 
 varImp(RFAgeRangeFinal )
-plot(varImp(RFAgeRangeFinal ), 20, main = "Einkommensgruppe")
+plot(varImp(RFAgeRangeFinal ), 20, main = "Age_Range")
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -253,7 +254,7 @@ test_roc <- function(model, data) {
 
 #model auc: 
 RFAgeRangeFinal %>%
-  test_roc(data = test_dfAge_Range) %>%
+  test_roc(data = test_dfAgeRange) %>%
   auc()
 
 

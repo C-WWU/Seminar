@@ -44,7 +44,7 @@ library(elasticnet)
 library(glmnet)
 library(Matrix)
 library(Hmisc)
-
+library(naniar)
 
 options(max.print = 100000)
 
@@ -71,8 +71,10 @@ data_Religion <- data[,c(12, 27:255)]
 
 #Gibt es NAs in der DV?
 sum(is.na(data_Religion$Religion)) #122 NAs
+#Sonstige auch als NA, um sie aus Analyse auszuschließen:
+data_Religion <- data_Religion %>% replace_with_na_all(condition = ~.x == "Sonstige:")
+#Datenset ohne NAs
 data_Religion <- data_Religion %>% subset(data_Religion$Religion != "NA")
-
 
 #ist die Variable unbalanced?
 table(data_Religion$Religion) #hohes Einkommen ist unterrepräsentiert, verhältnis ca. 1:6:10 --> Korrektur notwendig!
@@ -80,6 +82,13 @@ max(table(data_Religion$Religion)/sum(table(data_Religion$Religion))) #no inform
 
 #IV als Faktor:
 data_Religion$Religion <- as.factor(data_Religion$Religion)
+
+
+#Variablennamen anpassen für Analyse
+data_Religion <- data_Religion %>% mutate(Religion = case_when(Religion == "Christentum" ~ 'Christentum',
+                                                              Religion == "Ich fühle mich keiner Religion zugehörig" ~ 'Nicht_zugehörig',
+                                                              Religion == "Islam" ~ 'Islam',
+                                                              Religion == "Judentum" ~ 'Judentum'))
 
 
 
@@ -224,7 +233,7 @@ RFReligion1 %>%
 #final model
 
 set.seed(1997)
-RFReligionFinal <- RFReligionXX
+RFReligionFinal <- RFReligion1
 
 # Print models
 RFReligionFinal 
@@ -294,26 +303,26 @@ PartialPlots %>% partial(pred.var = impvar[18], which.class = "Christentum") %>%
 PartialPlots %>% partial(pred.var = impvar[19], which.class = "Christentum") %>%plotPartial(main = "Christentum")
 PartialPlots %>% partial(pred.var = impvar[20], which.class = "Christentum") %>%plotPartial(main = "Christentum")
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
 
 
 PartialPlots %>% partial(pred.var = impvar[1], which.class = "Islam") %>%plotPartial(main = "Islam")

@@ -44,7 +44,7 @@ library(elasticnet)
 library(glmnet)
 library(Matrix)
 library(Hmisc)
-
+library(narniar)
 
 options(max.print = 100000)
 
@@ -70,7 +70,7 @@ cols_names
 data_Beziehungsstatus <- data[,c(18, 27:255)]
 
 #Gibt es NAs in der DV?
-sum(is.na(data_Beziehungsstatus$Beziehungsstatus)) #122 NAs
+sum(is.na(data_Beziehungsstatus$Beziehungsstatus)) #17 NAs
 data_Beziehungsstatus <- data_Beziehungsstatus %>% subset(data_Beziehungsstatus$Beziehungsstatus != "NA")
 
 
@@ -80,6 +80,13 @@ max(table(data_Beziehungsstatus$Beziehungsstatus)/sum(table(data_Beziehungsstatu
 
 #IV als Faktor:
 data_Beziehungsstatus$Beziehungsstatus <- as.factor(data_Beziehungsstatus$Beziehungsstatus)
+
+#Variablennamen anpassen für Analyse
+data_Beziehungsstatus <- data_Beziehungsstatus %>% mutate(Beziehungsstatus = case_when(Beziehungsstatus == "Geschieden" ~ 'Single',
+                                                               Beziehungsstatus == "In einer Beziehung" ~ 'In_Beziehung',
+                                                               Beziehungsstatus == "Single" ~ 'Single',
+                                                               Beziehungsstatus == "Verheiratet" ~ 'Verheiratet',
+                                                               Beziehungsstatus == "Verwitwet" ~ 'Single'))
 
 
 
@@ -114,7 +121,7 @@ myControl1 = trainControl(
   summaryFunction = defaultSummary, 
   classProbs = TRUE, 
   allowParallel=TRUE,
-  sampling = "smote", 
+  #sampling = "smote", 
   search = "grid"
 )
 
@@ -224,7 +231,7 @@ RFBeziehungsstatus1 %>%
 #final model
 
 set.seed(1997)
-RFBeziehungsstatusFinal <- RFBeziehungsstatusXX
+RFBeziehungsstatusFinal <- RFBeziehungsstatus
 
 # Print models
 RFBeziehungsstatusFinal 
@@ -294,26 +301,26 @@ PartialPlots %>% partial(pred.var = impvar[18], which.class = "Geschieden") %>%p
 PartialPlots %>% partial(pred.var = impvar[19], which.class = "Geschieden") %>%plotPartial(main = "Geschieden")
 PartialPlots %>% partial(pred.var = impvar[20], which.class = "Geschieden") %>%plotPartial(main = "Geschieden")
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
 
 
 PartialPlots %>% partial(pred.var = impvar[1], which.class = "Single") %>%plotPartial(main = "Single")
@@ -359,27 +366,6 @@ PartialPlots %>% partial(pred.var = impvar[18], which.class = "Verheiratet") %>%
 PartialPlots %>% partial(pred.var = impvar[19], which.class = "Verheiratet") %>%plotPartial(main = "Verheiratet")
 PartialPlots %>% partial(pred.var = impvar[20], which.class = "Verheiratet") %>%plotPartial(main = "Verheiratet")
 
-
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
 
 
 #------------------------------------------------WHEN BEST MODEL IS FOUND-----------------------------------------------------

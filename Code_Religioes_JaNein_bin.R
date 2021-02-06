@@ -315,7 +315,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 ### hier das finale model mit bestmtry und node size einfügen , auch best num.tree anpassen
 
-modelReligioesfinal <- modelReligioesXX
+modelReligioesfinal <- modelReligioesRF1
 # Print model
 ### hier den Model namen ändern
 print(modelReligioesfinal)

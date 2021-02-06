@@ -216,15 +216,14 @@ RFBildungsgruppe1 %>%
   auc()
 
 
-#model1: 500 trees performs better
-
+#model1: 1000 trees performs better
 
 ####-------tree 3: Final --------------------------------------------------
 
 #final model
 
 set.seed(1997)
-RFBildungsgruppeFinal <- RFBildungsgruppeXX
+RFBildungsgruppeFinal <- RFBildungsgruppe1
 
 # Print models
 RFBildungsgruppeFinal 

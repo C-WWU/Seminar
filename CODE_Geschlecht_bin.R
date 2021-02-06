@@ -311,7 +311,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 ### hier das finale model mit bestmtry und node size einfügen , auch best num.tree anpassen
 
-modelGeschlechtFinal <- modelGeschlechtXX
+modelGeschlechtFinal <- modelGeschlechtRF1
 
 # Print model
 ### hier den Model namen ändern
@@ -342,11 +342,12 @@ confusionMatrix(data=predictions, test_dfGeschlechtMW$weiblich_maennlich)
 #####(nur binär und kategorisch)
 test_roc <- function(model, data) {
   
-  roc(test_dfGeschlechtMW$GeschlechtMW,
+  roc(test_dfGeschlechtMW$weiblich_maennlich,
       predict(model, data, type = "prob")[, "weiblich"])
   
 }
 
+#model auc: 
 modelGeschlechtFinal %>%
   test_roc(data = test_dfGeschlechtMW) %>%
   auc()

@@ -168,10 +168,7 @@ predictions <- predict(modelArbeitend_oder_nichtRF, newdata=test_dfArbeitend_ode
 
 # Create confusion matrix --> nur für classification (binär oder categorical)
 confusionMatrix(data=predictions, test_dfArbeitend_oder_nicht$Arbeitend_oder_nicht)
-
-#save the best mtry 
-
-bestmtry <- modelArbeitend_oder_nichtRF$bestTune$mtry
+ 
 
 #check for AUC 
 #####(nur binär und kategorisch)
@@ -315,7 +312,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 ### hier das finale model mit bestmtry und node size einfügen , auch best num.tree anpassen
 
-modelArbeitend_oder_nichtfinal <- modelArbeitend_oder_nichtXX
+modelArbeitend_oder_nichtfinal <- modelArbeitend_oder_nichtRF
 # Print model
 ### hier den Model namen ändern
 print(modelArbeitend_oder_nichtfinal)

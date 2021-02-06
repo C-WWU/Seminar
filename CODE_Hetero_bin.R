@@ -170,9 +170,7 @@ predictions <- predict(modelHeteroRF, newdata=test_dfHetero)
 # Create confusion matrix --> nur für classification (binär oder categorical)
 confusionMatrix(data=predictions, test_dfHetero$Heterosexuell)
 
-#save the best mtry 
 
-bestmtry <- modelHeteroRF$bestTune$mtry
 
 #check for AUC 
 #####(nur binär und kategorisch)
@@ -316,7 +314,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 ### hier das finale model mit bestmtry und node size einfügen , auch best num.tree anpassen
 
-modelHeterofinal <- modelHeteroXX
+modelHeterofinal <- modelHeteroRF
 # Print model
 ### hier den Model namen ändern
 print(modelHeterofinal)
