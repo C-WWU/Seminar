@@ -944,7 +944,7 @@ summary(data$Accounts_followed)
 table(data$Accounts_followed)
 
 #Ausschluss von respondents, die keinem der Accounts folgen:
-data <- data %>% subset(Accounts_followed > 0)
+#data <- data %>% subset(Accounts_followed > 0)
 
 
 ggplot(data, aes(Accounts_followed))+
@@ -1277,6 +1277,16 @@ save(full, file = 'data_full.RData')
 #reduced set
 write.csv(reduced_set, "/Users/Miriam/Documents/Uni/Master/3. Semester/Seminar SRA/datasets/neu/data_reduced.csv")
 save(reduced_set, file = 'data_reduced.RData')
+
+
+#handle outliers in the dataset
+
+output <- quantile(data$`Duration (in seconds)`, 0.95)
+output1 <- quantile(data$`Duration (in seconds)`, 0.05)
+
+output2 <- quantile(data$Accounts_followed, 0.99)
+output3 <- quantile(data$Accounts_followed, 0.05)
+
 
 
 load("data_for_analysis.RData")
