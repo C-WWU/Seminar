@@ -110,160 +110,6 @@ train_dfZig_ja_nein <- data_Zig_ja_nein[index,]
 test_dfZig_ja_nein <- data_Zig_ja_nein[-index,]
 
 
-#--------------------------------------LOGISTIC REGRESSION/ LINEAR REGRESSION-----------------------------------------------------
-
-
-#-----------------------------------------BUILDING AND TRAINING THE MODEL---------------------------------------------
-
-
-# Specify the type of training method used & number of folds --> bei uns 10-fold Cross-Validation
-
-# hier muss eigentlich nichts geändert werden, es sei denn wir haben ein unbalanced sample, dann müssten wir überlegen welche resampling Methode wir wählen (hier ausgeklammert mit "smote")
-
-myControl = trainControl(
-  method = "cv",
-  number = 10, 
-  verboseIter = TRUE,
-  summaryFunction = twoClassSummary, #für linear raus!! Wenn das benutzt wird, auch ClassProbs = True setzen! und ClassProbs für linear auch raus
-  classProbs = TRUE, #für linear raus
-  allowParallel=TRUE,
-  #sampling = "smote", #wenn unbalanced, dann auch ausprobieren für: sampling = "up" / "down" / "smote"
-  search = "grid"
-)
-
-
-
-# Specify logistic regression model with most important IV's (maybe also these indicated by random forest and our own suggestions)
-
-### DV wird zuerst in den Klammern genannt, das auch immer anpassen. Der Rest kann eigentlich so bleiben. 
-### Aktuell ist hier die Logistische Regression als Method eingetragen. 
-### Wenn man eine lineare Regression bei bspw. dem Alter machen möchte, dann einmal die Method zu "lm" ändern und family zu "linear"?
-### HIER DIE "~ ." WEG UND DIE WICHTIGSTEN VARIABLEN MIT + EINFÜGEN. DIESEN SCHRITT MEHRMALS WIEDERHOLEN UM DAS BESTE MODEL ZU FINDEN
-
-
-
-#--------------first regression: all parameters-----------------
-
-set.seed(1997)
-
-model1 <- train(weiblich_maennlich ~.,
-                data=train_dfGeschlechtMW,
-                method = "glm", family= binomial, ## für mehr als zwei Ausprägungen (z.B. Alkohol) --> method = "multinom"
-                metric = "ROC", #--> for imbalanced data the metric "Kappa" can be used and improves the quality of the final model; for linear regression use "RSME"
-                na.action = na.omit,
-                trControl=myControl)
-
-print(model1)
-summary(model1)
-
-#variable Importance (predictor variables)
-
-### diese Funktion gibt noch einmal die 10 wichtigsten variablen des models aus.
-
-varImp(model1)
-
-#look for most important variables
-ImportanceAll1 <- varImp(model1)$importance
-ImportanceAll1 <- arrange(ImportanceAll1, desc(Overall))
-ImportanceAll1
-
-# Apply model to test_df --> test_dfGeschlecht
-
-# predict outcome using model from train_df applied to the test_df
-
-### hier auch einmal nach dem testdf der DV umbenennen
-
-predictions1 <- predict(model1, newdata=test_dfGeschlechtMW)
-
-
-# Create confusion matrix
-
-confusionMatrix(data=predictions1, test_dfGeschlechtMW$weiblich_maennlich)
-
-
-
-#------second regression: ridge/lasso for shrinking model---------
-
-set.seed(1998)
-
-myGrid <- expand.grid(alpha = 0:1,
-                      lambda = seq(0.0001, 1, length = 100))
-
-model2 <- train(weiblich_maennlich ~ .,
-                data=train_dfGeschlechtMW,
-                method = "glmnet", 
-                metric = "ROC", 
-                na.action = na.omit,
-                tuneGrid = myGrid,
-                trControl=myControl) 
-
-print(model2)
-summary(model2)
-coef(model2$finalModel, model2$finalModel$lambdaOpt)
-
-
-varImp(model2)
-
-ImportanceAll2 <- varImp(model2)$importance
-ImportanceAll2 <- arrange(ImportanceAll2, desc(Overall))
-ImportanceAll2
-
-
-# Apply model to test_df --> test_dfGeschlecht
-
-# predict outcome using model from train_df applied to the test_df
-
-### hier auch einmal nach dem testdf der DV umbenennen
-
-predictions2 <- predict(model2, newdata=test_dfGeschlechtMW)
-
-
-# Create confusion matrix
-
-confusionMatrix(data=predictions2, test_dfGeschlechtMW$weiblich_maennlich)
-
-
-#------------third regression: specify ideal model--------------
-
-set.seed(1999)
-
-model3 <- train(weiblich_maennlich ~ EA_Sports_FIFA + Mady_Morrison + Gamingzelle + Montana_Black + Jens_Knossalla + kicker + Bundeswehr + Christian_Lindner + Die_Partei + Inscope21 + Ischtar_Isik + RB_Leipzig + Reyst + Leon_Skincare + Christoph_Icke_Dommisch + Linda_DIY + NYX_Professional_Makeup + Tiere_suchen_ein_Zuhause + dm + Playboy_Germany,                data=train_dfGeschlechtMW,
-                method = "glm", family= binomial, 
-                metric = "ROC",
-                na.action = na.omit,
-                trControl=myControl) 
-
-print(model3)
-summary(model3)
-
-varImp(model3)
-
-ImportanceAll3 <- varImp(model3)$importance
-ImportanceAll3 <- arrange(ImportanceAll3, desc(Overall))
-ImportanceAll3
-
-
-# Apply model to test_df --> test_dfGeschlecht
-
-# predict outcome using model from train_df applied to the test_df
-
-### hier auch einmal nach dem testdf der DV umbenennen
-
-predictions3 <- predict(model3, newdata=test_dfGeschlechtMW)
-
-
-# Create confusion matrix
-
-confusionMatrix(data=predictions3, test_dfGeschlechtMW$weiblich_maennlich)
-
-
-#----------save best regression model----------------------
-
-bestregression_GeschlechtMW <- model3
-
-#####
-
-
 #---------------------------------------------------RANDOM FOREST----------------------------------------------------
 
 #--------------------------------------------BUILDING AND TRAINING THE MODEL---------------------------------------------
@@ -278,7 +124,7 @@ myControl = trainControl(
   summaryFunction = twoClassSummary, #nur für binär; Wenn das benutzt wird, auch ClassProbs = True setzen!
   classProbs = TRUE,
   allowParallel=TRUE,
-  #sampling = "smote", #wenn sampling, dann hier anpassen und für alle drei Varianten ausprobieren!! (up, down, smote)
+  sampling = "smote", #wenn sampling, dann hier anpassen und für alle drei Varianten ausprobieren!! (up, down, smote)
   search = "grid",
 )
 
@@ -309,7 +155,7 @@ modelZig_ja_nein <- train(Zigaretten_ja_nein ~ .,
 modelZig_ja_nein
 summary(modelZig_ja_nein)
 plot(modelZig_ja_nein)
-#best mtry = 10, splitrule = extratrees, min.node.size = 10
+#best mtry = 12, splitrule = extratrees, min.node.size = 15
 
 # Apply model to test_df --> test_dfGeschlecht
 
@@ -471,7 +317,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 ### hier das finale model mit bestmtry und node size einfügen , auch best num.tree anpassen
 
 set.seed(1997)
-modelZig_ja_neinfinal <- modelZig_ja_nein
+modelZig_ja_neinfinal <- modelZig_ja_nein1
   
   
 # Print model

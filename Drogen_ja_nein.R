@@ -124,7 +124,7 @@ myControl = trainControl(
   summaryFunction = twoClassSummary, #nur für binär; Wenn das benutzt wird, auch ClassProbs = True setzen!
   classProbs = TRUE,
   allowParallel=TRUE,
-  #sampling = "smote", #wenn sampling, dann hier anpassen und für alle drei Varianten ausprobieren!! (up, down, smote)
+  sampling = "smote", #wenn sampling, dann hier anpassen und für alle drei Varianten ausprobieren!! (up, down, smote)
   search = "grid",
 )
 
