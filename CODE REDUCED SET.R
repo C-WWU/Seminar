@@ -51,13 +51,13 @@ library(naniar)
 options(max.print = 100000)
 
 
-#------------------------Analysis Full Dataset------------------------------
+#------------------------Analysis Reduced Dataset------------------------------
 
 # load data 
 
-load("data_for_analysis.RData")
+load("data_reduced.RData")
 
-data <- full
+data <- reduced_set
 
 cols_names <- names(data)  
 cols_names
@@ -12814,7 +12814,7 @@ PartialPlots %>% partial(pred.var = impvar[20], which.class = "Student_in") %>%p
 
 #save model to disk 
 
-  
+
 besttree_Beschaeftigung <- RFBeschaeftigungFinal
 saveRDS(besttree_Beschaeftigung, "./besttree_Beschaeftigung.rds")
 
@@ -16480,6 +16480,5 @@ saveRDS(besttree_Kinder, "./besttree_Kinder.rds")
 
 besttree_Kinder <- readRDS("./besttree_Kinder.rds")
 print(besttree_Kinder)
-
 
 
