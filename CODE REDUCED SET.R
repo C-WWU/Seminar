@@ -63,6 +63,16 @@ cols_names <- names(data)
 cols_names
 
 
+
+#define tuning grid
+myGrid = expand.grid(mtry = c(10:20),
+                     splitrule = "extratrees", 
+                     min.node.size = c(5,10,15))
+
+
+
+
+
 #######################
 #Alter: Age Ranges Categorical (hoch, mittel, niedrig)
 ######################

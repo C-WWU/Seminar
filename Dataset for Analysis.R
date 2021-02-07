@@ -1262,30 +1262,36 @@ write.csv(data, "/Users/Miriam/Documents/Uni/Master/3. Semester/Seminar SRA/data
 save(data, file = 'data_for_analysis.RData')
 
 
+
+#handle outliers in the dataset: define by IQR
+
+duration_zu_groß <- quantile(data$`Duration (in seconds)`, 0.99)
+duration_zu_klein <- quantile(data$`Duration (in seconds)`, 0.01)
+
+Accounts_zu_viele <- quantile(data$Accounts_followed, 0.99)
+Accounts_zu_wenige <- quantile(data$Accounts_followed, 0.01)
+
+
+
 ######
 #define different datasets for analysis: with and without outliers
 
-full <- data
-reduced_set <- data %>% subset(data$`Duration (in seconds)` > 300 & data$Accounts_followed < 150)
+full_set <- data %>% subset(data$Accounts_followed > 0)
+reduced_set <- data %>% subset(data$`Duration (in seconds)` > duration_zu_klein & data$`Duration (in seconds)` < duration_zu_groß & data$Accounts_followed > Accounts_zu_wenige & data$Accounts_followed < Accounts_zu_viele)
+
+
+(duration_zu_klein < data$`Duration (in seconds)` < duration_zu_groß & Accounts_zu_wenige < data$Accounts_followed < Accounts_zu_viele)
 #ACHTUNG noch festlegen und abändern!
 
 #save different datasets as CSV and R Document
 #full set
-write.csv(full, "/Users/Miriam/Documents/Uni/Master/3. Semester/Seminar SRA/datasets/neu/data_full.csv")
-save(full, file = 'data_full.RData')
+write.csv(full_set, "/Users/Miriam/Documents/Uni/Master/3. Semester/Seminar SRA/datasets/neu/data_full.csv")
+save(full_set, file = 'data_full.RData')
 
 #reduced set
 write.csv(reduced_set, "/Users/Miriam/Documents/Uni/Master/3. Semester/Seminar SRA/datasets/neu/data_reduced.csv")
 save(reduced_set, file = 'data_reduced.RData')
 
-
-#handle outliers in the dataset
-
-output <- quantile(data$`Duration (in seconds)`, 0.95)
-output1 <- quantile(data$`Duration (in seconds)`, 0.05)
-
-output2 <- quantile(data$Accounts_followed, 0.99)
-output3 <- quantile(data$Accounts_followed, 0.05)
 
 
 

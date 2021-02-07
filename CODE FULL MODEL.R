@@ -55,12 +55,23 @@ options(max.print = 100000)
 
 # load data 
 
-load("data_for_analysis.RData")
+load("data_full.RData")
 
-data <- full
+data <- full_set
 
 cols_names <- names(data)  
 cols_names
+
+
+
+#define tuning grid
+myGrid = expand.grid(mtry = c(10:20),
+                     splitrule = "extratrees", 
+                     min.node.size = c(5,10,15))
+
+
+
+
 
 
 #######################
