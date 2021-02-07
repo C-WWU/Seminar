@@ -10895,16 +10895,6 @@ print(besttree_Nichtwahler)
 #--------------------------------------DATA PRE-PROCESSING------------------------------------------
 
 
-# load data 
-
-load("data_for_analysis.RData")
-
-#data <- full  #oder ändern zu data <- reduced_set
-
-cols_names <- names(data)  
-cols_names
-
-
 #define data for analysis
 data_Hardliner <- data[,c(307, 27:255)]
 
@@ -10954,16 +10944,6 @@ myControl1 = trainControl(
   allowParallel=TRUE,
   search = "grid"
 )
-
-#set random seed again 
-set.seed(1997)
-
-#set grid for testing ideal mtry and min.node.size
-myGrid = expand.grid(mtry = c(10:20),
-                     splitrule = "extratrees", 
-                     min.node.size = c(5,10,15))
-
-
 
 
 ####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
@@ -11047,6 +11027,11 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   theme_bw(base_size = 18)
 
 
+#save model to disk 
+
+tree500_Corona_Hardliner <- RFHardliner1
+saveRDS(tree500_Corona_Hardliner, "./tree500_Corona_Hardliner.rds")
+
 
 ####-------tree 2: num.tree prüfen --------------------------------------------------
 
@@ -11128,7 +11113,10 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
 
-#better num.trees: 500 trees
+# best model with 500
+
+tree1000_Corona_Hardliner <- RFHardliner2
+saveRDS(tree1000_Corona_Hardliner, "./tree1000_Corona_Hardliner.rds")
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -11270,16 +11258,6 @@ print(besttree_Hardliner)
 #--------------------------------------DATA PRE-PROCESSING------------------------------------------
 
 
-# load data 
-
-load("data_for_analysis.RData")
-
-#data <- full  #oder ändern zu data <- reduced_set
-
-cols_names <- names(data)  
-cols_names
-
-
 #define data for analysis
 data_Softliner <- data[,c(308, 27:255)]
 
@@ -11330,14 +11308,6 @@ myControl1 = trainControl(
   sampling = "smote",
   search = "grid"
 )
-
-#set tuning grid
-
-set.seed(1997)
-
-myGrid = expand.grid(mtry = c(10:20),
-                     splitrule = "extratrees", 
-                     min.node.size = c(5,10,15))
 
 
 
@@ -11420,6 +11390,10 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
 
+#save model to disk 
+
+tree500_Corona_Softliner <- RFSoftliner1
+saveRDS(tree500_Corona_Softliner, "./tree500_Corona_Softliner.rds")
 
 
 ####-------tree 2: num.tree prüfen --------------------------------------------------
@@ -11502,6 +11476,11 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   theme_bw(base_size = 18)
 
 #better num.trees: 500 trees ist minimal besser
+
+#save model to disk 
+
+tree1000_Corona_Softliner <- RFSoftliner2
+saveRDS(tree1000_Corona_Softliner, "./tree1000_Corona_Softliner.rds")
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -11643,16 +11622,6 @@ print(RFSoftliner_fin)
 #--------------------------------------DATA PRE-PROCESSING------------------------------------------
 
 
-# load data 
-
-load("data_for_analysis.RData")
-
-#data <- full  #oder ändern zu data <- reduced_set
-
-cols_names <- names(data)  
-cols_names
-
-
 #define data for analysis
 data_Skeptiker <- data[,c(309, 27:255)]
 
@@ -11704,14 +11673,6 @@ myControl1 = trainControl(
   search = "grid"
 )
 
-
-#set tuning grid
-
-set.seed(1997)
-
-myGrid = expand.grid(mtry = c(10:20),
-                     splitrule = "extratrees", 
-                     min.node.size = c(5,10,15))
 
 
 ####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
@@ -11793,7 +11754,10 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
 
+#save model to disk 
 
+tree500_Corona_Skeptiker <- RFSkeptiker1
+saveRDS(tree500_Corona_Skeptiker, "./tree500_Corona_Skeptiker.rds")
 
 ####-------tree 2: num.tree prüfen --------------------------------------------------
 
@@ -11877,6 +11841,8 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 #better num.trees: 1000 trees --> better predictions!
 
+tree1000_Corona_Skeptiker <- RFSkeptiker2
+saveRDS(tree1000_Corona_Skeptiker, "./tree1000_Corona_Skeptiker.rds")
 
 ####-------tree 3: Final --------------------------------------------------
 
@@ -12010,24 +11976,12 @@ print(besttree_Skeptiker)
 
 
 
-
-
-
 #######################
 #Corona Leugner: binär
 ######################
 
 #--------------------------------------DATA PRE-PROCESSING------------------------------------------
 
-
-# load data 
-
-load("data_for_analysis.RData")
-
-#data <- full  #oder ändern zu data <- reduced_set
-
-cols_names <- names(data)  
-cols_names
 
 
 #define data for analysis
@@ -12080,14 +12034,6 @@ myControl1 = trainControl(
   sampling = "smote",
   search = "grid"
 )
-
-#set tuning grid 
-
-set.seed(1997)
-
-myGrid = expand.grid(mtry = c(10:20),
-                     splitrule = "extratrees", 
-                     min.node.size = c(5,10,15))
 
 
 ####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
@@ -12169,6 +12115,10 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
 
+#save model to disk 
+
+tree500_Corona_Leugner <- RFLeugner1
+saveRDS(tree500_Corona_Leugner, "./tree500_Corona_Leugner.rds")
 
 
 ####-------tree 2: num.tree prüfen --------------------------------------------------
@@ -12250,6 +12200,12 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   theme_bw(base_size = 18)
 
 #better num.trees: 1000 trees --> better predictions
+
+
+#save model to disk 
+
+tree1000_CoronaLeugner <- RFLeugner2
+saveRDS(tree1000_Corona_Leugner, "./tree100_Corona_Leugner.rds")
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -12382,25 +12338,12 @@ print(besttree_Leugner)
 
 
 
-
-
-
-
 #######################
 #Hardliner 1-7: numeric
 ######################
 
 #--------------------------------------DATA PRE-PROCESSING------------------------------------------
 
-
-# load data 
-
-load("data_for_analysis.RData")
-
-#data <- full  #oder ändern zu data <- reduced_set
-
-cols_names <- names(data)  
-cols_names
 
 #define data for analysis
 data_Hardliner_num <- data[,c(278, 27:255)]
@@ -12444,13 +12387,6 @@ myControl = trainControl(
   search = "grid",
 )
 
-#set random seed again 
-
-set.seed(1997)
-
-myGrid = expand.grid(mtry = c(10:20),
-                     splitrule = "extratrees", 
-                     min.node.size = c(5,10,15))
 
 ####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
 
@@ -12494,6 +12430,10 @@ spearmanHard1 <- cor.test(predictions1, test_dfHard_num$Corona_Massnahmen_muesst
 spearmanHard1
 
 
+#save model to disk 
+
+tree500_CoronaHardliner_num <- RFHard_num1
+saveRDS(tree500_CoronaHardliner_num, "./tree500_CoronaHardliner_num.rds")
 
 ####-------tree 2: num.tree prüfen --------------------------------------------------
 
@@ -12538,6 +12478,11 @@ spearmanHard2 <- cor.test(predictions2, test_dfHard_num$Corona_Massnahmen_muesst
 spearmanHard2
 
 #both quite bad but 1000 is a bit better
+
+#save model to disk 
+
+tree1000_CoronaHardliner_num <- RFHard_num2
+saveRDS(tree1000_CoronaHardliner_num, "./tree1000_CoronaHardliner_num.rds")
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -12636,15 +12581,6 @@ print(besttree_Hardliner_num)
 #--------------------------------------DATA PRE-PROCESSING------------------------------------------
 
 
-# load data 
-
-load("data_for_analysis.RData")
-
-#data <- full  #oder ändern zu data <- reduced_set
-
-cols_names <- names(data)  
-cols_names
-
 #define data for analysis
 data_Softliner_num <- data[,c(277, 27:255)]
 
@@ -12687,13 +12623,6 @@ myControl = trainControl(
   search = "grid",
 )
 
-#set tuning grid
-
-set.seed(1997)
-
-myGrid = expand.grid(mtry = c(10:20),
-                     splitrule = "extratrees", 
-                     min.node.size = c(5,10,15))
 
 
 ####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
@@ -12737,6 +12666,10 @@ pearsonSoft1
 spearmanSoft1 <- cor.test(predictions, test_dfSoft_num$Corona_Massnahmen_uebertrieben, method = "spearman")
 spearmanSoft1
 
+#save model to disk 
+
+tree500_CoronaSoftliner_num <- RFSoft_num1
+saveRDS(tree500_CoronaSoftliner_num, "./tree500_CoronaSoftliner_num.rds")
 
 
 ####-------tree 2: num.tree prüfen --------------------------------------------------
@@ -12781,6 +12714,11 @@ spearmanSoft2 <- cor.test(predictions2, test_dfSoft_num$Corona_Massnahmen_uebert
 spearmanSoft2
 
 #num.trees 1000 performs slightly better
+
+#save model to disk 
+
+tree1000_CoronaSoftliner_num <- RFSoft_num2
+saveRDS(tree1000_CoronaSoftliner_num, "./tree1000_CoronaSoftliner_num.rds")
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -12880,15 +12818,6 @@ print(besttree_Softliner_num)
 #--------------------------------------DATA PRE-PROCESSING------------------------------------------
 
 
-# load data 
-
-load("data_for_analysis.RData")
-
-#data <- full  #oder ändern zu data <- reduced_set
-
-cols_names <- names(data)  
-cols_names
-
 #define data for analysis
 data_Skeptik_num <- data[,c(279, 27:255)]
 
@@ -12932,14 +12861,6 @@ myControl = trainControl(
 )
 
 
-#set tuning grid
-
-set.seed(1997)
-
-myGrid = expand.grid(mtry = c(10:20),
-                     splitrule = "extratrees", 
-                     min.node.size = c(5,10,15))
-
 
 ####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
 
@@ -12982,6 +12903,10 @@ pearsonSkeptiker1
 spearmanSkeptiker1 <- cor.test(predictions1, test_Skeptiker_num$Corona_ist_harmlos_gleich_Grippe, method = "spearman")
 spearmanSkeptiker1
 
+#save model to disk 
+
+tree500_CoronaSkeptiker_num <- RFSkeptiker_num1
+saveRDS(tree500_CoronaSkeptiker_num, "./tree500_CoronaSkeptiker_num.rds")
 
 
 ####-------tree 2: num.tree prüfen --------------------------------------------------
@@ -13029,6 +12954,10 @@ spearmanSkeptiker2
 
 #num.trees 1000 performs better
 
+#save model to disk 
+
+tree1000_CoronaSkeptiker_num <- RFSkeptiker_num2
+saveRDS(tree1000_CoronaSkeptiker_num, "./tree1000_CoronaSkeptiker_num.rds")
 
 ####-------tree 3: Final --------------------------------------------------
 
@@ -13127,15 +13056,6 @@ print(besttree_Skeptiker_num)
 #--------------------------------------DATA PRE-PROCESSING------------------------------------------
 
 
-# load data 
-
-load("data_for_analysis.RData")
-
-#data <- full  #oder ändern zu data <- reduced_set
-
-cols_names <- names(data)  
-cols_names
-
 #define data for analysis
 data_Leugner_num <- data[,c(280, 27:255)]
 
@@ -13178,13 +13098,6 @@ myControl = trainControl(
   search = "grid",
 )
 
-#set random seed again 
-
-set.seed(1997)
-
-myGrid = expand.grid(mtry = c(10:20),
-                     splitrule = "extratrees", 
-                     min.node.size = c(5,10,15))
 
 
 ####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
@@ -13228,6 +13141,10 @@ pearsonLeugner1
 spearmanLeugner1 <- cor.test(predictions1, test_dfLeugner_num$Glaube_nicht_an_Corona, method = "spearman")
 spearmanLeugner1
 
+#save model to disk 
+
+tree500_CoronaLeugner_num <- RFLeugner_num1
+saveRDS(tree500_CoronaLeugner_num, "./tree500_CoronaLeugner_num.rds")
 
 
 ####-------tree 2: num.tree prüfen --------------------------------------------------
@@ -13273,6 +13190,11 @@ spearmanLeugner2 <- cor.test(predictions2, test_dfLeugner_num$Glaube_nicht_an_Co
 spearmanLeugner2
 
 #num.trees 500 performs better
+
+#save model to disk 
+
+tree1000_CoronaLeugner_num <- RFLeugner_num2
+saveRDS(tree1000_CoronaLeugner_num, "./tree1000_CoronaLeugner_num.rds")
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -13366,16 +13288,6 @@ print(besttree_Leugner_num)
 #--------------------------------------DATA PRE-PROCESSING------------------------------------------
 
 
-# load data 
-
-load("data_for_analysis.RData")
-
-#data <- full  #oder ändern zu data <- reduced_set
-
-cols_names <- names(data)  
-cols_names
-
-
 #define data for analysis
 data_Einkommen <- data[,c(315, 27:255)]
 
@@ -13428,14 +13340,6 @@ myControl1 = trainControl(
   search = "grid"
 )
 
-#set tuning grid
-
-set.seed(1997)
-
-myGrid = expand.grid(mtry = c(10:20),
-                     splitrule = "extratrees", 
-                     min.node.size = c(5,10,15))
-
 
 ####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
 
@@ -13481,6 +13385,11 @@ test_roc <- function(model, data) {
 RFEinkommen_1 %>%
   test_roc(data = test_dfEinkommen) %>%
   auc()
+
+#save model to disk 
+
+tree500_Einkommen <- RFEinkommen_1
+saveRDS(tree500_Einkommen, "./tree500_Einkommen.rds")
 
 
 
@@ -13529,6 +13438,10 @@ RFEinkommen_2 %>%
 
 #model1: 1000 trees performs better on predictions
 
+#save model to disk 
+
+tree1000_Einkommen <- RFEinkommen_2
+saveRDS(tree1000_Einkommen, "./tree1000_Einkommen.rds")
 
 ####-------tree 3: Final --------------------------------------------------
 
@@ -13671,16 +13584,6 @@ print(besttree_Einkommen)
 #--------------------------------------DATA PRE-PROCESSING------------------------------------------
 
 
-# load data 
-
-load("data_for_analysis.RData")
-
-#data <- full  #oder ändern zu data <- reduced_set
-
-cols_names <- names(data)  
-cols_names
-
-
 #define data for analysis
 data_Durchschnittseinkommen <- data[,c(346, 27:255)]
 
@@ -13731,14 +13634,6 @@ myControl1 = trainControl(
   search = "grid"
 )
 
-
-#set tuning grid
-
-set.seed(1997)
-
-myGrid = expand.grid(mtry = c(10:20),
-                     splitrule = "extratrees", 
-                     min.node.size = c(5,10,15))
 
 
 
@@ -13821,6 +13716,10 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
 
+#save model to disk 
+
+tree500_Durchschnittseinkommen <- RFDurchschnittseinkommen1
+saveRDS(tree500_Durchschnittseinkommen, "./tree500_Durchschnittseinkommen.rds")
 
 
 ####-------tree 2: num.tree prüfen --------------------------------------------------
@@ -13905,6 +13804,12 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   theme_bw(base_size = 18)
 
 #grows very similar trees, thus keep 500 --> we don't need to grow 1000
+
+#save model to disk 
+
+tree1000_Durchschnittseinkommen <- RFDurchschnittseinkommen2
+saveRDS(tree1000_Durchschnittseinkommen, "./tree1000_Durchschnittseinkommen.rds")
+
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -14040,16 +13945,6 @@ print(besttree_Durchschnittseinkommen)
 
 #--------------------------------------DATA PRE-PROCESSING------------------------------------------
 
-
-# load data 
-
-load("data_for_analysis.RData")
-
-#data <- full  #oder ändern zu data <- reduced_set
-
-cols_names <- names(data)  
-cols_names
-
 #define data for analysis
 data_Green1 <- data[,c(305, 27:255)]
 
@@ -14091,13 +13986,6 @@ myControl = trainControl(
   search = "grid",
 )
 
-#set tuning grid
-
-set.seed(1997)
-
-myGrid = expand.grid(mtry = c(10:20),
-                     splitrule = "extratrees", 
-                     min.node.size = c(5,10,15))
 
 
 ####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
@@ -14140,6 +14028,11 @@ pearsonGreen1_1
 
 spearmanGreen1_1 <- cor.test(predictions, test_dfGreen1$Green_Values, method = "spearman")
 spearmanGreen1_1
+
+#save model to disk 
+
+tree500_GreenValues_num <- RFGreen1_1
+saveRDS(tree500_GreenValues_num, "./tree500_GreenValues_num.rds")
 
 
 
@@ -14185,6 +14078,12 @@ spearmanGreen1_2 <- cor.test(predictions, test_dfGreen1$Green_Values, method = "
 spearmanGreen1_2
 
 #num.trees 1000 performs slightly better
+
+#save model to disk 
+
+tree1000_GreenValues_num <- RFGreen1_2
+saveRDS(tree1000_GreenValues_num, "./tree1000_GreenValues_num.rds")
+
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -14281,14 +14180,6 @@ print(super_model)
 
 #--------------------------------------DATA PRE-PROCESSING------------------------------------------
 
-
-# load data 
-
-load("data_for_analysis.RData")
-
-cols_names <- names(data)  
-cols_names
-
 #define data for analysis
 data_Green2 <- data[,c(306, 27:255)]
 
@@ -14334,14 +14225,6 @@ myControl1 = trainControl(
   search = "grid"
 )
 
-
-#set tuning grid
-
-set.seed(1997)
-
-myGrid = expand.grid(mtry = c(10:20),
-                     splitrule = "extratrees", 
-                     min.node.size = c(5,10,15))
 
 
 ####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
@@ -14422,6 +14305,11 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   scale_color_manual(values = custom_col) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
+
+#save model to disk 
+
+tree500_GreenValues_bin <- RFGreen2_1
+saveRDS(tree500_GreenValues_bin, "./tree500_GreenValues_bin.rds")
 
 
 
@@ -14506,6 +14394,12 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   theme_bw(base_size = 18)
 
 #better num.trees: 500 trees sorts 1 person more correctly
+
+#save model to disk 
+
+tree1000_GreenValues_bin <- RFGreen2_2
+saveRDS(tree1000_GreenValues_bin, "./tree1000_GreenValues_bin.rds")
+
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -14644,16 +14538,6 @@ print(besttree_Green2)
 #--------------------------------------DATA PRE-PROCESSING------------------------------------------
 
 
-# load data 
-
-load("data_for_analysis.RData")
-
-#data <- full  #oder ändern zu data <- reduced_set
-
-cols_names <- names(data)  
-cols_names
-
-
 #define data for analysis
 data_Beschaeftigung <- data[,c(10, 27:255)]
 
@@ -14663,12 +14547,20 @@ data_Beschaeftigung <- data_Beschaeftigung %>% subset(data_Beschaeftigung$Bescha
 
 
 #ist die Variable unbalanced?
-table(data_Beschaeftigung$Beschaeftigung) #hohes Einkommen ist unterrepräsentiert, verhältnis ca. 1:6:10 --> Korrektur notwendig!
-max(table(data_Beschaeftigung$Beschaeftigung)/sum(table(data_Beschaeftigung$Beschaeftigung))) #no information rate 61%
+table(data_Beschaeftigung$Beschaeftigung) 
+max(table(data_Beschaeftigung$Beschaeftigung)/sum(table(data_Beschaeftigung$Beschaeftigung))) 
 
 #IV als Faktor:
 data_Beschaeftigung$Beschaeftigung <- as.factor(data_Beschaeftigung$Beschaeftigung)
 
+#Variablennamen anpassen für Analyse
+data_Beschaeftigung <- data_Beschaeftigung %>% mutate(Beschaeftigung = case_when(Beschaeftigung == "Arbeitslos/-suchend" ~ 'Arbeitslos_suchend',
+                                                                                 Beschaeftigung == "Auszubildende/r" ~ 'Auszubildende_r',
+                                                                                 Beschaeftigung == "Berufstätige/r" ~ 'Berufstätige_r',
+                                                                                 Beschaeftigung == "Hausfrau/-mann" ~ 'Hausfrau_mann',
+                                                                                 Beschaeftigung == "Renter/in" ~ 'Renter_in',
+                                                                                 Beschaeftigung == "Schüler/in" ~ 'Schüler_in',
+                                                                                 Beschaeftigung == "Student/in" ~ 'Student_in'))
 
 
 #----------------------------------------DATA PARTITIONING------------------------------------
@@ -14706,13 +14598,7 @@ myControl1 = trainControl(
   search = "grid"
 )
 
-#set tuning grid
 
-set.seed(1997)
-
-myGrid = expand.grid(mtry = c(10:20),
-                     splitrule = "extratrees", 
-                     min.node.size = c(5,10,15))
 
 
 ####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
@@ -14751,7 +14637,7 @@ confusionMatrix(data=as.factor(predictions), as.factor(test_dfBeschaeftigung$Bes
 test_roc <- function(model, data) {
   
   multiclass.roc(test_dfBeschaeftigung$Beschaeftigung,
-                 predict(model, data, type = "prob")[, "Arbeitslos/-suchend"])
+                 predict(model, data, type = "prob")[, "Arbeitslos_suchend"])
   
 }
 
@@ -14759,6 +14645,11 @@ test_roc <- function(model, data) {
 RFBeschaeftigung %>%
   test_roc(data = test_dfBeschaeftigung) %>%
   auc()
+
+#save model to disk 
+
+tree500_Beschaeftigung <- RFBeschaeftigung
+saveRDS(tree500_Beschaeftigung, "./tree500_Beschaeftigung.rds")
 
 
 
@@ -14794,7 +14685,7 @@ confusionMatrix(data=as.factor(predictions2), as.factor(test_dfBeschaeftigung$Be
 test_roc <- function(model, data) {
   
   multiclass.roc(test_dfBeschaeftigung$Beschaeftigung,
-                 predict(model, data, type = "prob")[, "Arbeitslos/-suchend"])
+                 predict(model, data, type = "prob")[, "Arbeitslos_suchend"])
   
 }
 
@@ -14806,13 +14697,18 @@ RFBeschaeftigung1 %>%
 
 #model1: 500 trees performs better
 
+#save model to disk 
+
+tree1000_Beschaeftigung <- RFBeschaeftigung1
+saveRDS(tree1000_Beschaeftigung, "./tree1000_Beschaeftigung.rds")
+
 
 ####-------tree 3: Final --------------------------------------------------
 
 #final model
 
 set.seed(1997)
-RFBeschaeftigungFinal <- RFBeschaeftigungXX
+RFBeschaeftigungFinal <- RFBeschaeftigung1
 
 # Print models
 RFBeschaeftigungFinal 
@@ -14835,7 +14731,7 @@ confusionMatrix(data=as.factor(predictions3), as.factor(test_dfBeschaeftigung$Be
 test_roc <- function(model, data) {
   
   multiclass.roc(test_dfBeschaeftigung$Beschaeftigung,
-                 predict(model, data, type = "prob")[, "Arbeitslos/-suchend"])
+                 predict(model, data, type = "prob")[, "Arbeitslos_suchend"])
   
 }
 
@@ -14861,170 +14757,167 @@ impvar <- impvar[1:20]
 
 PartialPlots <- RFBeschaeftigungFinal 
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "Arbeitslos/-suchend") %>%plotPartial (main = "Arbeitslos/-suchend")
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "Arbeitslos/-suchend") %>%plotPartial(main = "Arbeitslos/-suchend")
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "Arbeitslos/-suchend") %>%plotPartial(main = "Arbeitslos/-suchend")
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "Arbeitslos/-suchend") %>%plotPartial(main = "Arbeitslos/-suchend")
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "Arbeitslos/-suchend") %>%plotPartial(main = "Arbeitslos/-suchend")
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "Arbeitslos/-suchend") %>%plotPartial(main = "Arbeitslos/-suchend")
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "Arbeitslos/-suchend") %>%plotPartial(main = "Arbeitslos/-suchend")
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "Arbeitslos/-suchend") %>%plotPartial(main = "Arbeitslos/-suchend")
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "Arbeitslos/-suchend") %>%plotPartial(main = "Arbeitslos/-suchend")
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "Arbeitslos/-suchend") %>%plotPartial(main = "Arbeitslos/-suchend")
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "Arbeitslos/-suchend") %>%plotPartial(main = "Arbeitslos/-suchend")
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "Arbeitslos/-suchend") %>%plotPartial(main = "Arbeitslos/-suchend")
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "Arbeitslos/-suchend") %>%plotPartial(main = "Arbeitslos/-suchend")
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "Arbeitslos/-suchend") %>%plotPartial(main = "Arbeitslos/-suchend")
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "Arbeitslos/-suchend") %>%plotPartial(main = "Arbeitslos/-suchend")
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "Arbeitslos/-suchend") %>%plotPartial(main = "Arbeitslos/-suchend")
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "Arbeitslos/-suchend") %>%plotPartial(main = "Arbeitslos/-suchend")
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "Arbeitslos/-suchend") %>%plotPartial(main = "Arbeitslos/-suchend")
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "Arbeitslos/-suchend") %>%plotPartial(main = "Arbeitslos/-suchend")
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "Arbeitslos/-suchend") %>%plotPartial(main = "Arbeitslos/-suchend")
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "Arbeitslos_suchend") %>%plotPartial (main = "Arbeitslos_suchend")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "Arbeitslos_suchend") %>%plotPartial(main = "Arbeitslos_suchend")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "Arbeitslos_suchend") %>%plotPartial(main = "Arbeitslos_suchend")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "Arbeitslos_suchend") %>%plotPartial(main = "Arbeitslos_suchend")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "Arbeitslos_suchend") %>%plotPartial(main = "Arbeitslos_suchend")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "Arbeitslos_suchend") %>%plotPartial(main = "Arbeitslos_suchend")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "Arbeitslos_suchend") %>%plotPartial(main = "Arbeitslos_suchend")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "Arbeitslos_suchend") %>%plotPartial(main = "Arbeitslos_suchend")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "Arbeitslos_suchend") %>%plotPartial(main = "Arbeitslos_suchend")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "Arbeitslos_suchend") %>%plotPartial(main = "Arbeitslos_suchend")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "Arbeitslos_suchend") %>%plotPartial(main = "Arbeitslos_suchend")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "Arbeitslos_suchend") %>%plotPartial(main = "Arbeitslos_suchend")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "Arbeitslos_suchend") %>%plotPartial(main = "Arbeitslos_suchend")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "Arbeitslos_suchend") %>%plotPartial(main = "Arbeitslos_suchend")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "Arbeitslos_suchend") %>%plotPartial(main = "Arbeitslos_suchend")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "Arbeitslos_suchend") %>%plotPartial(main = "Arbeitslos_suchend")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "Arbeitslos_suchend") %>%plotPartial(main = "Arbeitslos_suchend")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "Arbeitslos_suchend") %>%plotPartial(main = "Arbeitslos_suchend")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "Arbeitslos_suchend") %>%plotPartial(main = "Arbeitslos_suchend")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "Arbeitslos_suchend") %>%plotPartial(main = "Arbeitslos_suchend")
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "Auszubildende/r") %>%plotPartial(main = "Auszubildende/r")
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "Auszubildende/r") %>%plotPartial(main = "Auszubildende/r")
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "Auszubildende/r") %>%plotPartial(main = "Auszubildende/r")
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "Auszubildende/r") %>%plotPartial(main = "Auszubildende/r")
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "Auszubildende/r") %>%plotPartial(main = "Auszubildende/r")
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "Auszubildende/r") %>%plotPartial(main = "Auszubildende/r")
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "Auszubildende/r") %>%plotPartial(main = "Auszubildende/r")
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "Auszubildende/r") %>%plotPartial(main = "Auszubildende/r")
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "Auszubildende/r") %>%plotPartial(main = "Auszubildende/r")
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "Auszubildende/r") %>%plotPartial(main = "Auszubildende/r")
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "Auszubildende/r") %>%plotPartial(main = "Auszubildende/r")
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "Auszubildende/r") %>%plotPartial(main = "Auszubildende/r")
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "Auszubildende/r") %>%plotPartial(main = "Auszubildende/r")
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "Auszubildende/r") %>%plotPartial(main = "Auszubildende/r")
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "Auszubildende/r") %>%plotPartial(main = "Auszubildende/r")
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "Auszubildende/r") %>%plotPartial(main = "Auszubildende/r")
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "Auszubildende/r") %>%plotPartial(main = "Auszubildende/r")
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "Auszubildende/r") %>%plotPartial(main = "Auszubildende/r")
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "Auszubildende/r") %>%plotPartial(main = "Auszubildende/r")
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "Auszubildende/r") %>%plotPartial(main = "Auszubildende/r")
-
-
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "Berufstätige/r") %>%plotPartial(main = "Berufstätige/r")
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "Berufstätige/r") %>%plotPartial(main = "Berufstätige/r")
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "Berufstätige/r") %>%plotPartial(main = "Berufstätige/r")
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "Berufstätige/r") %>%plotPartial(main = "Berufstätige/r")
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "Berufstätige/r") %>%plotPartial(main = "Berufstätige/r")
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "Berufstätige/r") %>%plotPartial(main = "Berufstätige/r")
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "Berufstätige/r") %>%plotPartial(main = "Berufstätige/r")
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "Berufstätige/r") %>%plotPartial(main = "Berufstätige/r")
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "Berufstätige/r") %>%plotPartial(main = "Berufstätige/r")
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "Berufstätige/r") %>%plotPartial(main = "Berufstätige/r")
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "Berufstätige/r") %>%plotPartial(main = "Berufstätige/r")
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "Berufstätige/r") %>%plotPartial(main = "Berufstätige/r")
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "Berufstätige/r") %>%plotPartial(main = "Berufstätige/r")
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "Berufstätige/r") %>%plotPartial(main = "Berufstätige/r")
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "Berufstätige/r") %>%plotPartial(main = "Berufstätige/r")
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "Berufstätige/r") %>%plotPartial(main = "Berufstätige/r")
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "Berufstätige/r") %>%plotPartial(main = "Berufstätige/r")
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "Berufstätige/r") %>%plotPartial(main = "Berufstätige/r")
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "Berufstätige/r") %>%plotPartial(main = "Berufstätige/r")
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "Berufstätige/r") %>%plotPartial(main = "Berufstätige/r")
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "Auszubildende_r") %>%plotPartial(main = "Auszubildende_r")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "Auszubildende_r") %>%plotPartial(main = "Auszubildende_r")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "Auszubildende_r") %>%plotPartial(main = "Auszubildende_r")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "Auszubildende_r") %>%plotPartial(main = "Auszubildende_r")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "Auszubildende_r") %>%plotPartial(main = "Auszubildende_r")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "Auszubildende_r") %>%plotPartial(main = "Auszubildende_r")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "Auszubildende_r") %>%plotPartial(main = "Auszubildende_r")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "Auszubildende_r") %>%plotPartial(main = "Auszubildende_r")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "Auszubildende_r") %>%plotPartial(main = "Auszubildende_r")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "Auszubildende_r") %>%plotPartial(main = "Auszubildende_r")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "Auszubildende_r") %>%plotPartial(main = "Auszubildende_r")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "Auszubildende_r") %>%plotPartial(main = "Auszubildende_r")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "Auszubildende_r") %>%plotPartial(main = "Auszubildende_r")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "Auszubildende_r") %>%plotPartial(main = "Auszubildende_r")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "Auszubildende_r") %>%plotPartial(main = "Auszubildende_r")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "Auszubildende_r") %>%plotPartial(main = "Auszubildende_r")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "Auszubildende_r") %>%plotPartial(main = "Auszubildende_r")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "Auszubildende_r") %>%plotPartial(main = "Auszubildende_r")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "Auszubildende_r") %>%plotPartial(main = "Auszubildende_r")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "Auszubildende_r") %>%plotPartial(main = "Auszubildende_r")
 
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "Hausfrau/-mann") %>%plotPartial(main = "Hausfrau/-mann")
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "Hausfrau/-mann") %>%plotPartial(main = "Hausfrau/-mann")
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "Hausfrau/-mann") %>%plotPartial(main = "Hausfrau/-mann")
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "Hausfrau/-mann") %>%plotPartial(main = "Hausfrau/-mann")
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "Hausfrau/-mann") %>%plotPartial(main = "Hausfrau/-mann")
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "Hausfrau/-mann") %>%plotPartial(main = "Hausfrau/-mann")
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "Hausfrau/-mann") %>%plotPartial(main = "Hausfrau/-mann")
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "Hausfrau/-mann") %>%plotPartial(main = "Hausfrau/-mann")
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "Hausfrau/-mann") %>%plotPartial(main = "Hausfrau/-mann")
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "Hausfrau/-mann") %>%plotPartial(main = "Hausfrau/-mann")
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "Hausfrau/-mann") %>%plotPartial(main = "Hausfrau/-mann")
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "Hausfrau/-mann") %>%plotPartial(main = "Hausfrau/-mann")
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "Hausfrau/-mann") %>%plotPartial(main = "Hausfrau/-mann")
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "Hausfrau/-mann") %>%plotPartial(main = "Hausfrau/-mann")
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "Hausfrau/-mann") %>%plotPartial(main = "Hausfrau/-mann")
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "Hausfrau/-mann") %>%plotPartial(main = "Hausfrau/-mann")
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "Hausfrau/-mann") %>%plotPartial(main = "Hausfrau/-mann")
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "Hausfrau/-mann") %>%plotPartial(main = "Hausfrau/-mann")
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "Hausfrau/-mann") %>%plotPartial(main = "Hausfrau/-mann")
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "Hausfrau/-mann") %>%plotPartial(main = "Hausfrau/-mann")
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "Berufstätige_r") %>%plotPartial(main = "Berufstätige_r")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "Berufstätige_r") %>%plotPartial(main = "Berufstätige_r")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "Berufstätige_r") %>%plotPartial(main = "Berufstätige_r")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "Berufstätige_r") %>%plotPartial(main = "Berufstätige_r")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "Berufstätige_r") %>%plotPartial(main = "Berufstätige_r")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "Berufstätige_r") %>%plotPartial(main = "Berufstätige_r")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "Berufstätige_r") %>%plotPartial(main = "Berufstätige_r")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "Berufstätige_r") %>%plotPartial(main = "Berufstätige_r")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "Berufstätige_r") %>%plotPartial(main = "Berufstätige_r")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "Berufstätige_r") %>%plotPartial(main = "Berufstätige_r")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "Berufstätige_r") %>%plotPartial(main = "Berufstätige_r")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "Berufstätige_r") %>%plotPartial(main = "Berufstätige_r")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "Berufstätige_r") %>%plotPartial(main = "Berufstätige_r")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "Berufstätige_r") %>%plotPartial(main = "Berufstätige_r")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "Berufstätige_r") %>%plotPartial(main = "Berufstätige_r")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "Berufstätige_r") %>%plotPartial(main = "Berufstätige_r")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "Berufstätige_r") %>%plotPartial(main = "Berufstätige_r")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "Berufstätige_r") %>%plotPartial(main = "Berufstätige_r")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "Berufstätige_r") %>%plotPartial(main = "Berufstätige_r")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "Berufstätige_r") %>%plotPartial(main = "Berufstätige_r")
 
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "Rentner/in") %>%plotPartial(main = "Rentner/in")
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "Rentner/in") %>%plotPartial(main = "Rentner/in")
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "Rentner/in") %>%plotPartial(main = "Rentner/in")
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "Rentner/in") %>%plotPartial(main = "Rentner/in")
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "Rentner/in") %>%plotPartial(main = "Rentner/in")
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "Rentner/in") %>%plotPartial(main = "Rentner/in")
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "Rentner/in") %>%plotPartial(main = "Rentner/in")
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "Rentner/in") %>%plotPartial(main = "Rentner/in")
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "Rentner/in") %>%plotPartial(main = "Rentner/in")
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "Rentner/in") %>%plotPartial(main = "Rentner/in")
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "Rentner/in") %>%plotPartial(main = "Rentner/in")
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "Rentner/in") %>%plotPartial(main = "Rentner/in")
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "Rentner/in") %>%plotPartial(main = "Rentner/in")
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "Rentner/in") %>%plotPartial(main = "Rentner/in")
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "Rentner/in") %>%plotPartial(main = "Rentner/in")
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "Rentner/in") %>%plotPartial(main = "Rentner/in")
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "Rentner/in") %>%plotPartial(main = "Rentner/in")
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "Rentner/in") %>%plotPartial(main = "Rentner/in")
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "Rentner/in") %>%plotPartial(main = "Rentner/in")
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "Rentner/in") %>%plotPartial(main = "Rentner/in")
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "Hausfrau_mann") %>%plotPartial(main = "Hausfrau_mann")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "Hausfrau_mann") %>%plotPartial(main = "Hausfrau_mann")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "Hausfrau_mann") %>%plotPartial(main = "Hausfrau_mann")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "Hausfrau_mann") %>%plotPartial(main = "Hausfrau_mann")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "Hausfrau_mann") %>%plotPartial(main = "Hausfrau_mann")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "Hausfrau_mann") %>%plotPartial(main = "Hausfrau_mann")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "Hausfrau_mann") %>%plotPartial(main = "Hausfrau_mann")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "Hausfrau_mann") %>%plotPartial(main = "Hausfrau_mann")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "Hausfrau_mann") %>%plotPartial(main = "Hausfrau_mann")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "Hausfrau_mann") %>%plotPartial(main = "Hausfrau_mann")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "Hausfrau_mann") %>%plotPartial(main = "Hausfrau_mann")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "Hausfrau_mann") %>%plotPartial(main = "Hausfrau_mann")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "Hausfrau_mann") %>%plotPartial(main = "Hausfrau_mann")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "Hausfrau_mann") %>%plotPartial(main = "Hausfrau_mann")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "Hausfrau_mann") %>%plotPartial(main = "Hausfrau_mann")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "Hausfrau_mann") %>%plotPartial(main = "Hausfrau_mann")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "Hausfrau_mann") %>%plotPartial(main = "Hausfrau_mann")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "Hausfrau_mann") %>%plotPartial(main = "Hausfrau_mann")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "Hausfrau_mann") %>%plotPartial(main = "Hausfrau_mann")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "Hausfrau_mann") %>%plotPartial(main = "Hausfrau_mann")
 
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "Schüler/in") %>%plotPartial(main = "Schüler/in")
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "Schüler/in") %>%plotPartial(main = "Schüler/in")
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "Schüler/in") %>%plotPartial(main = "Schüler/in")
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "Schüler/in") %>%plotPartial(main = "Schüler/in")
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "Schüler/in") %>%plotPartial(main = "Schüler/in")
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "Schüler/in") %>%plotPartial(main = "Schüler/in")
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "Schüler/in") %>%plotPartial(main = "Schüler/in")
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "Schüler/in") %>%plotPartial(main = "Schüler/in")
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "Schüler/in") %>%plotPartial(main = "Schüler/in")
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "Schüler/in") %>%plotPartial(main = "Schüler/in")
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "Schüler/in") %>%plotPartial(main = "Schüler/in")
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "Schüler/in") %>%plotPartial(main = "Schüler/in")
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "Schüler/in") %>%plotPartial(main = "Schüler/in")
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "Schüler/in") %>%plotPartial(main = "Schüler/in")
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "Schüler/in") %>%plotPartial(main = "Schüler/in")
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "Schüler/in") %>%plotPartial(main = "Schüler/in")
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "Schüler/in") %>%plotPartial(main = "Schüler/in")
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "Schüler/in") %>%plotPartial(main = "Schüler/in")
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "Schüler/in") %>%plotPartial(main = "Schüler/in")
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "Schüler/in") %>%plotPartial(main = "Schüler/in")
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "Rentner_in") %>%plotPartial(main = "Rentner_in")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "Rentner_in") %>%plotPartial(main = "Rentner_in")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "Rentner_in") %>%plotPartial(main = "Rentner_in")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "Rentner_in") %>%plotPartial(main = "Rentner_in")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "Rentner_in") %>%plotPartial(main = "Rentner_in")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "Rentner_in") %>%plotPartial(main = "Rentner_in")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "Rentner_in") %>%plotPartial(main = "Rentner_in")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "Rentner_in") %>%plotPartial(main = "Rentner_in")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "Rentner_in") %>%plotPartial(main = "Rentner_in")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "Rentner_in") %>%plotPartial(main = "Rentner_in")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "Rentner_in") %>%plotPartial(main = "Rentner_in")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "Rentner_in") %>%plotPartial(main = "Rentner_in")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "Rentner_in") %>%plotPartial(main = "Rentner_in")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "Rentner_in") %>%plotPartial(main = "Rentner_in")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "Rentner_in") %>%plotPartial(main = "Rentner_in")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "Rentner_in") %>%plotPartial(main = "Rentner_in")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "Rentner_in") %>%plotPartial(main = "Rentner_in")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "Rentner_in") %>%plotPartial(main = "Rentner_in")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "Rentner_in") %>%plotPartial(main = "Rentner_in")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "Rentner_in") %>%plotPartial(main = "Rentner_in")
 
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "Student/in") %>%plotPartial(main = "Student/in")
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "Student/in") %>%plotPartial(main = "Student/in")
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "Student/in") %>%plotPartial(main = "Student/in")
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "Student/in") %>%plotPartial(main = "Student/in")
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "Student/in") %>%plotPartial(main = "Student/in")
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "Student/in") %>%plotPartial(main = "Student/in")
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "Student/in") %>%plotPartial(main = "Student/in")
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "Student/in") %>%plotPartial(main = "Student/in")
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "Student/in") %>%plotPartial(main = "Student/in")
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "Student/in") %>%plotPartial(main = "Student/in")
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "Student/in") %>%plotPartial(main = "Student/in")
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "Student/in") %>%plotPartial(main = "Student/in")
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "Student/in") %>%plotPartial(main = "Student/in")
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "Student/in") %>%plotPartial(main = "Student/in")
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "Student/in") %>%plotPartial(main = "Student/in")
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "Student/in") %>%plotPartial(main = "Student/in")
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "Student/in") %>%plotPartial(main = "Student/in")
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "Student/in") %>%plotPartial(main = "Student/in")
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "Student/in") %>%plotPartial(main = "Student/in")
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "Student/in") %>%plotPartial(main = "Student/in")
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "Schüler_in") %>%plotPartial(main = "Schüler_in")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "Schüler_in") %>%plotPartial(main = "Schüler_in")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "Schüler_in") %>%plotPartial(main = "Schüler_in")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "Schüler_in") %>%plotPartial(main = "Schüler_in")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "Schüler_in") %>%plotPartial(main = "Schüler_in")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "Schüler_in") %>%plotPartial(main = "Schüler_in")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "Schüler_in") %>%plotPartial(main = "Schüler_in")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "Schüler_in") %>%plotPartial(main = "Schüler_in")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "Schüler_in") %>%plotPartial(main = "Schüler_in")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "Schüler_in") %>%plotPartial(main = "Schüler_in")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "Schüler_in") %>%plotPartial(main = "Schüler_in")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "Schüler_in") %>%plotPartial(main = "Schüler_in")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "Schüler_in") %>%plotPartial(main = "Schüler_in")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "Schüler_in") %>%plotPartial(main = "Schüler_in")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "Schüler_in") %>%plotPartial(main = "Schüler_in")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "Schüler_in") %>%plotPartial(main = "Schüler_in")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "Schüler_in") %>%plotPartial(main = "Schüler_in")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "Schüler_in") %>%plotPartial(main = "Schüler_in")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "Schüler_in") %>%plotPartial(main = "Schüler_in")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "Schüler_in") %>%plotPartial(main = "Schüler_in")
+
+
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "Student_in") %>%plotPartial(main = "Student_in")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "Student_in") %>%plotPartial(main = "Student_in")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "Student_in") %>%plotPartial(main = "Student_in")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "Student_in") %>%plotPartial(main = "Student_in")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "Student_in") %>%plotPartial(main = "Student_in")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "Student_in") %>%plotPartial(main = "Student_in")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "Student_in") %>%plotPartial(main = "Student_in")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "Student_in") %>%plotPartial(main = "Student_in")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "Student_in") %>%plotPartial(main = "Student_in")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "Student_in") %>%plotPartial(main = "Student_in")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "Student_in") %>%plotPartial(main = "Student_in")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "Student_in") %>%plotPartial(main = "Student_in")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "Student_in") %>%plotPartial(main = "Student_in")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "Student_in") %>%plotPartial(main = "Student_in")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "Student_in") %>%plotPartial(main = "Student_in")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "Student_in") %>%plotPartial(main = "Student_in")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "Student_in") %>%plotPartial(main = "Student_in")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "Student_in") %>%plotPartial(main = "Student_in")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "Student_in") %>%plotPartial(main = "Student_in")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "Student_in") %>%plotPartial(main = "Student_in")
 
 
 #------------------------------------------------WHEN BEST MODEL IS FOUND-----------------------------------------------------
 
 #save model to disk 
 
-besttree_Einkommen <- RFEinkommen_fin
-saveRDS(besttree_Einkommen, "./tree_Einkommen.rds")
+  
+besttree_Beschaeftigung <- RFBeschaeftigungFinal
+saveRDS(besttree_Beschaeftigung, "./besttree_Beschaeftigung.rds")
 
-#load the model
-
-besttree_Einkommen <- readRDS("./tree_Einkommen.rds")
-print(besttree_Einkommen)
 
 
 
@@ -15035,40 +14928,23 @@ print(besttree_Einkommen)
 
 #--------------------------------------DATA PRE-PROCESSING------------------------------------------
 
-# load data 
-
-load("data_for_analysis.RData")
-
-#data <- full  #oder ändern zu data <- reduced_set
-
-cols_names <- names(data)  
-cols_names
-
-###hier: Zeilen anpassen, die wir auswählen, und Dateienname ändern zu jew. Variable
-
-# c(313 --> das ist hier die column wo die Dv drin ist, in dem Fall weiblich_maennlich)
-# c(27:255 --> das sind unsere IV's, sprich die Accounts)
+#define data for analysis
 data_Arbeitend_oder_nicht <- data[,c(317, 27:255)]
 
-
-### es ist besonders wichtig die gewünschte DV in einen Faktor zu transformieren, da "caret" nicht mit 0/1 ausprägungen umgehen kann, wenn das model trainiert werden soll. 
-###nur für binär/categorical
 cols_Arbeitend_oder_nicht <- names(data_Arbeitend_oder_nicht)
 
 
-# Convert factor names of trial to caret compatible format (1 and 0 as numbers are not allowed)
+# Convert to factor
 data_Arbeitend_oder_nicht$Arbeitend_oder_nicht = as.factor(data_Arbeitend_oder_nicht$Arbeitend_oder_nicht)
 
 
 #Gibt es NAs in der DV?
-sum(is.na(data_Arbeitend_oder_nicht$Arbeitend_oder_nicht)) #keine NAs
-###folgende Kommentierung und Code nur drin lassen und anpassen, wenn es NAs gibt --> bitte prüfen, dass der Code auch das richtige macht :)
-#Respondents mit NAs für diese Variable löschen (NAs stehen nur, wenn Respondent "Keine Angabe" gemacht hat, daher bedeutet löschen keinen Informationsverlust)
+sum(is.na(data_Arbeitend_oder_nicht$Arbeitend_oder_nicht)) 
 data_Arbeitend_oder_nicht <- data_Arbeitend_oder_nicht %>% subset(data_Arbeitend_oder_nicht$Arbeitend_oder_nicht != "NA")
 
 
 #ist die Variable unbalanced?
-table(data_Arbeitend_oder_nicht$Arbeitend_oder_nicht) #Verteilung in Ordnung
+table(data_Arbeitend_oder_nicht$Arbeitend_oder_nicht)
 max(table(data_Arbeitend_oder_nicht$Arbeitend_oder_nicht)/sum(table(data_Arbeitend_oder_nicht$Arbeitend_oder_nicht))) #no information rate 61%
 
 
@@ -15076,23 +14952,14 @@ max(table(data_Arbeitend_oder_nicht$Arbeitend_oder_nicht)/sum(table(data_Arbeite
 #----------------------------------------DATA PARTITIONING------------------------------------
 
 
-
-### ACHTUNG DAS DATA SET NUR SPLITTEN WENN NOCH NICHT VORHER FÜR DIE DV GEMACHT. ANSONSTEN STEP ÜBERSPRINGEN
-
 #Training und Test Dataset
 set.seed(1997)
 
 # Partitioning of the data: Create index matrix of selected values
 
-### hier einmal das vorhin definierte dataframe auswählen und nach dem $ die gewünschte DV eintragen. 
-### p=0.8 heißt das data set wird nach der 80/20 regel in training und test data set geteilt. 
-### Könnte  man auch anpassen in 70/30 oder 75/25 wie Kübler das in seinem Buch geschrieben hat. 
-
 index <- createDataPartition(data_Arbeitend_oder_nicht$Arbeitend_oder_nicht, p=.8, list= FALSE, times= 1)
 
-# Create train_dfGeschlecht & test_dfGeschlecht
-
-### name anpassen an DV
+# split into train and test set
 
 train_dfArbeitend_oder_nicht <- data_Arbeitend_oder_nicht[index,]
 test_dfArbeitend_oder_nicht <- data_Arbeitend_oder_nicht[-index,]
@@ -15122,12 +14989,6 @@ myControl = trainControl(
 # test of the ideal mtry, splitrule and min-node.size
 
 set.seed(1997)
-
-myGrid = expand.grid(mtry = c(10:20),
-                     splitrule = "extratrees", 
-                     min.node.size = c(5,10,15))
-
-
 modelArbeitend_oder_nichtRF <- train(Arbeitend_oder_nicht ~ ., 
                                      data=train_dfArbeitend_oder_nicht,
                                      tuneGrid = myGrid,
@@ -15146,22 +15007,15 @@ plot(modelArbeitend_oder_nichtRF)
 
 #best mtry = 18, splitrule = extratrees, min.node.size = 10
 
-# Apply model to test_df --> test_dfGeschlecht
 
 # predict outcome using model from train_df applied to the test_df
-
-### hier auch einmal nach dem testdf der DV umbenennen
 predictions <- predict(modelArbeitend_oder_nichtRF, newdata=test_dfArbeitend_oder_nicht)
 
 # Create confusion matrix --> nur für classification (binär oder categorical)
 confusionMatrix(data=predictions, test_dfArbeitend_oder_nicht$Arbeitend_oder_nicht)
 
-#save the best mtry 
-
-bestmtry <- modelArbeitend_oder_nichtRF$bestTune$mtry
 
 #check for AUC 
-#####(nur binär und kategorisch)
 test_roc <- function(model, data) {
   
   roc(test_dfArbeitend_oder_nicht$Arbeitend_oder_nicht,
@@ -15173,7 +15027,6 @@ modelArbeitend_oder_nichtRF %>%
   test_roc(data = test_dfArbeitend_oder_nicht) %>%
   auc()
 
-###nur für binär (von hier bis Ende des Abschnitts)
 #compare different ROC-plots
 model_list <- list(M1 = modelArbeitend_oder_nichtRF)
 
@@ -15209,12 +15062,14 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
 
+#save model to disk 
 
+tree500_Arbeitend_oder_nicht <- modelArbeitend_oder_nichtRF
+saveRDS(tree500_Arbeitend_oder_nicht, "./tree500_Arbeitend_oder_nicht.rds")
 
 ####-------tree 2: num.tree prüfen --------------------------------------------------
 
 # test of ideal num.tree --> try if numtree 1000 leads to better results!
-###mtry, splitrule und min.node.size zu dem anpassen, was tree 1 gefunden hat!
 
 set.seed(1997)
 modelArbeitend_oder_nichtRF1 <- train(Arbeitend_oder_nicht ~ ., 
@@ -15233,11 +15088,8 @@ modelArbeitend_oder_nichtRF1
 summary(modelArbeitend_oder_nichtRF1)
 plot(modelArbeitend_oder_nichtRF1)
 
-# Apply model to test_df --> test_dfGeschlecht
 
 # predict outcome using model from train_df applied to the test_df
-
-### hier auch einmal nach dem testdf der DV umbenennen
 predictions <- predict(modelArbeitend_oder_nichtRF1, newdata=test_dfArbeitend_oder_nicht)
 
 # Create confusion matrix --> nur für classification
@@ -15245,7 +15097,6 @@ confusionMatrix(data=predictions, test_dfArbeitend_oder_nicht$Arbeitend_oder_nic
 
 
 #check for AUC 
-#####(nur binär und kategorisch) (von hier bis Ende des Abschnitts)
 test_roc <- function(model, data) {
   
   roc(test_dfArbeitend_oder_nicht$Arbeitend_oder_nicht,
@@ -15257,7 +15108,6 @@ modelArbeitend_oder_nichtRF1 %>%
   test_roc(data = test_dfArbeitend_oder_nicht) %>%
   auc()
 
-###nur für binär
 #compare different ROC-plots
 model_list <- list(M1 = modelArbeitend_oder_nichtRF1)
 
@@ -15294,17 +15144,21 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   theme_bw(base_size = 18)
 
 
+#save model to disk 
+
+tree1000_Arbeitend_oder_nicht <- modelArbeitend_oder_nichtRF1
+saveRDS(tree1000_Arbeitend_oder_nicht, "./tree1000_Arbeitend_oder_nicht.rds")
 
 
 #fit model with num.trees = xx trees (better performance)
 
 ####-------tree 3: Final --------------------------------------------------
 
-### hier das finale model mit bestmtry und node size einfügen , auch best num.tree anpassen
 
-modelArbeitend_oder_nichtfinal <- modelArbeitend_oder_nichtXX
+modelArbeitend_oder_nichtfinal <- modelArbeitend_oder_nichtRF
+
+
 # Print model
-### hier den Model namen ändern
 print(modelArbeitend_oder_nichtfinal)
 
 #output in terms of regression coefficients
@@ -15312,16 +15166,12 @@ summary(modelArbeitend_oder_nichtfinal)
 
 #evaluate variable importance 
 # Mean Decrease Gini - Measure of variable importance based on the Gini impurity index used for the calculation of splits in trees.
-### hier auch den model namen ändern
 
 varImp(modelArbeitend_oder_nichtfinal)
 plot(varImp(modelArbeitend_oder_nichtfinal), 20, main = "Arbeitend oder Nicht")
 
-# Apply model to test_df --> test_dfGeschlecht
 
 # predict outcome using model from train_df applied to the test_df
-
-### hier auch einmal nach dem testdf der DV umbenennen
 predictions <- predict(modelArbeitend_oder_nichtfinal, newdata=test_dfArbeitend_oder_nicht)
 
 # Create confusion matrix --> nur für classification
@@ -15329,7 +15179,6 @@ confusionMatrix(data=predictions, test_dfArbeitend_oder_nicht$Arbeitend_oder_nic
 
 
 #check for AUC 
-#####(nur binär und kategorisch)
 test_roc <- function(model, data) {
   
   roc(test_dfArbeitend_oder_nicht$Arbeitend_oder_nicht,
@@ -15341,7 +15190,6 @@ modelArbeitend_oder_nichtfinal %>%
   test_roc(data = test_dfArbeitend_oder_nicht) %>%
   auc()
 
-###nur für binär (von hier bis Ende des Abschnitts)
 #compare different ROC-plots
 model_list <- list(M1 = modelArbeitend_oder_nichtfinal)
 
@@ -15383,14 +15231,12 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 #checking direction of the 10 most important variables
 
-###anpassen: name vom dataset
-
 imp <- importance(modelArbeitend_oder_nichtfinal$finalModel)
 imp <- as.data.frame(imp)
 impvar <- rownames(imp)[order(imp[1], decreasing=TRUE)]
 impvar <- impvar[1:20]
 
-###Model umbenennen
+# Model umbenennen
 
 PartialPlots <- modelArbeitend_oder_nichtfinal
 
@@ -15420,13 +15266,8 @@ PartialPlots %>% partial(pred.var = impvar[20], which.class = "Ja") %>%plotParti
 
 #save model to disk 
 
-final_model <- model
-saveRDS(final_model, "./final_model.rds")
-
-#load the model
-
-super_model <- readRDS("./final_model.rds")
-print(super_model)
+final_Arbeitend_oder_nicht <- modelArbeitend_oder_nichtfinal
+saveRDS(final_Arbeitend_oder_nicht, "./final_Arbeitend_oder_nicht.rds")
 
 
 
@@ -15439,27 +15280,17 @@ print(super_model)
 #--------------------------------------DATA PRE-PROCESSING------------------------------------------
 
 
-# load data 
-
-load("data_for_analysis.RData")
-
-#data <- full  #oder ändern zu data <- reduced_set
-
-cols_names <- names(data)  
-cols_names
-
-
 #define data for analysis
 data_Bildungsgruppe <- data[,c(314, 27:255)]
 
 #Gibt es NAs in der DV?
-sum(is.na(data_Bildungsgruppe$Bildungsgruppe)) #122 NAs
+sum(is.na(data_Bildungsgruppe$Bildungsgruppe))
 data_Bildungsgruppe <- data_Bildungsgruppe %>% subset(data_Bildungsgruppe$Bildungsgruppe != "NA")
 
 
 #ist die Variable unbalanced?
-table(data_Bildungsgruppe$Bildungsgruppe) #hohes Einkommen ist unterrepräsentiert, verhältnis ca. 1:6:10 --> Korrektur notwendig!
-max(table(data_Bildungsgruppe$Bildungsgruppe)/sum(table(data_Bildungsgruppe$Bildungsgruppe))) #no information rate 61%
+table(data_Bildungsgruppe$Bildungsgruppe) 
+max(table(data_Bildungsgruppe$Bildungsgruppe)/sum(table(data_Bildungsgruppe$Bildungsgruppe))) 
 
 #IV als Faktor:
 data_Bildungsgruppe$Bildungsgruppe <- as.factor(data_Bildungsgruppe$Bildungsgruppe)
@@ -15501,13 +15332,6 @@ myControl1 = trainControl(
   search = "grid"
 )
 
-#set tuning grid
-
-set.seed(1997)
-
-myGrid = expand.grid(mtry = c(10:20),
-                     splitrule = "extratrees", 
-                     min.node.size = c(5,10,15))
 
 
 ####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
@@ -15557,6 +15381,13 @@ RFBildungsgruppe %>%
 
 # AUC model 1 0.744
 
+
+#save model to disk 
+
+tree500_Bildungsgruppe <- RFBildungsgruppe
+saveRDS(tree500_Bildungsgruppe, "./tree500_Bildungsgruppe.rds")
+
+
 ####-------tree 2: num.tree prüfen --------------------------------------------------
 
 #getunte Werte setzen und num.tree ausprobieren --> ist mehr besser?
@@ -15599,15 +15430,19 @@ RFBildungsgruppe1 %>%
   auc()
 
 
-#model1: 500 trees performs better
+#model1: 1000 trees performs better
 
+#save model to disk 
+
+tree1000_Bildungsgruppe <- RFBildungsgruppe1
+saveRDS(tree1000_Bildungsgruppe, "./tree1000_Bildungsgruppe.rds")
 
 ####-------tree 3: Final --------------------------------------------------
 
 #final model
 
 set.seed(1997)
-RFBildungsgruppeFinal <- RFBildungsgruppeXX
+RFBildungsgruppeFinal <- RFBildungsgruppe1
 
 # Print models
 RFBildungsgruppeFinal 
@@ -15723,15 +15558,14 @@ PartialPlots %>% partial(pred.var = impvar[20], which.class = "niedrig") %>%plot
 
 #------------------------------------------------WHEN BEST MODEL IS FOUND-----------------------------------------------------
 
+
 #save model to disk 
 
-besttree_Einkommen <- RFEinkommen_fin
-saveRDS(besttree_Einkommen, "./tree_Einkommen.rds")
+besttree_Bildungsgruppe <- RFBildungsgruppeFinal
+saveRDS(besttree_Bildungsgruppe, "./besttree_Bildungsgruppe.rds")
 
-#load the model
 
-besttree_Einkommen <- readRDS("./tree_Einkommen.rds")
-print(besttree_Einkommen)
+
 
 
 
@@ -15741,33 +15575,32 @@ print(besttree_Einkommen)
 #Religion: Categorical (4 Gruppen: Christentum, Ich fühle mich keiner Religion zugehörig, Islam, Judentum)
 ######################
 
-#--------------------------------------DATA PRE-PROCESSING------------------------------------------
-
-
-# load data 
-
-load("data_for_analysis.RData")
-
-#data <- full  #oder ändern zu data <- reduced_set
-
-cols_names <- names(data)  
-cols_names
+#-------------------------------------Data Pre-Processing---------------------------------------------
 
 
 #define data for analysis
 data_Religion <- data[,c(12, 27:255)]
 
 #Gibt es NAs in der DV?
-sum(is.na(data_Religion$Religion)) #122 NAs
+sum(is.na(data_Religion$Religion)) 
+#Sonstige auch als NA, um sie aus Analyse auszuschließen:
+data_Religion <- data_Religion %>% replace_with_na_all(condition = ~.x == "Sonstige:")
+#Datenset ohne NAs
 data_Religion <- data_Religion %>% subset(data_Religion$Religion != "NA")
 
-
 #ist die Variable unbalanced?
-table(data_Religion$Religion) #hohes Einkommen ist unterrepräsentiert, verhältnis ca. 1:6:10 --> Korrektur notwendig!
-max(table(data_Religion$Religion)/sum(table(data_Religion$Religion))) #no information rate 61%
+table(data_Religion$Religion) 
+max(table(data_Religion$Religion)/sum(table(data_Religion$Religion)))
 
 #IV als Faktor:
 data_Religion$Religion <- as.factor(data_Religion$Religion)
+
+
+#Variablennamen anpassen für Analyse
+data_Religion <- data_Religion %>% mutate(Religion = case_when(Religion == "Christentum" ~ 'Christentum',
+                                                               Religion == "Ich fühle mich keiner Religion zugehörig" ~ 'Nicht_zugehörig',
+                                                               Religion == "Islam" ~ 'Islam',
+                                                               Religion == "Judentum" ~ 'Judentum'))
 
 
 
@@ -15806,13 +15639,6 @@ myControl1 = trainControl(
   search = "grid"
 )
 
-#set tuning grid
-
-set.seed(1997)
-
-myGrid = expand.grid(mtry = c(10:20),
-                     splitrule = "extratrees", 
-                     min.node.size = c(5,10,15))
 
 
 ####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
@@ -15860,6 +15686,10 @@ RFReligion %>%
   test_roc(data = test_dfReligion) %>%
   auc()
 
+#save model to disk 
+
+tree500_Religion <- RFReligion
+saveRDS(tree500_Religion, "./tree500_Religion.rds")
 
 
 ####-------tree 2: num.tree prüfen --------------------------------------------------
@@ -15906,13 +15736,18 @@ RFReligion1 %>%
 
 #model1: 500 trees performs better
 
+#save model to disk 
+
+tree1000_Religion <- RFReligion1
+saveRDS(tree1000_Religion, "./tree1000_Religion.rds")
+
 
 ####-------tree 3: Final --------------------------------------------------
 
 #final model
 
 set.seed(1997)
-RFReligionFinal <- RFReligionXX
+RFReligionFinal <- RFReligion1
 
 # Print models
 RFReligionFinal 
@@ -15982,26 +15817,26 @@ PartialPlots %>% partial(pred.var = impvar[18], which.class = "Christentum") %>%
 PartialPlots %>% partial(pred.var = impvar[19], which.class = "Christentum") %>%plotPartial(main = "Christentum")
 PartialPlots %>% partial(pred.var = impvar[20], which.class = "Christentum") %>%plotPartial(main = "Christentum")
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "Ich_fühle_mich_keiner_Religion_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "Nicht_zugehörig") %>%plotPartial(main = "Ich fühle mich keiner Religion zugehörig")
 
 
 PartialPlots %>% partial(pred.var = impvar[1], which.class = "Islam") %>%plotPartial(main = "Islam")
@@ -16051,13 +15886,8 @@ PartialPlots %>% partial(pred.var = impvar[20], which.class = "Judentum") %>%plo
 
 #save model to disk 
 
-besttree_Einkommen <- RFEinkommen_fin
-saveRDS(besttree_Einkommen, "./tree_Einkommen.rds")
-
-#load the model
-
-besttree_Einkommen <- readRDS("./tree_Einkommen.rds")
-print(besttree_Einkommen)
+besttree_Religion <- RFReligionFinal
+saveRDS(besttree_Religion, "./besttree_Religion.rds")
 
 
 
@@ -16067,43 +15897,26 @@ print(besttree_Einkommen)
 #Religioes ja nein: binär
 ######################
 
+
 #--------------------------------------DATA PRE-PROCESSING------------------------------------------
 
-# load data 
 
-load("data_for_analysis.RData")
-
-#data <- full  #oder ändern zu data <- reduced_set
-
-cols_names <- names(data)  
-cols_names
-
-###hier: Zeilen anpassen, die wir auswählen, und Dateienname ändern zu jew. Variable
-
-# c(313 --> das ist hier die column wo die Dv drin ist, in dem Fall weiblich_maennlich)
-# c(27:255 --> das sind unsere IV's, sprich die Accounts)
+#define data for analysis
 data_Religioes <- data[,c(333, 27:255)]
 
 
-### es ist besonders wichtig die gewünschte DV in einen Faktor zu transformieren, da "caret" nicht mit 0/1 ausprägungen umgehen kann, wenn das model trainiert werden soll. 
-###nur für binär/categorical
-cols_Religioes <- names(data_Religioes)
-
-
-# Convert factor names of trial to caret compatible format (1 and 0 as numbers are not allowed)
+# Convert DV to factor
 data_Religioes$Religioes = as.factor(data_Religioes$Religioes)
 
 
 #Gibt es NAs in der DV?
 sum(is.na(data_Religioes$Religioes)) #keine NAs
-###folgende Kommentierung und Code nur drin lassen und anpassen, wenn es NAs gibt --> bitte prüfen, dass der Code auch das richtige macht :)
-#Respondents mit NAs für diese Variable löschen (NAs stehen nur, wenn Respondent "Keine Angabe" gemacht hat, daher bedeutet löschen keinen Informationsverlust)
 data_Religioes <- data_Religioes %>% subset(data_Religioes$Religioes != "NA")
 
 
 #ist die Variable unbalanced?
 table(data_Religioes$Religioes) #Verteilung in Ordnung
-max(table(data_Religioes$Religioes)/sum(table(data_Religioes$Religioes))) #no information rate 61%
+max(table(data_Religioes$Religioes)/sum(table(data_Religioes$Religioes))) 
 
 
 
@@ -16156,12 +15969,6 @@ myControl = trainControl(
 # test of the ideal mtry, splitrule and min-node.size
 
 set.seed(1997)
-
-myGrid = expand.grid(mtry = c(10:20),
-                     splitrule = "extratrees", 
-                     min.node.size = c(5,10,15))
-
-
 modelReligioesRF <- train(Religioes ~ ., 
                           data=train_dfReligioes,
                           tuneGrid = myGrid,
@@ -16178,24 +15985,15 @@ modelReligioesRF
 summary(modelReligioesRF)
 plot(modelReligioesRF)
 
-#best mtry = 18, splitrule = extratrees, min.node.size = 10
-
-# Apply model to test_df --> test_dfGeschlecht
 
 # predict outcome using model from train_df applied to the test_df
-
-### hier auch einmal nach dem testdf der DV umbenennen
 predictions <- predict(modelReligioesRF, newdata=test_dfReligioes)
 
 # Create confusion matrix --> nur für classification (binär oder categorical)
 confusionMatrix(data=predictions, test_dfReligioes$Religioes)
 
-#save the best mtry 
-
-bestmtry <- modelReligioesRF$bestTune$mtry
 
 #check for AUC 
-#####(nur binär und kategorisch)
 test_roc <- function(model, data) {
   
   roc(test_dfReligioes$Religioes,
@@ -16207,7 +16005,6 @@ modelReligioesRF %>%
   test_roc(data = test_dfReligioes) %>%
   auc()
 
-###nur für binär (von hier bis Ende des Abschnitts)
 #compare different ROC-plots
 model_list <- list(M1 = modelReligioesRF)
 
@@ -16243,12 +16040,16 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
 
+#save model to disk 
+
+tree500_Religioes <- modelReligioesRF
+saveRDS(tree500_Religioes, "./tree500_Religioes.rds")
+
 
 
 ####-------tree 2: num.tree prüfen --------------------------------------------------
 
 # test of ideal num.tree --> try if numtree 1000 leads to better results!
-###mtry, splitrule und min.node.size zu dem anpassen, was tree 1 gefunden hat!
 
 set.seed(1997)
 modelReligioesRF1 <- train(Religioes ~ ., 
@@ -16267,11 +16068,8 @@ modelReligioesRF1
 summary(modelReligioesRF1)
 plot(modelReligioesRF1)
 
-# Apply model to test_df --> test_dfGeschlecht
 
 # predict outcome using model from train_df applied to the test_df
-
-### hier auch einmal nach dem testdf der DV umbenennen
 predictions <- predict(modelReligioesRF1, newdata=test_dfReligioes)
 
 # Create confusion matrix --> nur für classification
@@ -16279,7 +16077,6 @@ confusionMatrix(data=predictions, test_dfReligioes$Religioes)
 
 
 #check for AUC 
-#####(nur binär und kategorisch) (von hier bis Ende des Abschnitts)
 test_roc <- function(model, data) {
   
   roc(test_dfReligioes$Religioes,
@@ -16291,7 +16088,6 @@ modelReligioesRF1 %>%
   test_roc(data = test_dfReligioes) %>%
   auc()
 
-###nur für binär
 #compare different ROC-plots
 model_list <- list(M1 = modelReligioesRF1)
 
@@ -16328,17 +16124,19 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   theme_bw(base_size = 18)
 
 
+#save model to disk 
+
+tree1000_Religioes <- modelReligioesRF1
+saveRDS(tree1000_Religioes, "./tree1000_Religioes.rds")
 
 
 #fit model with num.trees = xx trees (better performance)
 
 ####-------tree 3: Final --------------------------------------------------
 
-### hier das finale model mit bestmtry und node size einfügen , auch best num.tree anpassen
 
-modelReligioesfinal <- modelReligioesXX
+modelReligioesfinal <- modelReligioesRF1
 # Print model
-### hier den Model namen ändern
 print(modelReligioesfinal)
 
 #output in terms of regression coefficients
@@ -16346,16 +16144,12 @@ summary(modelReligioesfinal)
 
 #evaluate variable importance 
 # Mean Decrease Gini - Measure of variable importance based on the Gini impurity index used for the calculation of splits in trees.
-### hier auch den model namen ändern
 
 varImp(modelReligioesfinal)
 plot(varImp(modelReligioesfinal), 20, main = "Religioes")
 
-# Apply model to test_df --> test_dfGeschlecht
 
 # predict outcome using model from train_df applied to the test_df
-
-### hier auch einmal nach dem testdf der DV umbenennen
 predictions <- predict(modelReligioesfinal, newdata=test_dfReligioes)
 
 # Create confusion matrix --> nur für classification
@@ -16363,7 +16157,6 @@ confusionMatrix(data=predictions, test_dfReligioes$Religioes)
 
 
 #check for AUC 
-#####(nur binär und kategorisch)
 test_roc <- function(model, data) {
   
   roc(test_dfReligioes$Religioes,
@@ -16375,7 +16168,6 @@ modelReligioesfinal %>%
   test_roc(data = test_dfReligioes) %>%
   auc()
 
-###nur für binär (von hier bis Ende des Abschnitts)
 #compare different ROC-plots
 model_list <- list(M1 = modelReligioesfinal)
 
@@ -16424,7 +16216,7 @@ imp <- as.data.frame(imp)
 impvar <- rownames(imp)[order(imp[1], decreasing=TRUE)]
 impvar <- impvar[1:20]
 
-###Model umbenennen
+#Model umbenennen
 
 PartialPlots <- modelReligioesfinal
 
@@ -16452,16 +16244,11 @@ PartialPlots %>% partial(pred.var = impvar[20], which.class = "Ja") %>%plotParti
 
 #------------------------------------------------WHEN BEST MODEL IS FOUND-----------------------------------------------------
 
+
 #save model to disk 
 
-final_model <- model
-saveRDS(final_model, "./final_model.rds")
-
-#load the model
-
-super_model <- readRDS("./final_model.rds")
-print(super_model)
-
+besttree_Religioes <- modelReligioesfinal
+saveRDS(besttree_Religioes, "./besttree_Religioes.rds")
 
 
 
@@ -16471,35 +16258,17 @@ print(super_model)
 
 #--------------------------------------DATA PRE-PROCESSING------------------------------------------
 
-# load data 
 
-load("data_for_analysis.RData")
-
-#data <- full  #oder ändern zu data <- reduced_set
-
-cols_names <- names(data)  
-cols_names
-
-###hier: Zeilen anpassen, die wir auswählen, und Dateienname ändern zu jew. Variable
-
-# c(313 --> das ist hier die column wo die Dv drin ist, in dem Fall weiblich_maennlich)
-# c(27:255 --> das sind unsere IV's, sprich die Accounts)
+#define data for analysis
 data_IslamChrist <- data[,c(334, 27:255)]
 
 
-### es ist besonders wichtig die gewünschte DV in einen Faktor zu transformieren, da "caret" nicht mit 0/1 ausprägungen umgehen kann, wenn das model trainiert werden soll. 
-###nur für binär/categorical
-cols_IslamChrist <- names(data_IslamChrist)
-
-
-# Convert factor names of trial to caret compatible format (1 and 0 as numbers are not allowed)
+# Convert IV to factor
 data_IslamChrist$Islam_oder_Christ = as.factor(data_IslamChrist$Islam_oder_Christ)
 
 
 #Gibt es NAs in der DV?
 sum(is.na(data_IslamChrist$Islam_oder_Christ)) #keine NAs
-###folgende Kommentierung und Code nur drin lassen und anpassen, wenn es NAs gibt --> bitte prüfen, dass der Code auch das richtige macht :)
-#Respondents mit NAs für diese Variable löschen (NAs stehen nur, wenn Respondent "Keine Angabe" gemacht hat, daher bedeutet löschen keinen Informationsverlust)
 data_IslamChrist <- data_IslamChrist %>% subset(data_IslamChrist$Islam_oder_Christ != "NA")
 
 
@@ -16512,21 +16281,12 @@ max(table(data_IslamChrist$Islam_oder_Christ)/sum(table(data_IslamChrist$Islam_o
 #----------------------------------------DATA PARTITIONING------------------------------------
 
 
-
-### ACHTUNG DAS DATA SET NUR SPLITTEN WENN NOCH NICHT VORHER FÜR DIE DV GEMACHT. ANSONSTEN STEP ÜBERSPRINGEN
-
 #Training und Test Dataset
 set.seed(1997)
 
 # Partitioning of the data: Create index matrix of selected values
-
-### hier einmal das vorhin definierte dataframe auswählen und nach dem $ die gewünschte DV eintragen. 
-### p=0.8 heißt das data set wird nach der 80/20 regel in training und test data set geteilt. 
-### Könnte  man auch anpassen in 70/30 oder 75/25 wie Kübler das in seinem Buch geschrieben hat. 
-
 index <- createDataPartition(data_IslamChrist$Islam_oder_Christ, p=.8, list= FALSE, times= 1)
 
-# Create train_dfGeschlecht & test_dfGeschlecht
 
 ### name anpassen an DV
 
@@ -16558,12 +16318,6 @@ myControl = trainControl(
 # test of the ideal mtry, splitrule and min-node.size
 
 set.seed(1997)
-
-myGrid = expand.grid(mtry = c(10:20),
-                     splitrule = "extratrees", 
-                     min.node.size = c(5,10,15))
-
-
 modelIslamChristRF <- train(Islam_oder_Christ ~ ., 
                             data=train_dfIslamChrist,
                             tuneGrid = myGrid,
@@ -16582,22 +16336,14 @@ plot(modelIslamChristRF)
 
 #best mtry = 18, splitrule = extratrees, min.node.size = 10
 
-# Apply model to test_df --> test_dfGeschlecht
-
 # predict outcome using model from train_df applied to the test_df
-
-### hier auch einmal nach dem testdf der DV umbenennen
 predictions <- predict(modelIslamChristRF, newdata=test_dfIslamChrist)
 
 # Create confusion matrix --> nur für classification (binär oder categorical)
 confusionMatrix(data=predictions, test_dfIslamChrist$Islam_oder_Christ)
 
-#save the best mtry 
-
-bestmtry <- modelIslamChristRF$bestTune$mtry
 
 #check for AUC 
-#####(nur binär und kategorisch)
 test_roc <- function(model, data) {
   
   roc(test_dfIslamChrist$Islam_oder_Christ,
@@ -16635,7 +16381,7 @@ for(the_roc in model_list_roc){
 
 results_df_roc <- bind_rows(results_list_roc)
 
-# Plot ROC curve for all 5 models
+# Plot ROC curve 
 
 custom_col <- c("#000000", "#009E73", "#0072B2", "#D55E00", "#CC79A7")
 
@@ -16645,12 +16391,17 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
 
+#save model to disk 
+
+tree500_Islam_Christ <- modelIslamChristRF
+saveRDS(tree500_Islam_Christ , "./tree500_Islam_Christ .rds")
+
+
 
 
 ####-------tree 2: num.tree prüfen --------------------------------------------------
 
 # test of ideal num.tree --> try if numtree 1000 leads to better results!
-###mtry, splitrule und min.node.size zu dem anpassen, was tree 1 gefunden hat!
 
 set.seed(1997)
 modelIslamChristRF1 <- train(Islam_oder_Christ ~ ., 
@@ -16669,11 +16420,8 @@ modelIslamChristRF1
 summary(modelIslamChristRF1)
 plot(modelIslamChristRF1)
 
-# Apply model to test_df --> test_dfGeschlecht
 
 # predict outcome using model from train_df applied to the test_df
-
-### hier auch einmal nach dem testdf der DV umbenennen
 predictions <- predict(modelIslamChristRF1, newdata=test_dfIslamChrist)
 
 # Create confusion matrix --> nur für classification
@@ -16681,7 +16429,6 @@ confusionMatrix(data=predictions, test_dfIslamChrist$Islam_oder_Christ)
 
 
 #check for AUC 
-#####(nur binär und kategorisch) (von hier bis Ende des Abschnitts)
 test_roc <- function(model, data) {
   
   roc(test_dfIslamChrist$Islam_oder_Christ,
@@ -16693,7 +16440,6 @@ modelIslamChristRF1 %>%
   test_roc(data = test_dfIslamChrist) %>%
   auc()
 
-###nur für binär
 #compare different ROC-plots
 model_list <- list(M1 = modelIslamChristRF1)
 
@@ -16730,17 +16476,20 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   theme_bw(base_size = 18)
 
 
+#save model to disk 
+
+tree1000_Islam_Christ <- modelIslamChristRF1
+saveRDS(tree1000_Islam_Christ , "./tree1000_Islam_Christ .rds")
 
 
 #fit model with num.trees = xx trees (better performance)
 
 ####-------tree 3: Final --------------------------------------------------
 
-### hier das finale model mit bestmtry und node size einfügen , auch best num.tree anpassen
 
-modelIslamChristfinal <- modelIslamChristXX
+modelIslamChristfinal <- modelIslamChristRF
+
 # Print model
-### hier den Model namen ändern
 print(modelIslamChristfinal)
 
 #output in terms of regression coefficients
@@ -16748,16 +16497,11 @@ summary(modelIslamChristfinal)
 
 #evaluate variable importance 
 # Mean Decrease Gini - Measure of variable importance based on the Gini impurity index used for the calculation of splits in trees.
-### hier auch den model namen ändern
 
 varImp(modelIslamChristfinal)
 plot(varImp(modelIslamChristfinal), 20, main = "Islam_oder_Christ")
 
-# Apply model to test_df --> test_dfGeschlecht
-
 # predict outcome using model from train_df applied to the test_df
-
-### hier auch einmal nach dem testdf der DV umbenennen
 predictions <- predict(modelIslamChristfinal, newdata=test_dfIslamChrist)
 
 # Create confusion matrix --> nur für classification
@@ -16765,7 +16509,6 @@ confusionMatrix(data=predictions, test_dfIslamChrist$Islam_oder_Christ)
 
 
 #check for AUC 
-#####(nur binär und kategorisch)
 test_roc <- function(model, data) {
   
   roc(test_dfIslamChrist$Islam_oder_Christ,
@@ -16777,7 +16520,6 @@ modelIslamChristfinal %>%
   test_roc(data = test_dfIslamChrist) %>%
   auc()
 
-###nur für binär (von hier bis Ende des Abschnitts)
 #compare different ROC-plots
 model_list <- list(M1 = modelIslamChristfinal)
 
@@ -16803,7 +16545,7 @@ for(the_roc in model_list_roc){
 
 results_df_roc <- bind_rows(results_list_roc)
 
-# Plot ROC curve for all 5 models
+# Plot ROC curve 
 custom_col <- c("#000000", "#009E73", "#0072B2", "#D55E00", "#CC79A7")
 
 ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
@@ -16819,14 +16561,13 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 #checking direction of the 10 most important variables
 
-###anpassen: name vom dataset
 
 imp <- importance(modelIslamChristfinal$finalModel)
 imp <- as.data.frame(imp)
 impvar <- rownames(imp)[order(imp[1], decreasing=TRUE)]
 impvar <- impvar[1:20]
 
-###Model umbenennen
+# Model umbenennen
 
 PartialPlots <- modelIslamChristfinal
 
@@ -16855,14 +16596,8 @@ PartialPlots %>% partial(pred.var = impvar[20], which.class = "Islam") %>%plotPa
 #------------------------------------------------WHEN BEST MODEL IS FOUND-----------------------------------------------------
 
 #save model to disk 
-
-final_model <- model
-saveRDS(final_model, "./final_model.rds")
-
-#load the model
-
-super_model <- readRDS("./final_model.rds")
-print(super_model)
+bestree_Islam_Christ <- modelIslamChristRFfinal
+saveRDS(besttree_Islam_Christ , "./besttree_Islam_Christ .rds")
 
 
 
@@ -16870,37 +16605,18 @@ print(super_model)
 #Migrationshintergrund: binär
 #####################
 
-#--------------------------------------DATA PRE-PROCESSING------------------------------------------
+#---------------------------------------------------DATA PRE-PROCESSING-----------------------------------------------------
 
-# load data 
-
-load("data_for_analysis.RData")
-
-#data <- full  #oder ändern zu data <- reduced_set
-
-cols_names <- names(data)  
-cols_names
-
-###hier: Zeilen anpassen, die wir auswählen, und Dateienname ändern zu jew. Variable
-
-# c(313 --> das ist hier die column wo die Dv drin ist, in dem Fall weiblich_maennlich)
-# c(27:255 --> das sind unsere IV's, sprich die Accounts)
+#define data for analysis
 data_Migrationshintergrund <- data[,c(14, 27:255)]
 
 
-### es ist besonders wichtig die gewünschte DV in einen Faktor zu transformieren, da "caret" nicht mit 0/1 ausprägungen umgehen kann, wenn das model trainiert werden soll. 
-###nur für binär/categorical
-cols_Migrationshintergrund <- names(data_Migrationshintergrund)
-
-
-# Convert factor names of trial to caret compatible format (1 and 0 as numbers are not allowed)
+# Convert  DV to factor
 data_Migrationshintergrund$Migrationshintergrund = as.factor(data_Migrationshintergrund$Migrationshintergrund)
 
 
 #Gibt es NAs in der DV?
 sum(is.na(data_Migrationshintergrund$Migrationshintergrund)) #keine NAs
-###folgende Kommentierung und Code nur drin lassen und anpassen, wenn es NAs gibt --> bitte prüfen, dass der Code auch das richtige macht :)
-#Respondents mit NAs für diese Variable löschen (NAs stehen nur, wenn Respondent "Keine Angabe" gemacht hat, daher bedeutet löschen keinen Informationsverlust)
 data_Migrationshintergrund <- data_Migrationshintergrund %>% subset(data_Migrationshintergrund$Migrationshintergrund != "NA")
 
 
@@ -16913,23 +16629,13 @@ max(table(data_Migrationshintergrund$Migrationshintergrund)/sum(table(data_Migra
 #----------------------------------------DATA PARTITIONING------------------------------------
 
 
-
-### ACHTUNG DAS DATA SET NUR SPLITTEN WENN NOCH NICHT VORHER FÜR DIE DV GEMACHT. ANSONSTEN STEP ÜBERSPRINGEN
-
 #Training und Test Dataset
 set.seed(1997)
 
 # Partitioning of the data: Create index matrix of selected values
-
-### hier einmal das vorhin definierte dataframe auswählen und nach dem $ die gewünschte DV eintragen. 
-### p=0.8 heißt das data set wird nach der 80/20 regel in training und test data set geteilt. 
-### Könnte  man auch anpassen in 70/30 oder 75/25 wie Kübler das in seinem Buch geschrieben hat. 
-
 index <- createDataPartition(data_Migrationshintergrund$Migrationshintergrund, p=.8, list= FALSE, times= 1)
 
-# Create train_dfGeschlecht & test_dfGeschlecht
-
-### name anpassen an DV
+# Create train & test dataset
 
 train_dfMigrationshintergrund <- data_Migrationshintergrund[index,]
 test_dfMigrationshintergrund <- data_Migrationshintergrund[-index,]
@@ -16959,12 +16665,6 @@ myControl = trainControl(
 # test of the ideal mtry, splitrule and min-node.size
 
 set.seed(1997)
-
-myGrid = expand.grid(mtry = c(10:20),
-                     splitrule = "extratrees", 
-                     min.node.size = c(5,10,15))
-
-
 modelMigrationshintergrundRF <- train(Migrationshintergrund ~ ., 
                                       data=train_dfMigrationshintergrund,
                                       tuneGrid = myGrid,
@@ -16983,19 +16683,12 @@ plot(modelMigrationshintergrundRF)
 
 #best mtry = 18, splitrule = extratrees, min.node.size = 10
 
-# Apply model to test_df --> test_dfGeschlecht
-
 # predict outcome using model from train_df applied to the test_df
-
-### hier auch einmal nach dem testdf der DV umbenennen
 predictions <- predict(modelMigrationshintergrundRF, newdata=test_dfMigrationshintergrund)
 
 # Create confusion matrix --> nur für classification (binär oder categorical)
 confusionMatrix(data=predictions, test_dfMigrationshintergrund$Migrationshintergrund)
 
-#save the best mtry 
-
-bestmtry <- modelMigrationshintergrundRF$bestTune$mtry
 
 #check for AUC 
 #####(nur binär und kategorisch)
@@ -17046,12 +16739,15 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
 
+#save model to disk 
+
+tree500_Migrationshintergrund <- modelMigrationshintergrundRF
+saveRDS(tree500_Migrationshintergrund, "./tree500_Migrationshintergrund.rds")
 
 
 ####-------tree 2: num.tree prüfen --------------------------------------------------
 
 # test of ideal num.tree --> try if numtree 1000 leads to better results!
-###mtry, splitrule und min.node.size zu dem anpassen, was tree 1 gefunden hat!
 
 set.seed(1997)
 modelMigrationshintergrundRF1 <- train(Migrationshintergrund ~ ., 
@@ -17070,11 +16766,8 @@ modelMigrationshintergrundRF1
 summary(modelMigrationshintergrundRF1)
 plot(modelMigrationshintergrundRF1)
 
-# Apply model to test_df --> test_dfGeschlecht
 
 # predict outcome using model from train_df applied to the test_df
-
-### hier auch einmal nach dem testdf der DV umbenennen
 predictions <- predict(modelMigrationshintergrundRF1, newdata=test_dfMigrationshintergrund)
 
 # Create confusion matrix --> nur für classification
@@ -17082,7 +16775,6 @@ confusionMatrix(data=predictions, test_dfMigrationshintergrund$Migrationshinterg
 
 
 #check for AUC 
-#####(nur binär und kategorisch) (von hier bis Ende des Abschnitts)
 test_roc <- function(model, data) {
   
   roc(test_dfMigrationshintergrund$Migrationshintergrund,
@@ -17094,7 +16786,6 @@ modelMigrationshintergrundRF1 %>%
   test_roc(data = test_dfMigrationshintergrund) %>%
   auc()
 
-###nur für binär
 #compare different ROC-plots
 model_list <- list(M1 = modelMigrationshintergrundRF1)
 
@@ -17130,6 +16821,10 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
 
+#save model to disk 
+
+tree1000_Migrationshintergrund <- modelMigrationshintergrundRF1
+saveRDS(tree1000_Migrationshintergrund, "./tree1000_Migrationshintergrund.rds")
 
 
 
@@ -17137,11 +16832,11 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 ####-------tree 3: Final --------------------------------------------------
 
-### hier das finale model mit bestmtry und node size einfügen , auch best num.tree anpassen
 
-modelMigrationshintergrundfinal <- modelMigrationshintergrundXX
+modelMigrationshintergrundfinal <- modelMigrationshintergrundRF1
+
+
 # Print model
-### hier den Model namen ändern
 print(modelMigrationshintergrundfinal)
 
 #output in terms of regression coefficients
@@ -17149,16 +16844,11 @@ summary(modelMigrationshintergrundfinal)
 
 #evaluate variable importance 
 # Mean Decrease Gini - Measure of variable importance based on the Gini impurity index used for the calculation of splits in trees.
-### hier auch den model namen ändern
 
 varImp(modelMigrationshintergrundfinal)
 plot(varImp(modelMigrationshintergrundfinal), 20, main = "Migrationshintergrund")
 
-# Apply model to test_df --> test_dfGeschlecht
-
 # predict outcome using model from train_df applied to the test_df
-
-### hier auch einmal nach dem testdf der DV umbenennen
 predictions <- predict(modelMigrationshintergrundfinal, newdata=test_dfMigrationshintergrund)
 
 # Create confusion matrix --> nur für classification
@@ -17166,7 +16856,6 @@ confusionMatrix(data=predictions, test_dfMigrationshintergrund$Migrationshinterg
 
 
 #check for AUC 
-#####(nur binär und kategorisch)
 test_roc <- function(model, data) {
   
   roc(test_dfMigrationshintergrund$Migrationshintergrund,
@@ -17178,7 +16867,6 @@ modelMigrationshintergrundfinal %>%
   test_roc(data = test_dfMigrationshintergrund) %>%
   auc()
 
-###nur für binär (von hier bis Ende des Abschnitts)
 #compare different ROC-plots
 model_list <- list(M1 = modelMigrationshintergrundfinal)
 
@@ -17204,7 +16892,7 @@ for(the_roc in model_list_roc){
 
 results_df_roc <- bind_rows(results_list_roc)
 
-# Plot ROC curve for all 5 models
+# Plot ROC curve
 custom_col <- c("#000000", "#009E73", "#0072B2", "#D55E00", "#CC79A7")
 
 ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
@@ -17214,20 +16902,17 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   theme_bw(base_size = 18)
 
 
-
 #--------------Variable Direction: Partial Plots-----------------------------------------
 
 
 #checking direction of the 10 most important variables
-
-###anpassen: name vom dataset
 
 imp <- importance(modelMigrationshintergrundfinal$finalModel)
 imp <- as.data.frame(imp)
 impvar <- rownames(imp)[order(imp[1], decreasing=TRUE)]
 impvar <- impvar[1:20]
 
-###Model umbenennen
+#Model umbenennen
 
 PartialPlots <- modelMigrationshintergrundfinal
 
@@ -17256,24 +16941,303 @@ PartialPlots %>% partial(pred.var = impvar[20], which.class = "Ja") %>%plotParti
 #------------------------------------------------WHEN BEST MODEL IS FOUND-----------------------------------------------------
 
 #save model to disk 
-
-final_model <- model
-saveRDS(final_model, "./final_model.rds")
-
-#load the model
-
-super_model <- readRDS("./final_model.rds")
-print(super_model)
+bestree_Migrationshintergrund <- modelMigrationshintergrundRFfinal
+saveRDS(besttree_Migrationshintergrund, "./besttree_Migrationshintergrund.rds")
 
 
 
+#######################
+#Sexuelle_Orientierung: Categorical (3 Gruppen: Bisexuell, Heterosexuell, Homosexuell)
+######################
 
-####################
-#sexuelle Orientierung: kategorisch
-#FEHLT NOCH
-#####################
+#--------------------------------------DATA PRE-PROCESSING------------------------------------------
 
 
+#define data for analysis
+data_Sexuelle_Orientierung <- data[,c(16, 27:255)]
+
+#Gibt es NAs in der DV?
+sum(is.na(data_Sexuelle_Orientierung$Sexuelle_Orientierung)) #122 NAs
+#Sonstige auch als NA, um sie aus Analyse auszuschließen:
+data_Sexuelle_Orientierung <- data_Sexuelle_Orientierung %>% replace_with_na_all(condition = ~.x == "Sonstiges:")
+#Datenset ohne NAs
+data_Sexuelle_Orientierung <- data_Sexuelle_Orientierung %>% subset(data_Sexuelle_Orientierung$Sexuelle_Orientierung != "NA")
+
+#ist die Variable unbalanced?
+table(data_Sexuelle_Orientierung$Sexuelle_Orientierung) #hohes Einkommen ist unterrepräsentiert, verhältnis ca. 1:6:10 --> Korrektur notwendig!
+max(table(data_Sexuelle_Orientierung$Sexuelle_Orientierung)/sum(table(data_Sexuelle_Orientierung$Sexuelle_Orientierung))) #no information rate 61%
+
+#DV als Faktor:
+data_Sexuelle_Orientierung$Sexuelle_Orientierung <- as.factor(data_Sexuelle_Orientierung$Sexuelle_Orientierung)
+
+#Variablennamen anpassen für Analyse
+data_Sexuelle_Orientierung <- data_Sexuelle_Orientierung %>% mutate(Sexuelle_Orientierung = case_when(Sexuelle_Orientierung == "1" ~ 'Bisexuell',
+                                                                                                      Sexuelle_Orientierung == "2" ~ 'Heterosexuell',
+                                                                                                      Sexuelle_Orientierung == "3" ~ 'Homosexuell'))
+
+
+#----------------------------------------DATA PARTITIONING------------------------------------
+
+#Training und Test Dataset
+set.seed(1997)
+
+# Partitioning of the data: Create index matrix of selected values
+
+index <- createDataPartition(data_Sexuelle_Orientierung$Sexuelle_Orientierung, p=.8, list= FALSE, times= 1)
+
+# Create train_df & test_df
+
+train_dfSexuelle_Orientierung <- data_Sexuelle_Orientierung[index,]
+test_dfSexuelle_Orientierung <- data_Sexuelle_Orientierung[-index,]
+
+
+
+#---------------------------------------------------RANDOM FOREST----------------------------------------------------
+
+#--------------------------------------------BUILDING AND TRAINING THE MODEL---------------------------------------------
+
+
+# Specify the type of training method used & number of folds --> bei uns 10-fold Cross-Validation
+
+set.seed(1997)
+myControl1 = trainControl(
+  method = "cv",
+  number = 10, 
+  verboseIter = TRUE,
+  summaryFunction = defaultSummary, 
+  classProbs = TRUE, 
+  allowParallel=TRUE,
+  sampling = "smote", 
+  search = "grid"
+)
+
+
+####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
+
+# test of the ideal mtry, splitrule and min-node.size for 500 trees
+#use metric Kappa because of unbalanced dataset
+
+#set random seed again 
+
+set.seed(1997)
+RFSexuelle_Orientierung <- train(Sexuelle_Orientierung ~ ., 
+                                 data=train_dfSexuelle_Orientierung,
+                                 tuneGrid = myGrid,
+                                 method="ranger", 
+                                 metric= "Kappa",
+                                 num.tree = 500,
+                                 trControl = myControl1, 
+                                 na.action = na.omit,
+                                 importance = 'impurity')
+
+# Print models to console
+
+RFSexuelle_Orientierung
+summary(RFSexuelle_Orientierung)
+plot(RFSexuelle_Orientierung)
+#mtry = 14, extratrees, min.node.size = 10
+
+
+# predict outcome using model from train_df applied to the test_df
+predictions <- predict(RFSexuelle_Orientierung, newdata=test_dfSexuelle_Orientierung)
+
+# Create confusion matrix
+confusionMatrix(data=as.factor(predictions), as.factor(test_dfSexuelle_Orientierung$Sexuelle_Orientierung))
+
+#check for auc
+test_roc <- function(model, data) {
+  
+  multiclass.roc(test_dfSexuelle_Orientierung$Sexuelle_Orientierung,
+                 predict(model, data, type = "prob")[, "Bisexuell"])
+  
+}
+
+#model1 auc: 
+RFSexuelle_Orientierung %>%
+  test_roc(data = test_dfSexuelle_Orientierung) %>%
+  auc()
+
+#save model to disk 
+
+tree500_Sexuelle_Orientierung <- RFSexuelle_Orientierung
+saveRDS(tree500_Sexuelle_Orientierung, "./tree500_Sexuelle_Orientierung.rds")
+
+
+####-------tree 2: num.tree prüfen --------------------------------------------------
+
+#getunte Werte setzen und num.tree ausprobieren --> ist mehr besser?
+
+set.seed(1997)
+RFSexuelle_Orientierung1 <- train(Sexuelle_Orientierung ~ ., 
+                                  data=train_dfSexuelle_Orientierung, 
+                                  method="ranger", metric= "Kappa",
+                                  tuneGrid = myGrid,
+                                  na.action = na.omit,
+                                  num.tree = 1000,
+                                  trControl = myControl1, 
+                                  importance = 'impurity')
+
+# Print models
+RFSexuelle_Orientierung1
+summary(RFSexuelle_Orientierung1)
+#mtry = xx, extratrees, min.node.size = xx
+
+
+# predict outcome using model from train_df applied to the test_df
+predictions2 <- predict(RFSexuelle_Orientierung1, newdata=test_dfSexuelle_Orientierung)
+
+
+# Create confusion matrix
+confusionMatrix(data=as.factor(predictions2), as.factor(test_dfSexuelle_Orientierung$Sexuelle_Orientierung))
+
+
+#check for auc
+test_roc <- function(model, data) {
+  
+  multiclass.roc(test_dfSexuelle_Orientierung$Sexuelle_Orientierung,
+                 predict(model, data, type = "prob")[, "Bisexuell"])
+  
+}
+
+#model auc: 
+RFSexuelle_Orientierung1 %>%
+  test_roc(data = test_dfSexuelle_Orientierung) %>%
+  auc()
+
+
+#model1: 500 trees performs better
+
+#save model to disk 
+
+tree1000_Sexuelle_Orientierung <- RFSexuelle_Orientierung1
+saveRDS(tree1000_Sexuelle_Orientierung, "./tree1000_Sexuelle_Orientierung.rds")
+
+
+####-------tree 3: Final --------------------------------------------------
+
+#final model
+
+set.seed(1997)
+RFSexuelle_OrientierungFinal <- RFSexuelle_Orientierung
+
+# Print models
+RFSexuelle_OrientierungFinal 
+summary(RFSexuelle_OrientierungFinal )
+
+#evaluate variable importance 
+# Mean Decrease Gini - Measure of variable importance based on the Gini impurity index used for the calculation of splits in trees.
+
+varImp(RFSexuelle_OrientierungFinal )
+plot(varImp(RFSexuelle_OrientierungFinal ), 20, main = "Sexuelle_Orientierung")
+
+
+# predict outcome using model from train_df applied to the test_df
+predictions3 <- predict(RFSexuelle_OrientierungFinal , newdata=test_dfSexuelle_Orientierung)
+
+# Create confusion matrix
+confusionMatrix(data=as.factor(predictions3), as.factor(test_dfSexuelle_Orientierung$Sexuelle_Orientierung))
+
+#check for auc
+test_roc <- function(model, data) {
+  
+  multiclass.roc(test_dfSexuelle_Orientierung$Sexuelle_Orientierung,
+                 predict(model, data, type = "prob")[, "Bisexuell"])
+  
+}
+
+#model auc: 
+RFSexuelle_OrientierungFinal %>%
+  test_roc(data = test_dfSexuelle_Orientierung) %>%
+  auc()
+
+
+
+
+#--------------Variable Direction: Partial Plots-----------------------------------------
+
+
+#checking direction of the 20 most important variables
+
+imp <- importance(RFSexuelle_OrientierungFinal$finalModel)
+imp <- as.data.frame(imp)
+impvar <- rownames(imp)[order(imp[1], decreasing=TRUE)]
+impvar <- impvar[1:20]
+
+#Model umbenennen
+
+PartialPlots <- RFSexuelle_OrientierungFinal 
+
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "Bisexuell") %>%plotPartial (main = "Bisexuell")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "Bisexuell") %>%plotPartial(main = "Bisexuell")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "Bisexuell") %>%plotPartial(main = "Bisexuell")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "Bisexuell") %>%plotPartial(main = "Bisexuell")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "Bisexuell") %>%plotPartial(main = "Bisexuell")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "Bisexuell") %>%plotPartial(main = "Bisexuell")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "Bisexuell") %>%plotPartial(main = "Bisexuell")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "Bisexuell") %>%plotPartial(main = "Bisexuell")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "Bisexuell") %>%plotPartial(main = "Bisexuell")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "Bisexuell") %>%plotPartial(main = "Bisexuell")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "Bisexuell") %>%plotPartial(main = "Bisexuell")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "Bisexuell") %>%plotPartial(main = "Bisexuell")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "Bisexuell") %>%plotPartial(main = "Bisexuell")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "Bisexuell") %>%plotPartial(main = "Bisexuell")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "Bisexuell") %>%plotPartial(main = "Bisexuell")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "Bisexuell") %>%plotPartial(main = "Bisexuell")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "Bisexuell") %>%plotPartial(main = "Bisexuell")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "Bisexuell") %>%plotPartial(main = "Bisexuell")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "Bisexuell") %>%plotPartial(main = "Bisexuell")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "Bisexuell") %>%plotPartial(main = "Bisexuell")
+
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "Heterosexuell") %>%plotPartial(main = "Heterosexuell")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "Heterosexuell") %>%plotPartial(main = "Heterosexuell")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "Heterosexuell") %>%plotPartial(main = "Heterosexuell")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "Heterosexuell") %>%plotPartial(main = "Heterosexuell")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "Heterosexuell") %>%plotPartial(main = "Heterosexuell")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "Heterosexuell") %>%plotPartial(main = "Heterosexuell")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "Heterosexuell") %>%plotPartial(main = "Heterosexuell")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "Heterosexuell") %>%plotPartial(main = "Heterosexuell")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "Heterosexuell") %>%plotPartial(main = "Heterosexuell")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "Heterosexuell") %>%plotPartial(main = "Heterosexuell")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "Heterosexuell") %>%plotPartial(main = "Heterosexuell")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "Heterosexuell") %>%plotPartial(main = "Heterosexuell")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "Heterosexuell") %>%plotPartial(main = "Heterosexuell")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "Heterosexuell") %>%plotPartial(main = "Heterosexuell")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "Heterosexuell") %>%plotPartial(main = "Heterosexuell")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "Heterosexuell") %>%plotPartial(main = "Heterosexuell")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "Heterosexuell") %>%plotPartial(main = "Heterosexuell")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "Heterosexuell") %>%plotPartial(main = "Heterosexuell")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "Heterosexuell") %>%plotPartial(main = "Heterosexuell")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "Heterosexuell") %>%plotPartial(main = "Heterosexuell")
+
+
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "Homosexuell") %>%plotPartial(main = "Homosexuell")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "Homosexuell") %>%plotPartial(main = "Homosexuell")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "Homosexuell") %>%plotPartial(main = "Homosexuell")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "Homosexuell") %>%plotPartial(main = "Homosexuell")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "Homosexuell") %>%plotPartial(main = "Homosexuell")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "Homosexuell") %>%plotPartial(main = "Homosexuell")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "Homosexuell") %>%plotPartial(main = "Homosexuell")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "Homosexuell") %>%plotPartial(main = "Homosexuell")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "Homosexuell") %>%plotPartial(main = "Homosexuell")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "Homosexuell") %>%plotPartial(main = "Homosexuell")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "Homosexuell") %>%plotPartial(main = "Homosexuell")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "Homosexuell") %>%plotPartial(main = "Homosexuell")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "Homosexuell") %>%plotPartial(main = "Homosexuell")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "Homosexuell") %>%plotPartial(main = "Homosexuell")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "Homosexuell") %>%plotPartial(main = "Homosexuell")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "Homosexuell") %>%plotPartial(main = "Homosexuell")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "Homosexuell") %>%plotPartial(main = "Homosexuell")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "Homosexuell") %>%plotPartial(main = "Homosexuell")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "Homosexuell") %>%plotPartial(main = "Homosexuell")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "Homosexuell") %>%plotPartial(main = "Homosexuell")
+
+
+#------------------------------------------------WHEN BEST MODEL IS FOUND-----------------------------------------------------
+
+#save model to disk 
+
+besttree_Sexuelle_Orientierung <- RFSexuelle_OrientierungFinal
+saveRDS(besttree_Sexuelle_Orientierung, "./besttree_Sexuelle_Orientierung.rds")
 
 
 
@@ -17286,35 +17250,17 @@ print(super_model)
 
 #--------------------------------------DATA PRE-PROCESSING------------------------------------------
 
-# load data 
 
-load("data_for_analysis.RData")
-
-#data <- full  #oder ändern zu data <- reduced_set
-
-cols_names <- names(data)  
-cols_names
-
-###hier: Zeilen anpassen, die wir auswählen, und Dateienname ändern zu jew. Variable
-
-# c(313 --> das ist hier die column wo die Dv drin ist, in dem Fall weiblich_maennlich)
-# c(27:255 --> das sind unsere IV's, sprich die Accounts)
+#
 data_Hetero <- data[,c(335, 27:255)]
 
 
-### es ist besonders wichtig die gewünschte DV in einen Faktor zu transformieren, da "caret" nicht mit 0/1 ausprägungen umgehen kann, wenn das model trainiert werden soll. 
-###nur für binär/categorical
-cols_Hetero <- names(data_Hetero)
-
-
-# Convert factor names of trial to caret compatible format (1 and 0 as numbers are not allowed)
+# Convert DV to factor
 data_Hetero$Heterosexuell = as.factor(data_Hetero$Heterosexuell)
 
 
 #Gibt es NAs in der DV?
 sum(is.na(data_Hetero$Heterosexuell)) #keine NAs
-###folgende Kommentierung und Code nur drin lassen und anpassen, wenn es NAs gibt --> bitte prüfen, dass der Code auch das richtige macht :)
-#Respondents mit NAs für diese Variable löschen (NAs stehen nur, wenn Respondent "Keine Angabe" gemacht hat, daher bedeutet löschen keinen Informationsverlust)
 data_Hetero <- data_Hetero %>% subset(data_Hetero$Heterosexuell != "NA")
 
 
@@ -17327,24 +17273,13 @@ max(table(data_Hetero$Heterosexuell)/sum(table(data_Hetero$Heterosexuell))) #no 
 #----------------------------------------DATA PARTITIONING------------------------------------
 
 
-
-### ACHTUNG DAS DATA SET NUR SPLITTEN WENN NOCH NICHT VORHER FÜR DIE DV GEMACHT. ANSONSTEN STEP ÜBERSPRINGEN
-
 #Training und Test Dataset
 set.seed(1997)
 
 # Partitioning of the data: Create index matrix of selected values
-
-### hier einmal das vorhin definierte dataframe auswählen und nach dem $ die gewünschte DV eintragen. 
-### p=0.8 heißt das data set wird nach der 80/20 regel in training und test data set geteilt. 
-### Könnte  man auch anpassen in 70/30 oder 75/25 wie Kübler das in seinem Buch geschrieben hat. 
-
 index <- createDataPartition(data_Hetero$Heterosexuell, p=.8, list= FALSE, times= 1)
 
-# Create train_dfGeschlecht & test_dfGeschlecht
-
-### name anpassen an DV
-
+# Create train_df & test_df
 train_dfHetero <- data_Hetero[index,]
 test_dfHetero <- data_Hetero[-index,]
 
@@ -17373,12 +17308,6 @@ myControl = trainControl(
 # test of the ideal mtry, splitrule and min-node.size
 
 set.seed(1997)
-
-myGrid = expand.grid(mtry = c(10:20),
-                     splitrule = "extratrees", 
-                     min.node.size = c(5,10,15))
-
-
 modelHeteroRF <- train(Heterosexuell ~ ., 
                        data=train_dfHetero,
                        tuneGrid = myGrid,
@@ -17397,22 +17326,16 @@ plot(modelHeteroRF)
 
 #best mtry = 18, splitrule = extratrees, min.node.size = 10
 
-# Apply model to test_df --> test_dfGeschlecht
 
 # predict outcome using model from train_df applied to the test_df
-
-### hier auch einmal nach dem testdf der DV umbenennen
 predictions <- predict(modelHeteroRF, newdata=test_dfHetero)
 
 # Create confusion matrix --> nur für classification (binär oder categorical)
 confusionMatrix(data=predictions, test_dfHetero$Heterosexuell)
 
-#save the best mtry 
 
-bestmtry <- modelHeteroRF$bestTune$mtry
 
 #check for AUC 
-#####(nur binär und kategorisch)
 test_roc <- function(model, data) {
   
   roc(test_dfHetero$Heterosexuell,
@@ -17424,7 +17347,7 @@ modelHeteroRF %>%
   test_roc(data = test_dfHetero) %>%
   auc()
 
-###nur für binär (von hier bis Ende des Abschnitts)
+
 #compare different ROC-plots
 model_list <- list(M1 = modelHeteroRF)
 
@@ -17460,12 +17383,15 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
 
+#save model to disk 
+
+tree500_Hetero <- modelHeteroRF
+saveRDS(tree500_Hetero, "./tree500_Hetero.rds")
 
 
 ####-------tree 2: num.tree prüfen --------------------------------------------------
 
 # test of ideal num.tree --> try if numtree 1000 leads to better results!
-###mtry, splitrule und min.node.size zu dem anpassen, was tree 1 gefunden hat!
 
 set.seed(1997)
 modelHeteroRF1 <- train(Heterosexuell ~ ., 
@@ -17484,11 +17410,8 @@ modelHeteroRF1
 summary(modelHeteroRF1)
 plot(modelHeteroRF1)
 
-# Apply model to test_df --> test_dfGeschlecht
 
 # predict outcome using model from train_df applied to the test_df
-
-### hier auch einmal nach dem testdf der DV umbenennen
 predictions <- predict(modelHeteroRF1, newdata=test_dfHetero)
 
 # Create confusion matrix --> nur für classification
@@ -17496,7 +17419,6 @@ confusionMatrix(data=predictions, test_dfHetero$Heterosexuell)
 
 
 #check for AUC 
-#####(nur binär und kategorisch) (von hier bis Ende des Abschnitts)
 test_roc <- function(model, data) {
   
   roc(test_dfHetero$Heterosexuell,
@@ -17508,7 +17430,6 @@ modelHeteroRF1 %>%
   test_roc(data = test_dfHetero) %>%
   auc()
 
-###nur für binär
 #compare different ROC-plots
 model_list <- list(M1 = modelHeteroRF1)
 
@@ -17545,17 +17466,20 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   theme_bw(base_size = 18)
 
 
+#save model to disk 
+
+tree1000_Hetero <- modelHeteroRF1
+saveRDS(tree1000_Hetero, "./tree1000_Hetero.rds")
 
 
 #fit model with num.trees = xx trees (better performance)
 
 ####-------tree 3: Final --------------------------------------------------
 
-### hier das finale model mit bestmtry und node size einfügen , auch best num.tree anpassen
+#finalmodel
+modelHeterofinal <- modelHeteroRF
 
-modelHeterofinal <- modelHeteroXX
 # Print model
-### hier den Model namen ändern
 print(modelHeterofinal)
 
 #output in terms of regression coefficients
@@ -17563,16 +17487,12 @@ summary(modelHeterofinal)
 
 #evaluate variable importance 
 # Mean Decrease Gini - Measure of variable importance based on the Gini impurity index used for the calculation of splits in trees.
-### hier auch den model namen ändern
 
 varImp(modelHeterofinal)
 plot(varImp(modelHeterofinal), 20, main = "Heterosexuell")
 
-# Apply model to test_df --> test_dfGeschlecht
 
 # predict outcome using model from train_df applied to the test_df
-
-### hier auch einmal nach dem testdf der DV umbenennen
 predictions <- predict(modelHeterofinal, newdata=test_dfHetero)
 
 # Create confusion matrix --> nur für classification
@@ -17580,7 +17500,6 @@ confusionMatrix(data=predictions, test_dfHetero$Heterosexuell)
 
 
 #check for AUC 
-#####(nur binär und kategorisch)
 test_roc <- function(model, data) {
   
   roc(test_dfHetero$Heterosexuell,
@@ -17592,7 +17511,6 @@ modelHeterofinal %>%
   test_roc(data = test_dfHetero) %>%
   auc()
 
-###nur für binär (von hier bis Ende des Abschnitts)
 #compare different ROC-plots
 model_list <- list(M1 = modelHeterofinal)
 
@@ -17680,21 +17598,11 @@ super_model <- readRDS("./final_model.rds")
 print(super_model)
 
 
-
 ####################
 #Allein vs. in Beziehung: binär
 #####################
 
 #--------------------------------------DATA PRE-PROCESSING------------------------------------------
-
-# load data 
-
-load("data_for_analysis.RData")
-
-#data <- full  #oder ändern zu data <- reduced_set
-
-cols_names <- names(data)  
-cols_names
 
 # Columns wählen
 data_AlleinBeziehung <- data[,c(316, 27:255)]
@@ -17726,9 +17634,7 @@ set.seed(1997)
 
 index <- createDataPartition(data_AlleinBeziehung$Allein_vs_Beziehung, p=.8, list= FALSE, times= 1)
 
-# Create train_dfGeschlecht & test_dfGeschlecht
-
-### name anpassen an DV
+# Create train_df & test_df
 
 train_dfAlleinBeziehung <- data_AlleinBeziehung[index,]
 test_dfAlleinBeziehung <- data_AlleinBeziehung[-index,]
@@ -17751,16 +17657,11 @@ myControl = trainControl(
   search = "grid",
 )
 
-myGrid = expand.grid(mtry = c(10:20),
-                     splitrule = "extratrees", 
-                     min.node.size = c(5,10,15))
-
 ####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
 
 # test of the ideal mtry, splitrule and min-node.size
 
 set.seed(1997)
-
 
 modelAlleinBeziehungRF <- train(Allein_vs_Beziehung ~ ., 
                                 data=train_dfAlleinBeziehung,
@@ -17838,6 +17739,10 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
 
+#save model to disk 
+
+tree500_AlleinBeziehung <- modelAlleinBeziehungRF
+saveRDS(tree500_AlleinBeziehung, "./tree500_AlleinBeziehung.rds")
 
 
 ####-------tree 2: num.tree prüfen --------------------------------------------------
@@ -17861,9 +17766,6 @@ modelAlleinBeziehungRF1
 summary(modelAlleinBeziehungRF1)
 plot(modelAlleinBeziehungRF1)
 #best mtry = 12, splitrule = extratrees, min.node.size = 15
-
-
-# Apply model to test_df --> test_dfGeschlecht
 
 # predict outcome using model from train_df applied to the test_df
 
@@ -17922,6 +17824,11 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   theme_bw(base_size = 18)
 
 
+#save model to disk 
+
+tree1000_AlleinBeziehung <- modelAlleinBeziehungRF1
+saveRDS(tree1000_AlleinBeziehung, "./tree1000_AlleinBeziehung.rds")
+
 
 
 #fit model with num.trees = 500 trees (better performance)
@@ -17944,7 +17851,6 @@ summary(modelAlleinBeziehungfinal)
 varImp(modelAlleinBeziehungfinal)
 plot(varImp(modelAlleinBeziehungfinal), 20, main = "Allein_vs_Beziehung")
 
-# Apply model to test_df --> test_dfGeschlecht
 
 # predict outcome using model from train_df applied to the test_df
 
@@ -18059,30 +17965,27 @@ print(besttree_allein_beziehung)
 #--------------------------------------DATA PRE-PROCESSING------------------------------------------
 
 
-# load data 
-
-load("data_for_analysis.RData")
-
-#data <- full  #oder ändern zu data <- reduced_set
-
-cols_names <- names(data)  
-cols_names
-
-
 #define data for analysis
 data_Beziehungsstatus <- data[,c(18, 27:255)]
 
 #Gibt es NAs in der DV?
-sum(is.na(data_Beziehungsstatus$Beziehungsstatus)) #122 NAs
+sum(is.na(data_Beziehungsstatus$Beziehungsstatus)) #17 NAs
 data_Beziehungsstatus <- data_Beziehungsstatus %>% subset(data_Beziehungsstatus$Beziehungsstatus != "NA")
 
 
 #ist die Variable unbalanced?
-table(data_Beziehungsstatus$Beziehungsstatus) #hohes Einkommen ist unterrepräsentiert, verhältnis ca. 1:6:10 --> Korrektur notwendig!
-max(table(data_Beziehungsstatus$Beziehungsstatus)/sum(table(data_Beziehungsstatus$Beziehungsstatus))) #no information rate 61%
+table(data_Beziehungsstatus$Beziehungsstatus)
+max(table(data_Beziehungsstatus$Beziehungsstatus)/sum(table(data_Beziehungsstatus$Beziehungsstatus)))
 
 #IV als Faktor:
 data_Beziehungsstatus$Beziehungsstatus <- as.factor(data_Beziehungsstatus$Beziehungsstatus)
+
+#Variablennamen anpassen für Analyse
+data_Beziehungsstatus <- data_Beziehungsstatus %>% mutate(Beziehungsstatus = case_when(Beziehungsstatus == "Geschieden" ~ 'Single',
+                                                                                       Beziehungsstatus == "In einer Beziehung" ~ 'In_Beziehung',
+                                                                                       Beziehungsstatus == "Single" ~ 'Single',
+                                                                                       Beziehungsstatus == "Verheiratet" ~ 'Verheiratet',
+                                                                                       Beziehungsstatus == "Verwitwet" ~ 'Single'))
 
 
 
@@ -18117,17 +18020,10 @@ myControl1 = trainControl(
   summaryFunction = defaultSummary, 
   classProbs = TRUE, 
   allowParallel=TRUE,
-  sampling = "smote", 
+  #sampling = "smote", 
   search = "grid"
 )
 
-#set tuning grid
-
-set.seed(1997)
-
-myGrid = expand.grid(mtry = c(10:20),
-                     splitrule = "extratrees", 
-                     min.node.size = c(5,10,15))
 
 
 ####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
@@ -18174,6 +18070,11 @@ test_roc <- function(model, data) {
 RFBeziehungsstatus %>%
   test_roc(data = test_dfBeziehungsstatus) %>%
   auc()
+
+#save model to disk 
+
+tree500_Beziehungsstatus <- RFBeziehungsstatus
+saveRDS(tree500_Beziehungsstatus, "./tree500_Beziehungsstatus.rds")
 
 
 
@@ -18222,12 +18123,18 @@ RFBeziehungsstatus1 %>%
 #model1: 500 trees performs better
 
 
+#save model to disk 
+
+tree1000_Beziehungsstatus <- RFBeziehungsstatus1
+saveRDS(tree1000_Beziehungsstatus, "./tree1000_Beziehungsstatus.rds")
+
+
 ####-------tree 3: Final --------------------------------------------------
 
 #final model
 
 set.seed(1997)
-RFBeziehungsstatusFinal <- RFBeziehungsstatusXX
+RFBeziehungsstatusFinal <- RFBeziehungsstatus
 
 # Print models
 RFBeziehungsstatusFinal 
@@ -18297,26 +18204,26 @@ PartialPlots %>% partial(pred.var = impvar[18], which.class = "Geschieden") %>%p
 PartialPlots %>% partial(pred.var = impvar[19], which.class = "Geschieden") %>%plotPartial(main = "Geschieden")
 PartialPlots %>% partial(pred.var = impvar[20], which.class = "Geschieden") %>%plotPartial(main = "Geschieden")
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "In_einer_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[1], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[2], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[3], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[4], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[5], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[6], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[7], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[8], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[9], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[10], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[11], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[12], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[13], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[14], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[15], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[16], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[17], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[18], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[19], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
+PartialPlots %>% partial(pred.var = impvar[20], which.class = "In_Beziehung") %>%plotPartial(main = "In einer Beziehung")
 
 
 PartialPlots %>% partial(pred.var = impvar[1], which.class = "Single") %>%plotPartial(main = "Single")
@@ -18363,27 +18270,6 @@ PartialPlots %>% partial(pred.var = impvar[19], which.class = "Verheiratet") %>%
 PartialPlots %>% partial(pred.var = impvar[20], which.class = "Verheiratet") %>%plotPartial(main = "Verheiratet")
 
 
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "Verwitwet") %>%plotPartial(main = "Verwitwet")
-
 
 #------------------------------------------------WHEN BEST MODEL IS FOUND-----------------------------------------------------
 
@@ -18398,23 +18284,11 @@ besttree_Einkommen <- readRDS("./tree_Einkommen.rds")
 print(besttree_Einkommen)
 
 
-
-
-
 #######################
 #Kinder: binär
 ######################
 
 #--------------------------------------DATA PRE-PROCESSING------------------------------------------
-
-# load data 
-
-load("data_for_analysis.RData")
-
-#data <- full  #oder ändern zu data <- reduced_set
-
-cols_names <- names(data)  
-cols_names
 
 # choose relevant columns
 data_Kinder <- data[,c(288, 27:255)]
@@ -18480,10 +18354,6 @@ myControl = trainControl(
   sampling = "smote", #wenn sampling, dann hier anpassen und für alle drei Varianten ausprobieren!! (up, down, smote)
   search = "grid",
 )
-
-myGrid = expand.grid(mtry = c(10:20),
-                     splitrule = "extratrees", 
-                     min.node.size = c(5,10,15))
 
 
 ####-------tree 1: mtry, splitrule and min.node.size tunen --------------------------------------------------
@@ -18563,6 +18433,12 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   scale_color_manual(values = custom_col) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
+
+#save model to disk 
+
+tree500_Kinder <- modelKinderRF
+saveRDS(tree500_Kinder, "./tree500_Kinder.rds")
+
 
 
 ####-------tree 2: num.tree prüfen --------------------------------------------------
@@ -18644,6 +18520,11 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
 
+
+#save model to disk 
+
+tree1000_Kinder <- modelKinderRF1
+saveRDS(tree1000_Kinder, "./tree1000_Kinder.rds")
 
 
 
