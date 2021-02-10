@@ -8893,7 +8893,7 @@ RFHardliner1 <- train(Corona_Hardliner ~ .,
 RFHardliner1
 summary(RFHardliner1)
 plot(RFHardliner1)
-#mtry = 14, extratrees, min.node.size = 5
+#mtry = 13, extratrees, min.node.size = 15
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -8911,7 +8911,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0.5903
+#model auc: 0.5857
 RFHardliner1 %>%
   test_roc(data = test_dfHardliner) %>%
   auc()
@@ -8980,7 +8980,7 @@ RFHardliner2 <- train(Corona_Hardliner ~ .,
 RFHardliner2
 summary(RFHardliner2)
 plot(RFHardliner2)
-#mtry = 11, extratrees, min.node.size = 15
+#mtry = 13, extratrees, min.node.size = 15
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -8998,7 +8998,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,5819
+#model auc: 0,5843
 RFHardliner2 %>%
   test_roc(data = test_dfHardliner) %>%
   auc()
@@ -9192,7 +9192,7 @@ data_Softliner <- data_Softliner %>% subset(data_Softliner$Corona_Softliner != "
 
 #ist die Variable unbalanced?
 table(data_Softliner$Corona_Softliner) #should correct for imbalancedness
-max(table(data_Softliner$Corona_Softliner)/sum(table(data_Softliner$Corona_Softliner))) #no information rate 73%
+max(table(data_Softliner$Corona_Softliner)/sum(table(data_Softliner$Corona_Softliner))) #no information rate 74%
 
 #IV als Faktor:
 data_Softliner$Corona_Softliner <- as.factor(data_Softliner$Corona_Softliner)
@@ -9255,7 +9255,7 @@ RFSoftliner1 <- train(Corona_Softliner ~ .,
 RFSoftliner1
 summary(RFSoftliner1)
 plot(RFSoftliner1)
-#mtry = 11, extratrees, min.node.size = 10
+#mtry = 13, extratrees, min.node.size = 10
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -9273,7 +9273,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,6721
+#model auc: 0,6115
 RFSoftliner1 %>%
   test_roc(data = test_dfSoftliner) %>%
   auc()
@@ -9340,7 +9340,7 @@ RFSoftliner2 <- train(Corona_Softliner ~ .,
 RFSoftliner2
 summary(RFSoftliner2)
 plot(RFSoftliner2)
-#mtry = 11, extratrees, min.node.size = 10
+#mtry = 13, extratrees, min.node.size = 10
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -9358,7 +9358,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,6735
+#model auc: 0,6137
 RFSoftliner2 %>%
   test_roc(data = test_dfSoftliner) %>%
   auc()
@@ -9619,7 +9619,7 @@ RFSkeptiker1 <- train(Corona_Skeptiker ~ .,
 RFSkeptiker1
 summary(RFSkeptiker1)
 plot(RFSkeptiker1)
-#mtry = 19, extratrees, min.node.size = 10
+#mtry = 11, extratrees, min.node.size = 10
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -9637,7 +9637,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0.7532
+#model auc: 0,6864
 RFSkeptiker1 %>%
   test_roc(data = test_dfSkeptiker) %>%
   auc()
@@ -9705,7 +9705,7 @@ RFSkeptiker2 <- train(Corona_Skeptiker ~ .,
 RFSkeptiker2
 summary(RFSkeptiker2)
 plot(RFSkeptiker2)
-#mtry = 11, extratrees, min.node.size = 15
+#mtry = 11, extratrees, min.node.size = 10
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RFSkeptiker2, newdata=test_dfSkeptiker)
@@ -9722,7 +9722,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,7689
+#model auc: 0,6921
 RFSkeptiker2 %>%
   test_roc(data = test_dfSkeptiker) %>%
   auc()
@@ -9763,7 +9763,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
 
-#better num.trees: 1000 trees --> better predictions!
+#better num.trees: 500 trees --> better predictions for Skeptiker
 
 tree1000_Corona_Skeptiker <- RFSkeptiker2
 saveRDS(tree1000_Corona_Skeptiker, "./tree1000_Corona_Skeptiker.rds")
@@ -9773,7 +9773,7 @@ saveRDS(tree1000_Corona_Skeptiker, "./tree1000_Corona_Skeptiker.rds")
 #finales Model
 
 set.seed(1997)
-RFSkeptiker_fin <- RFSkeptiker2
+RFSkeptiker_fin <- RFSkeptiker1
 
 # Print models
 RFSkeptiker_fin
@@ -10329,9 +10329,9 @@ RFHard_num1
 summary(RFHard_num1)
 plot(RFHard_num1)
 
-#best mtry:11
+#best mtry:10
 #splitrule: extratrees
-#min.node.size used: 10
+#min.node.size used: 15
 
 # predict outcome using model from train_df applied to the test_df
 predictions1 <- predict(RFHard_num1, newdata=test_dfHard_num)
@@ -10565,9 +10565,9 @@ RFSoft_num1
 summary(RFSoft_num1)
 plot(RFSoft_num1)
 
-#best mtry:13
+#best mtry:11
 #splitrule: extratrees
-#min.node.size used: 10
+#min.node.size used: 5
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(RFSoft_num1, newdata=test_dfSoft_num)
@@ -10613,7 +10613,7 @@ summary(RFSoft_num2)
 plot(RFSoft_num2)
 #best mtry:10
 #splitrule: extratrees
-#min.node.size used: 10
+#min.node.size used: 5
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RFSoft_num2, newdata=test_dfSoft_num)
@@ -11106,7 +11106,7 @@ pearsonLeugner2
 spearmanLeugner2 <- cor.test(predictions2, test_dfLeugner_num$Glaube_nicht_an_Corona, method = "spearman")
 spearmanLeugner2
 
-#num.trees 500 performs better
+#num.trees 1000 performs better
 
 #save model to disk 
 
@@ -11120,7 +11120,7 @@ saveRDS(tree1000_CoronaLeugner_num, "./tree1000_CoronaLeugner_num.rds")
 
 set.seed(1997)
 
-RFLeugner_num_fin <- RFLeugner_num1
+RFLeugner_num_fin <- RFLeugner_num2
 
 # Print model
 RFLeugner_num_fin
@@ -11209,7 +11209,7 @@ print(besttree_Leugner_num)
 data_Einkommen <- data[,c(315, 27:255)]
 
 #Gibt es NAs in der DV?
-sum(is.na(data_Einkommen$Einkommensgruppe)) #122 NAs
+sum(is.na(data_Einkommen$Einkommensgruppe)) #121 NAs
 data_Einkommen <- data_Einkommen %>% subset(data_Einkommen$Einkommensgruppe != "NA")
 
 
@@ -11280,7 +11280,7 @@ RFEinkommen_1 <- train(Einkommensgruppe ~ .,
 RFEinkommen_1
 summary(RFEinkommen_1)
 plot(RFEinkommen_1)
-#mtry = 14, extratrees, min.node.size = 10
+#mtry = 17, extratrees, min.node.size = 15
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -11297,7 +11297,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,7018
+#model auc: 0,6772
 RFEinkommen_1 %>%
   test_roc(data = test_dfEinkommen) %>%
   auc()
@@ -11327,7 +11327,7 @@ RFEinkommen_2 <- train(Einkommensgruppe ~ .,
 RFEinkommen_2
 summary(RFEinkommen_2)
 plot(RFEinkommen_2)
-#mtry = 17, extratrees, min.node.size = 15
+#mtry = 15, extratrees, min.node.size = 5
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -11338,7 +11338,7 @@ predictions2 <- predict(RFEinkommen_2, newdata=test_dfEinkommen)
 confusionMatrix(data=as.factor(predictions2), as.factor(test_dfEinkommen$Einkommensgruppe))
 
 
-#check for auc: 0,7056
+#check for auc: 0,6715
 test_roc <- function(model, data) {
   
   multiclass.roc(test_dfEinkommen$Einkommensgruppe,
@@ -11352,7 +11352,7 @@ RFEinkommen_2 %>%
   auc()
 
 
-#model1: 1000 trees performs better on predictions
+#model1: 500 trees performs better 
 
 #save model to disk 
 
@@ -11364,7 +11364,7 @@ saveRDS(tree1000_Einkommen, "./tree1000_Einkommen.rds")
 #final model
 
 set.seed(1997)
-RFEinkommen_fin <- RFEinkommen_2
+RFEinkommen_fin <- RFEinkommen_1
 
 # Print models
 RFEinkommen_fin
@@ -11391,7 +11391,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,7056
+#model auc: 0,6772
 RFEinkommen_fin %>%
   test_roc(data = test_dfEinkommen) %>%
   auc()
@@ -11501,10 +11501,10 @@ print(besttree_Einkommen)
 
 
 #define data for analysis
-data_Durchschnittseinkommen <- data[,c(346, 27:255)]
+data_Durchschnittseinkommen <- data[,c(344, 27:255)]
 
 #Gibt es NAs in der DV?
-sum(is.na(data_Durchschnittseinkommen$Durchschnittseinkommen)) #122 NAs
+sum(is.na(data_Durchschnittseinkommen$Durchschnittseinkommen)) #121 NAs
 data_Durchschnittseinkommen <- data_Durchschnittseinkommen %>% subset(data_Durchschnittseinkommen$Durchschnittseinkommen != "NA")
 
 
@@ -11924,9 +11924,9 @@ RFGreen1_1
 summary(RFGreen1_1)
 plot(RFGreen1_1)
 
-#best mtry:10
+#best mtry:11
 #splitrule: extratrees
-#min.node.size used: 10
+#min.node.size used: 15
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(RFGreen1_1, newdata=test_dfGreen1)
@@ -12162,7 +12162,7 @@ RFGreen2_1 <- train(Green2 ~ .,
 RFGreen2_1
 summary(RFGreen2_1)
 plot(RFGreen2_1)
-#mtry = 13, extratrees, min.node.size = 10
+#mtry = 11, extratrees, min.node.size = 10
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -12180,7 +12180,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,6346
+#model auc: 0,6469
 RFGreen2_1 %>%
   test_roc(data = test_dfGreen2) %>%
   auc()
@@ -12249,7 +12249,7 @@ RFGreen2_2 <- train(Green2 ~ .,
 RFGreen2_2
 summary(RFGreen2_2)
 plot(RFGreen2_2)
-#mtry = 13, extratrees, min.node.size = 10
+#mtry = 11, extratrees, min.node.size = 10
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -12267,7 +12267,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,6341
+#model auc: 0,646
 RFGreen2_2 %>%
   test_roc(data = test_dfGreen2) %>%
   auc()
@@ -12308,7 +12308,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
 
-#better num.trees: 500 trees sorts 1 person more correctly
+#better num.trees: 1000 trees --> better at predicting imbalanced class
 
 #save model to disk 
 
@@ -12322,7 +12322,7 @@ saveRDS(tree1000_GreenValues_bin, "./tree1000_GreenValues_bin.rds")
 #final getunte Werte einsetzen
 
 set.seed(1997)
-RFGreen2_fin <- RFGreen2_1
+RFGreen2_fin <- RFGreen2_2
 
 # Print models
 RFGreen2_fin
@@ -12352,7 +12352,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,6346
+#model auc: 0,646
 RFGreen2_fin %>%
   test_roc(data = test_dfGreen2) %>%
   auc()
