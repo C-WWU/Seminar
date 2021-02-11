@@ -712,31 +712,31 @@ data <- bind_cols(data, nichtR)
 #extraversion: Q8_1 and Q8_7
 data <- data %>%
   rowwise() %>%
-  mutate(Extraversion = mean(c(`Extrovertiert_enthusiastisch`, `Zurueckhaltend/ruhig_nichtR`)))
+  mutate(Extraversion = (`Extrovertiert_enthusiastisch` + `Zurueckhaltend/ruhig_nichtR`)/2)
 
 
 #Agreeableness: 2R + 8
 data <- data %>%
   rowwise() %>%
-  mutate(Agreeableness = mean(c(`Kritisch/konfliktfreudig_nichtR`, `Sympathisch_warmherzig`)))
+  mutate(Agreeableness = (`Kritisch/konfliktfreudig_nichtR` + `Sympathisch_warmherzig`)/2)
 
 
 #Conscientiousness: 3 + 9R
 data <- data %>%
   rowwise() %>%
-  mutate(Conscientiousness = mean(c(`Zuverlaessig_selbstdiszipliniert`, `Unorganisiert/nachlaessig_nichtR`)))
+  mutate(Conscientiousness = (`Zuverlaessig_selbstdiszipliniert` + `Unorganisiert/nachlaessig_nichtR`)/2)
 
 
 #Emotional stability: 4R + 10
 data <- data %>%
   rowwise() %>%
-  mutate(Emotional_stablity = mean(c(`Aengstlich/leicht reizbar_nichtR`, `Ruhig_emotional_stabil`)))
+  mutate(Emotional_stablity = (`Aengstlich/leicht reizbar_nichtR` + `Ruhig_emotional_stabil`)/2)
 
 
 #Openness to Experiences: 5R + 11
 data <- data %>%
   rowwise() %>%
-  mutate(Openness_to_Experiences = mean(c(`Offen_fuer_neue_Erfahrungen_vielseitig`, `Konventionell/unkreativ_nichtR`)))
+  mutate(Openness_to_Experiences = (`Offen_fuer_neue_Erfahrungen_vielseitig` + `Konventionell/unkreativ_nichtR`)/2)
 
 #Version 2: Persönlichkeit mit je nur 2 Ausgängen coden: <4 oder >4; 4 = NA
 data <- data %>% mutate(Extraversion2 = case_when(Extraversion < 4 ~ 'Introvertiert',
@@ -744,11 +744,11 @@ data <- data %>% mutate(Extraversion2 = case_when(Extraversion < 4 ~ 'Introverti
 data <- data %>% mutate(Agreeableness2 = case_when(Agreeableness < 4 ~ 'Not_Agreeable',
                                                                 Agreeableness > 4 ~ 'Agreeable'))
 data <- data %>% mutate(Conscientiousness2 = case_when(Conscientiousness < 4 ~ 'Not_Conscientious',
-                                                            Agreeableness > 4 ~ 'Conscientious'))
+                                                       Conscientiousness > 4 ~ 'Conscientious'))
 data <- data %>% mutate(Emotional_stablity2 = case_when(Emotional_stablity < 4 ~ 'Unstable',
-                                                            Agreeableness > 4 ~ 'Stable'))
-data <- data %>% mutate(Openness_Experiences2 = case_when(Agreeableness < 4 ~ 'Closed',
-                                                            Agreeableness > 4 ~ 'Open'))
+                                                        Emotional_stablity > 4 ~ 'Stable'))
+data <- data %>% mutate(Openness_Experiences2 = case_when(Openness_to_Experiences < 4 ~ 'Closed',
+                                                          Openness_to_Experiences > 4 ~ 'Open'))
 
 
 
@@ -756,7 +756,7 @@ data <- data %>% mutate(Openness_Experiences2 = case_when(Agreeableness < 4 ~ 'C
 #Green Values
 data <- data %>%
   rowwise() %>%
-  mutate(Green_Values = mean(c(Verwendete_Produkte_Umwelt_nicht_belasten, Auswirkungen_meiner_Handlungen_auf_Umwelt, Kaufgewohnheiten_Sorge_um_Umwelt, Verschwendung_Ressourcen, Umweltverantwortlich, Unannehmlichkeiten_fuer_Umwelt)))
+  mutate(Green_Values = (Verwendete_Produkte_Umwelt_nicht_belasten + Auswirkungen_meiner_Handlungen_auf_Umwelt + Kaufgewohnheiten_Sorge_um_Umwelt + Verschwendung_Ressourcen + Umweltverantwortlich + Unannehmlichkeiten_fuer_Umwelt)/6)
 
 
 #Version 2: mit je nur 2 Ausgängen coden: <4 oder >4; 4 = NA
@@ -1123,9 +1123,9 @@ ggplot(data, aes(Openness_to_Experiences))+
 #Variablen: Extraversion2, Agreeableness2 usw. teilen in zwei Gruppen auf:
 table(data$Extraversion2)/sum(table(data$Extraversion2)) #51% Introvertiert
 table(data$Agreeableness2)/sum(table(data$Agreeableness2)) #83% Agreeable
-table(data$Conscientiousness2)/sum(table(data$Conscientiousness2)) #89% Conscentious
-table(data$Emotional_stablity2)/sum(table(data$Emotional_stablity2)) #69% Emotionally Stable
-table(data$Openness_Experiences2)/sum(table(data$Openness_Experiences2)) #83% open to new experiences
+table(data$Conscientiousness2)/sum(table(data$Conscientiousness2)) #92% Conscentious
+table(data$Emotional_stablity2)/sum(table(data$Emotional_stablity2)) #73% Emotionally Stable
+table(data$Openness_Experiences2)/sum(table(data$Openness_Experiences2)) #89% open to new experiences
 
 
 #Green Values
@@ -1157,15 +1157,15 @@ table(data$Gefuehl_von_Erfolg)
 #no controverse goals, usually majority >5
 
 #Zusammengefasst: Variablen zu Wichtigkeit des Ziels
-table(data$Zugehoerigkeit_wichtig) #für 1625 wichtig
-table(data$Spannung_wichtig) #für 1088 wichtig
-table(data$Herzliche_Beziehung_wichtig) #für 1788 wichtig
-table(data$Selbstverwirklichung_wichtig) #für 1658 wichtig
-table(data$Respekt_wichtig) #für 1734 wichtig
-table(data$Spass_Freude_wichtig) #für 1849 wichtig
-table(data$Sicherheit_wichtig) #für 1779 wichtig
-table(data$Selbstachtung_wichtig) #für 1764 wichtig
-table(data$Erfolg_wichtig) #für 1637 wichtig
+table(data$Zugehoerigkeit_wichtig) 
+table(data$Spannung_wichtig) 
+table(data$Herzliche_Beziehung_wichtig) 
+table(data$Selbstverwirklichung_wichtig) 
+table(data$Respekt_wichtig) 
+table(data$Spass_Freude_wichtig) 
+table(data$Sicherheit_wichtig) 
+table(data$Selbstachtung_wichtig) 
+table(data$Erfolg_wichtig) 
 
 #Parteien
 round(table(data$`Wahl_Partei`)/sum(table(data$`Wahl_Partei`)), 2) #relative shares of voters in our dataset
@@ -1193,10 +1193,10 @@ ggplot(Partei, aes(factor(Var1, levels = Partei_Order), Freq))+
 
 
 #Corona: 4 Gruppen eingeteilt: Hardliner, Softliner, Skeptiker, Leugner
-table(data$Corona_Hardliner) #582 Hardliner: Wollen härtere Maßnahmen
-table(data$Corona_Softliner) #246 Softliner: Wollen softere Maßnahmen
-table(data$Corona_Skeptiker) #279 Skeptiker: Bezweifeln Gefährlichkeit des Virus
-table(data$Corona_Leugner) #118 Leugner: Glauben nicht an Virus
+table(data$Corona_Hardliner) #1166 Hardliner: Wollen härtere Maßnahmen
+table(data$Corona_Softliner) #537 Softliner: Wollen softere Maßnahmen
+table(data$Corona_Skeptiker) #299 Skeptiker: Bezweifeln Gefährlichkeit des Virus
+table(data$Corona_Leugner) #124 Leugner: Glauben nicht an Virus
 
 
 
@@ -1206,8 +1206,8 @@ table(data$Zigaretten_Konsum)
 table(data$Drogen_Konsum)
 #zusammengefasst: V1 mit 3 Ausprägungen
 table(data$Alkoholgruppe)
-table(data$Zigarettengruppe) #1250 Nichtraucher
-table(data$Drogengruppe) #"nur" 64 mit hohem Konsum
+table(data$Zigarettengruppe)
+table(data$Drogengruppe)
 #zusammengefasst: V2 mit 2 Ausprägungen
 table(data$Alkohol_ja_nein)
 table(data$Zigaretten_ja_nein)
@@ -1280,9 +1280,6 @@ full_set <- data %>% subset(data$Accounts_followed > 0)
 reduced_set <- data %>% subset(data$`Duration (in seconds)` > duration_zu_klein & data$`Duration (in seconds)` < duration_zu_groß & data$Accounts_followed > Accounts_zu_wenige & data$Accounts_followed < Accounts_zu_viele)
 
 
-(duration_zu_klein < data$`Duration (in seconds)` < duration_zu_groß & Accounts_zu_wenige < data$Accounts_followed < Accounts_zu_viele)
-#ACHTUNG noch festlegen und abändern!
-
 #save different datasets as CSV and R Document
 #full set
 write.csv(full_set, "/Users/Miriam/Documents/Uni/Master/3. Semester/Seminar SRA/datasets/neu/data_full.csv")
@@ -1294,8 +1291,6 @@ save(reduced_set, file = 'data_reduced.RData')
 
 
 
-
-load("data_for_analysis.RData")
 
 #####
 #Analysis
