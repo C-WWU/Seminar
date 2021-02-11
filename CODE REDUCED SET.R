@@ -5939,7 +5939,7 @@ print(besttree_Drogen_janein)
 data_Partei <- data[,c(7, 27:255)]
 
 #Gibt es NAs in der DV?
-sum(is.na(data_Partei$Wahl_Partei)) #181 NAs
+sum(is.na(data_Partei$Wahl_Partei)) #175 NAs
 #Sonstige auch als NA, um sie aus Analyse auszuschließen:
 data_Partei <- data_Partei %>% replace_with_na_all(condition = ~.x == "Sonstige:")
 #Datenset ohne NAs
@@ -6019,7 +6019,7 @@ RFPartei_1 <- train(Wahl_Partei ~ .,
 RFPartei_1
 summary(RFPartei_1)
 plot(RFPartei_1)
-#mtry = 19, extratrees, min.node.size = 15
+#mtry = 19, extratrees, min.node.size = 5
 
 # predict outcome using model from train_df applied to the test_df
 predictions1 <- predict(RFPartei_1, newdata=test_dfPartei)
@@ -6035,7 +6035,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0.6527
+#model auc: 0.6428
 RFPartei_1 %>%
   test_roc(data = test_dfPartei) %>%
   auc()
@@ -6065,7 +6065,7 @@ RFPartei_2 <- train(Wahl_Partei ~ .,
 RFPartei_2
 summary(RFPartei_2)
 plot(RFPartei_2)
-#mtry = 15, extratrees, min.node.size = 5
+#mtry = 19, extratrees, min.node.size = 5
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RFPartei_2, newdata=test_dfPartei)
@@ -6073,7 +6073,7 @@ predictions2 <- predict(RFPartei_2, newdata=test_dfPartei)
 # Create confusion matrix
 confusionMatrix(data=as.factor(predictions2), as.factor(test_dfPartei$Wahl_Partei))
 
-#check for auc: 0,6421
+#check for auc: 0,637
 test_roc <- function(model, data) {
   
   multiclass.roc(test_dfPartei$Wahl_Partei,
@@ -6093,7 +6093,7 @@ tree1000_WahlPartei <- RFPartei_2
 saveRDS(tree1000_WahlPartei, "./tree1000_WahlPartei.rds")
 
 
-#model: 1000 trees performs better at predicting correctly
+#model: 1000 trees performs better at predicting correctly though lower AUC
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -6348,7 +6348,7 @@ print(besttree_Partei)
 data_AfD <- data[,c(341, 27:255)]
 
 #Gibt es NAs in der DV?
-sum(is.na(data_AfD$AfD_Waehler)) #181 NAs
+sum(is.na(data_AfD$AfD_Waehler)) #175 NAs
 data_AfD <- data_AfD %>% subset(data_AfD$AfD_Waehler != "NA")
 
 
@@ -6422,7 +6422,7 @@ predictions <- predict(RfAfD_1, newdata=test_dfAfD)
 confusionMatrix(data=as.factor(predictions), as.factor(test_dfAfD$AfD_Waehler))
 
 
-#check for auc: 0,8374
+#check for auc: 0,8608
 test_roc <- function(model, data) {
   
   roc(test_dfAfD$AfD_Waehler,
@@ -6499,7 +6499,7 @@ RfAfD_2 <- train(AfD_Waehler ~ .,
 RfAfD_2
 summary(RfAfD_2)
 plot(RfAfD_2)
-#mtry = 11, extratrees, min.node.size = 5
+#mtry = 12, extratrees, min.node.size = 5
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -6517,7 +6517,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,8363
+#model auc: 0,8526
 RfAfD_2 %>%
   test_roc(data = test_dfAfD) %>%
   auc()
@@ -6566,7 +6566,7 @@ saveRDS(tree1000_AfD, "./tree1000_AfD.rds")
 
 
 
-#better num.trees: 1000 trees (performs 1 person better in predicting Afd Voters)
+#better num.trees: 500 trees
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -6574,7 +6574,7 @@ saveRDS(tree1000_AfD, "./tree1000_AfD.rds")
 #final Model
 
 set.seed(1997)
-RFAfD_fin <- RfAfD_2
+RFAfD_fin <- RfAfD_1
 
 # Print models
 RFAfD_fin
@@ -6709,7 +6709,7 @@ print(Tree_AfD)
 data_Gruen <- data[,c(339, 27:255)]
 
 #Gibt es NAs in der DV?
-sum(is.na(data_Gruen$Gruene_Waehler)) #181 NAs
+sum(is.na(data_Gruen$Gruene_Waehler)) #175 NAs
 data_Gruen <- data_Gruen %>% subset(data_Gruen$Gruene_Waehler != "NA")
 
 
@@ -6773,7 +6773,7 @@ RF_Gruene1 <- train(Gruene_Waehler ~ .,
 RF_Gruene1
 summary(RF_Gruene1)
 plot(RF_Gruene1)
-#mtry = 12, extratrees, min.node.size = 15
+#mtry = 13, extratrees, min.node.size = 10
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -6791,7 +6791,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,7591
+#model auc: 0,812
 RF_Gruene1 %>%
   test_roc(data = test_dfGruen) %>%
   auc()
@@ -6860,7 +6860,7 @@ RF_Gruene2 <- train(Gruene_Waehler ~ .,
 RF_Gruene2
 summary(RF_Gruene2)
 plot(RF_Gruene2)
-#mtry = 12, extratrees, min.node.size = 15
+#mtry = 13, extratrees, min.node.size = 10
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -6877,7 +6877,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,7619
+#model auc: 0,811
 RF_Gruene2 %>%
   test_roc(data = test_dfGruen) %>%
   auc()
@@ -7063,7 +7063,7 @@ print(besttree_Grün)
 data_CDU <- data[,c(337, 27:255)]
 
 #Gibt es NAs in der DV?
-sum(is.na(data_CDU$CDU_CSU_Waehler)) #181 NAs
+sum(is.na(data_CDU$CDU_CSU_Waehler)) #175 NAs
 data_CDU <- data_CDU %>% subset(data_CDU$CDU_CSU_Waehler != "NA")
 data_CDU$CDU_CSU_Waehler <- as.factor(data_CDU$CDU_CSU_Waehler)
 
@@ -7144,7 +7144,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0.6216
+#model auc: 0.622
 RF_CDU1 %>%
   test_roc(data = test_dfCDU) %>%
   auc()
@@ -7228,7 +7228,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,6278
+#model auc: 0,6233
 RF_CDU2 %>%
   test_roc(data = test_dfCDU) %>%
   auc()
@@ -7275,7 +7275,7 @@ tree1000_CDU <- RF_CDU2
 saveRDS(tree1000_CDU, "./tree1000_CDU.rds")
 
 
-#better num.trees: 500 trees (model converges afterwards)
+#better num.trees: 1000 trees 
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -7283,7 +7283,7 @@ saveRDS(tree1000_CDU, "./tree1000_CDU.rds")
 #final Model definieren
 
 set.seed(1997)
-RF_CDU_fin <- RF_CDU1
+RF_CDU_fin <- RF_CDU2
 
 # Print models
 RF_CDU_fin
@@ -7311,7 +7311,7 @@ test_roc <- function(model, data) {
 }
 
 #model auc
-RFGruene_fin %>%
+RF_CDU_fin %>%
   test_roc(data = test_dfCDU) %>%
   auc()
 
@@ -7391,11 +7391,11 @@ PartialPlots %>% partial(pred.var = impvar[20], which.class = "Ja") %>%plotParti
 #save model to disk 
 
 besttree_CDU <- RF_CDU_fin
-saveRDS(besttree_CDU, "./besttree_Grün.rds")
+saveRDS(besttree_CDU, "./besttree_CDU.rds")
 
 #load the model
 
-besttree_CDU <- readRDS("./besttree_Grün.rds")
+besttree_CDU <- readRDS("./besttree_CDU.rds")
 print(besttree_CDU)
 
 
@@ -7411,7 +7411,7 @@ print(besttree_CDU)
 data_Linke <- data[,c(342, 27:255)]
 
 #Gibt es NAs in der DV?
-sum(is.na(data_Linke$Linke_Waehler)) #181 NAs
+sum(is.na(data_Linke$Linke_Waehler)) #175 NAs
 data_Linke <- data_Linke %>% subset(data_Linke$Linke_Waehler != "NA")
 data_Linke$Linke_Waehler <- as.factor(data_Linke$Linke_Waehler)
 
@@ -7476,7 +7476,7 @@ RF_Linke1 <- train(Linke_Waehler ~ .,
 RF_Linke1
 summary(RF_Linke1)
 plot(RF_Linke1)
-#mtry = 13, extratrees, min.node.size = 5
+#mtry = 10, extratrees, min.node.size = 5
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -7494,7 +7494,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,7462
+#model auc: 0,7731
 RF_Linke1 %>%
   test_roc(data = test_dfLinke) %>%
   auc()
@@ -7560,7 +7560,7 @@ RF_Linke2 <- train(Linke_Waehler ~ .,
 
 RF_Linke2
 summary(RF_Linke2)
-#mtry = 11, extratrees, min.node.size = 10
+#mtry = 10, extratrees, min.node.size = 5
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -7577,7 +7577,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,7459
+#model auc: 0,7713
 RF_Linke2 %>%
   test_roc(data = test_dfLinke) %>%
   auc()
@@ -7624,7 +7624,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 tree1000_Linke <- RF_Linke2
 saveRDS(tree1000_Linke, "./tree1000_Linke.rds")
 
-#better num.trees: 500 trees has slightly better auc, the rest is similar
+#better num.trees: 1000 trees is slightly better to predict "ja"
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -7632,7 +7632,7 @@ saveRDS(tree1000_Linke, "./tree1000_Linke.rds")
 #final Model definieren
 
 set.seed(1997)
-RF_Linke_fin <- RF_Linke1
+RF_Linke_fin <- RF_Linke2
 
 
 # Print models
@@ -7761,7 +7761,7 @@ print(besttree_Linke)
 data_SPD <- data[,c(338, 27:255)]
 
 #Gibt es NAs in der DV?
-sum(is.na(data_SPD$SPD_Waehler)) #181 NAs
+sum(is.na(data_SPD$SPD_Waehler)) #175 NAs
 data_SPD <- data_SPD %>% subset(data_SPD$SPD_Waehler != "NA")
 data_SPD$SPD_Waehler <- as.factor(data_SPD$SPD_Waehler)
 
@@ -7824,7 +7824,7 @@ RF_SPD1 <- train(SPD_Waehler ~ .,
 RF_SPD1
 summary(RF_SPD1)
 plot(RF_SPD1)
-#mtry = 18, extratrees, min.node.size = 10
+#mtry = 19, extratrees, min.node.size = 15
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -7842,7 +7842,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0.5921
+#model auc: 0,5305
 RF_SPD1 %>%
   test_roc(data = test_dfSPD) %>%
   auc()
@@ -7912,7 +7912,7 @@ RF_SPD2 <- train(SPD_Waehler ~ .,
 RF_SPD2
 summary(RF_SPD2)
 plot(RF_SPD2)
-#mtry = 18, extratrees, min.node.size = 10
+#mtry = 10, extratrees, min.node.size = 5
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -7929,7 +7929,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,5879
+#model auc: 0,5344
 RF_SPD2 %>%
   test_roc(data = test_dfSPD) %>%
   auc()
@@ -7977,7 +7977,7 @@ tree1000_SPD <- RF_SPD2
 saveRDS(tree1000_SPD, "./tree1000_SPD.rds")
 
 
-#better num.trees: 500 trees because of better sensitivity and AUC
+#better num.trees: 1000 trees because of better sensitivity and AUC
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -7985,7 +7985,7 @@ saveRDS(tree1000_SPD, "./tree1000_SPD.rds")
 #final Model
 
 set.seed(1997)
-RF_SPD_fin <- RF_SPD1
+RF_SPD_fin <- RF_SPD2
 
 # Print models
 RF_SPD_fin
@@ -8012,7 +8012,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,5921
+#model auc: 0,5344
 RF_SPD_fin %>%
   test_roc(data = test_dfSPD) %>%
   auc()
@@ -8114,7 +8114,7 @@ print(besttree_SPD)
 data_FDP <- data[,c(340, 27:255)]
 
 #Gibt es NAs in der DV?
-sum(is.na(data_FDP$FDP_Waehler)) #181 NAs
+sum(is.na(data_FDP$FDP_Waehler)) #175 NAs
 data_FDP <- data_FDP %>% subset(data_FDP$FDP_Waehler != "NA")
 data_FDP$FDP_Waehler <- as.factor(data_FDP$FDP_Waehler)
 
@@ -8180,7 +8180,7 @@ RF_FDP1 <- train(FDP_Waehler ~ .,
 RF_FDP1
 summary(RF_FDP1)
 plot(RF_FDP1)
-#mtry = 13, extratrees, min.node.size = 5
+#mtry = 20, extratrees, min.node.size = 5
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -8198,7 +8198,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0.6219
+#model auc: 0.6881
 RF_FDP1 %>%
   test_roc(data = test_dfFDP) %>%
   auc()
@@ -8266,7 +8266,7 @@ RF_FDP2 <- train(FDP_Waehler ~ .,
 RF_FDP2
 summary(RF_FDP2)
 plot(RF_FDP2)
-#mtry = 13, extratrees, min.node.size = 5
+#mtry = 20, extratrees, min.node.size = 5
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -8283,7 +8283,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,6319
+#model auc: 0,6917
 RF_FDP2 %>%
   test_roc(data = test_dfFDP) %>%
   auc()
@@ -8469,7 +8469,7 @@ print(besttree_FDP)
 data_Nichtwahler <- data[,c(343, 27:255)]
 
 #Gibt es NAs in der DV?
-sum(is.na(data_Nichtwahler$Nichtwahler)) #181 NAs
+sum(is.na(data_Nichtwahler$Nichtwahler)) #175 NAs
 data_Nichtwahler <- data_Nichtwahler %>% subset(data_Nichtwahler$Nichtwahler != "NA")
 data_Nichtwahler$Nichtwahler <- as.factor(data_Nichtwahler$Nichtwahler)
 
@@ -8534,7 +8534,7 @@ RF_Nichtwahler1 <- train(Nichtwahler ~ .,
 RF_Nichtwahler1
 summary(RF_Nichtwahler1)
 plot(RF_Nichtwahler1)
-#mtry = 12, extratrees, min.node.size = 5
+#mtry = 11, extratrees, min.node.size = 5
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -8552,7 +8552,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,6801
+#model auc: 0,7405
 RF_Nichtwahler1 %>%
   test_roc(data = test_dfNichtwahler) %>%
   auc()
@@ -8621,7 +8621,7 @@ RF_Nichtwahler2 <- train(Nichtwahler ~ .,
 RF_Nichtwahler2
 summary(RF_Nichtwahler2)
 plot(RF_Nichtwahler2)
-#mtry = 12, extratrees, min.node.size = 5
+#mtry = 11, extratrees, min.node.size = 5
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -8638,7 +8638,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,6804
+#model auc: 0,7386
 RF_Nichtwahler2 %>%
   test_roc(data = test_dfNichtwahler) %>%
   auc()
@@ -8686,7 +8686,7 @@ tree1000_Nichtwahler <- RF_Nichtwahler2
 saveRDS(tree1000_Nichtwahler, "./tree1000_Nichtwahler.rds")
 
 
-#better num.trees: 500 trees --> worse overall accuracy but better for predicting Nichtwähler 
+#better num.trees: 1000 trees
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -8694,7 +8694,7 @@ saveRDS(tree1000_Nichtwahler, "./tree1000_Nichtwahler.rds")
 #final getunte Werte einsetzen
 
 set.seed(1997)
-RF_Nichtwahler_fin <- RF_Nichtwahler1
+RF_Nichtwahler_fin <- RF_Nichtwahler2
 
 
 # Print models
@@ -9978,7 +9978,7 @@ RFLeugner1 <- train(Corona_Leugner ~ .,
 RFLeugner1
 summary(RFLeugner1)
 plot(RFLeugner1)
-#mtry = 13, extratrees, min.node.size = 10
+#mtry = 14, extratrees, min.node.size = 10
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -9996,7 +9996,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,6736
+#model auc: 0,7164
 RFLeugner1 %>%
   test_roc(data = test_dfLeugner) %>%
   auc()
@@ -10063,7 +10063,7 @@ RFLeugner2 <- train(Corona_Leugner ~ .,
 RFLeugner2
 summary(RFLeugner2)
 plot(RFLeugner2)
-#mtry = 13, extratrees, min.node.size = 10
+#mtry = 14, extratrees, min.node.size = 10
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RFLeugner2, newdata=test_dfLeugner)
@@ -10080,7 +10080,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,6743
+#model auc: 0,7242
 RFLeugner2 %>%
   test_roc(data = test_dfLeugner) %>%
   auc()
@@ -10127,7 +10127,7 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 #save model to disk 
 
 tree1000_CoronaLeugner <- RFLeugner2
-saveRDS(tree1000_Corona_Leugner, "./tree100_Corona_Leugner.rds")
+saveRDS(tree1000_CoronaLeugner, "./tree1000_CoronaLeugner.rds")
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -10800,7 +10800,7 @@ RFSkeptiker_num1
 summary(RFSkeptiker_num1)
 plot(RFSkeptiker_num1)
 
-#best mtry:10
+#best mtry:12
 #splitrule: extratrees
 #min.node.size used: 15
 
@@ -10848,7 +10848,7 @@ RFSkeptikernum_2
 summary(RFSkeptikernum_2)
 plot(RFSkeptiker_num2)
 
-#best mtry:10
+#best mtry:11
 #splitrule: extratrees
 #min.node.size used: 15
 
@@ -10869,11 +10869,11 @@ pearsonSkeptiker2
 spearmanSkeptiker2 <- cor.test(predictions2, test_Skeptiker_num$Corona_ist_harmlos_gleich_Grippe, method = "spearman")
 spearmanSkeptiker2
 
-#num.trees 1000 performs better
+#num.trees 500 performs better
 
 #save model to disk 
 
-tree1000_CoronaSkeptiker_num <- RFSkeptiker_num2
+tree1000_CoronaSkeptiker_num <- RFSkeptikernum_2
 saveRDS(tree1000_CoronaSkeptiker_num, "./tree1000_CoronaSkeptiker_num.rds")
 
 ####-------tree 3: Final --------------------------------------------------
@@ -10882,7 +10882,7 @@ saveRDS(tree1000_CoronaSkeptiker_num, "./tree1000_CoronaSkeptiker_num.rds")
 
 set.seed(1997)
 
-RFSkeptikernum_fin <- RFSkeptikernum_2
+RFSkeptikernum_fin <- RFSkeptiker_num1
 
 # Print model
 RFSkeptikernum_fin
@@ -11591,7 +11591,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,7385
+#model auc: 0,7306
 RFDurchschnittseinkommen1 %>%
   test_roc(data = test_dfDurchschnittseinkommen) %>%
   auc()
@@ -11677,7 +11677,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,7407
+#model auc: 0,728
 RFDurchschnittseinkommen2 %>%
   test_roc(data = test_dfDurchschnittseinkommen) %>%
   auc()
@@ -13487,6 +13487,12 @@ data_Religion <- data[,c(12, 27:255)]
 sum(is.na(data_Religion$Religion)) 
 #Sonstige auch als NA, um sie aus Analyse auszuschließen:
 data_Religion <- data_Religion %>% replace_with_na_all(condition = ~.x == "Sonstige:")
+
+#Variablennamen anpassen für Analyse; Judentum als Na da zu wenige
+data_Religion <- data_Religion %>% mutate(Religion = case_when(Religion == "Christentum" ~ 'Christentum',
+                                                               Religion == "Ich fühle mich keiner Religion zugehörig" ~ 'Nicht_zugehörig',
+                                                               Religion == "Islam" ~ 'Islam',
+                                                               Religion == "Judentum" ~ 'NA'))
 #Datenset ohne NAs
 data_Religion <- data_Religion %>% subset(data_Religion$Religion != "NA")
 
@@ -13496,13 +13502,6 @@ max(table(data_Religion$Religion)/sum(table(data_Religion$Religion)))
 
 #IV als Faktor:
 data_Religion$Religion <- as.factor(data_Religion$Religion)
-
-
-#Variablennamen anpassen für Analyse
-data_Religion <- data_Religion %>% mutate(Religion = case_when(Religion == "Christentum" ~ 'Christentum',
-                                                               Religion == "Ich fühle mich keiner Religion zugehörig" ~ 'Nicht_zugehörig',
-                                                               Religion == "Islam" ~ 'Islam',
-                                                               Religion == "Judentum" ~ 'Judentum'))
 
 
 
@@ -13573,7 +13572,7 @@ predictions <- predict(RFReligion, newdata=test_dfReligion)
 # Create confusion matrix
 confusionMatrix(data=as.factor(predictions), as.factor(test_dfReligion$Religion))
 
-#check for auc
+#check for auc: 0,7635
 test_roc <- function(model, data) {
   
   multiclass.roc(test_dfReligion$Religion,
@@ -13609,7 +13608,7 @@ RFReligion1 <- train(Religion ~ .,
 # Print models
 RFReligion1
 summary(RFReligion1)
-#mtry = xx, extratrees, min.node.size = xx
+#mtry = 20, extratrees, min.node.size = 5
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -13628,13 +13627,13 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 
+#model auc: 0,762
 RFReligion1 %>%
   test_roc(data = test_dfReligion) %>%
   auc()
 
 
-#model1: 500 trees performs better
+#model1: 1000 trees performs better
 
 #save model to disk 
 
@@ -13760,27 +13759,6 @@ PartialPlots %>% partial(pred.var = impvar[18], which.class = "Islam") %>%plotPa
 PartialPlots %>% partial(pred.var = impvar[19], which.class = "Islam") %>%plotPartial(main = "Islam")
 PartialPlots %>% partial(pred.var = impvar[20], which.class = "Islam") %>%plotPartial(main = "Islam")
 
-
-PartialPlots %>% partial(pred.var = impvar[1], which.class = "Judentum") %>%plotPartial(main = "Judentum")
-PartialPlots %>% partial(pred.var = impvar[2], which.class = "Judentum") %>%plotPartial(main = "Judentum")
-PartialPlots %>% partial(pred.var = impvar[3], which.class = "Judentum") %>%plotPartial(main = "Judentum")
-PartialPlots %>% partial(pred.var = impvar[4], which.class = "Judentum") %>%plotPartial(main = "Judentum")
-PartialPlots %>% partial(pred.var = impvar[5], which.class = "Judentum") %>%plotPartial(main = "Judentum")
-PartialPlots %>% partial(pred.var = impvar[6], which.class = "Judentum") %>%plotPartial(main = "Judentum")
-PartialPlots %>% partial(pred.var = impvar[7], which.class = "Judentum") %>%plotPartial(main = "Judentum")
-PartialPlots %>% partial(pred.var = impvar[8], which.class = "Judentum") %>%plotPartial(main = "Judentum")
-PartialPlots %>% partial(pred.var = impvar[9], which.class = "Judentum") %>%plotPartial(main = "Judentum")
-PartialPlots %>% partial(pred.var = impvar[10], which.class = "Judentum") %>%plotPartial(main = "Judentum")
-PartialPlots %>% partial(pred.var = impvar[11], which.class = "Judentum") %>%plotPartial(main = "Judentum")
-PartialPlots %>% partial(pred.var = impvar[12], which.class = "Judentum") %>%plotPartial(main = "Judentum")
-PartialPlots %>% partial(pred.var = impvar[13], which.class = "Judentum") %>%plotPartial(main = "Judentum")
-PartialPlots %>% partial(pred.var = impvar[14], which.class = "Judentum") %>%plotPartial(main = "Judentum")
-PartialPlots %>% partial(pred.var = impvar[15], which.class = "Judentum") %>%plotPartial(main = "Judentum")
-PartialPlots %>% partial(pred.var = impvar[16], which.class = "Judentum") %>%plotPartial(main = "Judentum")
-PartialPlots %>% partial(pred.var = impvar[17], which.class = "Judentum") %>%plotPartial(main = "Judentum")
-PartialPlots %>% partial(pred.var = impvar[18], which.class = "Judentum") %>%plotPartial(main = "Judentum")
-PartialPlots %>% partial(pred.var = impvar[19], which.class = "Judentum") %>%plotPartial(main = "Judentum")
-PartialPlots %>% partial(pred.var = impvar[20], which.class = "Judentum") %>%plotPartial(main = "Judentum")
 
 #------------------------------------------------WHEN BEST MODEL IS FOUND-----------------------------------------------------
 
@@ -15564,7 +15542,7 @@ confusionMatrix(data=predictions, test_dfAlleinBeziehung$Allein_vs_Beziehung)
 
 
 
-#check for AUC: 0,6163
+#check for AUC: 0,559
 test_roc <- function(model, data) {
   
   roc(test_dfAlleinBeziehung$Allein_vs_Beziehung,
@@ -15638,7 +15616,7 @@ modelAlleinBeziehungRF1 <- train(Allein_vs_Beziehung ~ .,
 modelAlleinBeziehungRF1
 summary(modelAlleinBeziehungRF1)
 plot(modelAlleinBeziehungRF1)
-#best mtry = 12, splitrule = extratrees, min.node.size = 15
+#best mtry = 10, splitrule = extratrees, min.node.size = 5
 
 # predict outcome using model from train_df applied to the test_df
 
@@ -15648,7 +15626,7 @@ predictions1 <- predict(modelAlleinBeziehungRF1, newdata=test_dfAlleinBeziehung)
 confusionMatrix(data=predictions1, test_dfAlleinBeziehung$Allein_vs_Beziehung)
 
 
-#check for AUC: 0,612
+#check for AUC: 0,5515
 test_roc <- function(model, data) {
   
   roc(test_dfAlleinBeziehung$Allein_vs_Beziehung,
@@ -15832,7 +15810,7 @@ print(besttree_allein_beziehung)
 
 
 #######################
-#Beziehungsstatus: Categorical (5 Gruppen: Geschieden, In einer Beziehung, Single, Verheiratet, Verwitwet)
+#Beziehungsstatus: Categorical (3 Gruppen: In einer Beziehung, Single, Verheiratet)
 ######################
 
 #--------------------------------------DATA PRE-PROCESSING------------------------------------------
@@ -15859,6 +15837,10 @@ data_Beziehungsstatus <- data_Beziehungsstatus %>% mutate(Beziehungsstatus = cas
                                                                                        Beziehungsstatus == "Single" ~ 'Single',
                                                                                        Beziehungsstatus == "Verheiratet" ~ 'Verheiratet',
                                                                                        Beziehungsstatus == "Verwitwet" ~ 'Single'))
+
+#ist die Variable unbalanced?
+table(data_Beziehungsstatus$Beziehungsstatus)
+max(table(data_Beziehungsstatus$Beziehungsstatus)/sum(table(data_Beziehungsstatus$Beziehungsstatus)))
 
 
 
@@ -15921,7 +15903,7 @@ RFBeziehungsstatus <- train(Beziehungsstatus ~ .,
 RFBeziehungsstatus
 summary(RFBeziehungsstatus)
 plot(RFBeziehungsstatus)
-#mtry = 14, extratrees, min.node.size = 10
+#mtry = 15, extratrees, min.node.size = 15
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -15967,7 +15949,7 @@ RFBeziehungsstatus1 <- train(Beziehungsstatus ~ .,
 # Print models
 RFBeziehungsstatus1
 summary(RFBeziehungsstatus1)
-#mtry = xx, extratrees, min.node.size = xx
+#mtry = 13, extratrees, min.node.size = 10
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -15992,7 +15974,7 @@ RFBeziehungsstatus1 %>%
   auc()
 
 
-#model1: 500 trees performs better
+#model1: 1000 trees performs better
 
 
 #save model to disk 
@@ -16006,7 +15988,7 @@ saveRDS(tree1000_Beziehungsstatus, "./tree1000_Beziehungsstatus.rds")
 #final model
 
 set.seed(1997)
-RFBeziehungsstatusFinal <- RFBeziehungsstatus
+RFBeziehungsstatusFinal <- RFBeziehungsstatus1
 
 # Print models
 RFBeziehungsstatusFinal 
@@ -16222,7 +16204,7 @@ modelKinderRF
 summary(modelKinderRF)
 plot(modelKinderRF)
 
-#best mtry = 10, splitrule = extratrees, min.node.size = 5
+#best mtry = 13, splitrule = extratrees, min.node.size = 15
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -16232,7 +16214,7 @@ predictions <- predict(modelKinderRF, newdata=test_dfKinder)
 # Create confusion matrix  
 confusionMatrix(data=predictions, test_dfKinder$Kinder)
 
-#check for AUC : 0,7814
+#check for AUC : 0,7896
 test_roc <- function(model, data) {
   
   roc(test_dfKinder$Kinder,
@@ -16306,7 +16288,7 @@ modelKinderRF1 <- train(Kinder ~ .,
 modelKinderRF1
 summary(modelKinderRF1)
 plot(modelKinderRF1)
-#mtry = 10, extratrees, min.node.size = 5
+#mtry = 13, extratrees, min.node.size = 15
 
 # predict outcome using model from train_df applied to the test_df
 
@@ -16316,7 +16298,7 @@ predictions1 <- predict(modelKinderRF1, newdata=test_dfKinder)
 confusionMatrix(data=predictions1, test_dfKinder$Kinder)
 
 
-#check for AUC : 0,7809
+#check for AUC : 0,7909
 test_roc <- function(model, data) {
   
   roc(test_dfKinder$Kinder,
@@ -16371,12 +16353,12 @@ saveRDS(tree1000_Kinder, "./tree1000_Kinder.rds")
 
 
 
-#fit model with num.trees = 1000 trees (better predictions)
+#fit model with num.trees = 500 trees (better predictions)
 
 ####-------tree 3: Final --------------------------------------------------
 
 #final model definieren
-modelKinderFinal <- modelKinderRF1
+modelKinderFinal <- modelKinderRF
 
 # Print model
 print(modelKinderFinal)
