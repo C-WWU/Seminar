@@ -1245,7 +1245,7 @@ colnames(Followers_Accounts) <- "Followers"
 
 #Are there accounts which have too little followers? 
 #list of less than "a" followers:
-a <- 30
+a <- 50
 delete <- Followers_Accounts %>% filter(Followers < a)
 keep <-Followers_Accounts %>% filter(Followers > a) 
 #but: keep in sample nonetheless, just be aware!
