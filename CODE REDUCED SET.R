@@ -538,6 +538,19 @@ pearsonAlterfinal
 spearmanAlterfinal <- cor.test(predictions, test_dfAlter$Alter, method = "spearman")
 spearmanAlterfinal
 
+
+#testing baseline accuracy with mean and median
+
+mean_Alter <- rep(mean(test_dfAlter$Alter), nrow(test_dfAlter))
+median_Alter <- rep(median(test_dfAlter$Alter), nrow(test_dfAlter))
+
+MAE(predictions, mean_Alter)
+RMSE(predictions, mean_Alter)
+
+MAE(predictions, median_Alter)
+RMSE(predictions, median_Alter)
+
+
 #--------------Variable Direction: Partial Plots-----------------------------------------
 
 
@@ -1444,6 +1457,20 @@ pearsonExtraversionfinal
 spearmanExtraversionfinal <- cor.test(predictions, test_dfExtraversion$Extraversion, method = "spearman")
 spearmanExtraversionfinal
 
+
+#testing baseline accuracy with mean and median
+
+mean_Extraversion <- rep(mean(test_dfExtraversion$Extraversion), nrow(test_dfExtraversion))
+median_Extraversion <- rep(median(test_dfExtraversion$Extraversion), nrow(test_dfExtraversion))
+
+MAE(predictions, mean_Extraversion)
+RMSE(predictions, mean_Extraversion)
+
+MAE(predictions, median_Extraversion)
+RMSE(predictions, median_Extraversion)
+
+
+
 #--------------Variable Direction: Partial Plots-----------------------------------------
 
 
@@ -1999,6 +2026,19 @@ pearsonAgreeablenessfinal
 
 spearmanAgreeablenessfinal <- cor.test(predictions, test_dfAgreeableness$Agreeableness, method = "spearman")
 spearmanAgreeablenessfinal
+
+
+#testing baseline accuracy with mean and median
+
+mean_Agreeableness <- rep(mean(test_dfAgreeableness$Agreeableness), nrow(test_dfAgreeableness))
+median_Agreeableness <- rep(median(test_dfAgreeableness$Agreeableness), nrow(test_dfAgreeableness))
+
+MAE(predictions, mean_Agreeableness)
+RMSE(predictions, mean_Agreeableness)
+
+MAE(predictions, median_Agreeableness)
+RMSE(predictions, median_Agreeableness)
+
 
 #--------------Variable Direction: Partial Plots-----------------------------------------
 
@@ -2562,6 +2602,18 @@ pearsonConscientiousnessfinal
 spearmanConscientiousnessfinal <- cor.test(predictions, test_dfConscientiousness$Conscientiousness, method = "spearman")
 spearmanConscientiousnessfinal
 
+
+#testing baseline accuracy with mean and median
+
+mean_Conscentiousness <- rep(mean(test_dfConscientiousness$Conscientiousness), nrow(test_dfConscientiousness))
+median_Conscentiousness <- rep(median(test_dfConscientiousness$Conscientiousness), nrow(test_dfConscientiousness))
+
+MAE(predictions, mean_Conscentiousness)
+RMSE(predictions, mean_Conscentiousness)
+
+MAE(predictions, median_Conscentiousness)
+RMSE(predictions, median_Conscentiousness)
+
 #--------------Variable Direction: Partial Plots-----------------------------------------
 
 
@@ -3120,6 +3172,18 @@ pearsonEmotional_stablityfinal
 spearmanEmotional_stablityfinal <- cor.test(predictions, test_dfEmotional_stablity$Emotional_stablity, method = "spearman")
 spearmanEmotional_stablityfinal
 
+
+#testing baseline accuracy with mean and median
+
+mean_EmotionalStability <- rep(mean(test_dfEmotional_stablity$Emotional_stablity), nrow(test_dfEmotional_stablity))
+median_EmotionalStability <- rep(median(test_dfEmotional_stablity$Emotional_stablity), nrow(test_dfEmotional_stablity))
+
+MAE(predictions, mean_EmotionalStability)
+RMSE(predictions, mean_EmotionalStability)
+
+MAE(predictions, median_EmotionalStability)
+RMSE(predictions, median_EmotionalStability)
+
 #--------------Variable Direction: Partial Plots-----------------------------------------
 
 
@@ -3677,6 +3741,18 @@ pearsonOpenness_to_Experiencesfinal
 spearmanOpenness_to_Experiencesfinal <- cor.test(predictions, test_dfOpenness_to_Experiences$Openness_to_Experiences, method = "spearman")
 spearmanOpenness_to_Experiencesfinal
 
+#testing baseline accuracy with mean and median
+
+mean_OpennessToExp <- rep(mean(test_dfOpenness_to_Experiences$Openness_to_Experiences), nrow(test_dfOpenness_to_Experiences))
+median_OpennessToExp <- rep(median(test_dfOpenness_to_Experiences$Openness_to_Experiences), nrow(test_dfOpenness_to_Experiences))
+
+MAE(predictions, mean_OpennessToExp)
+RMSE(predictions, mean_OpennessToExp)
+
+MAE(predictions, median_OpennessToExp)
+RMSE(predictions, median_OpennessToExp)
+
+
 #--------------Variable Direction: Partial Plots-----------------------------------------
 
 
@@ -3799,7 +3875,7 @@ modelOpenness_Experiences2 <- train(Openness_Experiences2 ~ .,
 modelOpenness_Experiences2
 summary(modelOpenness_Experiences2)
 plot(modelOpenness_Experiences2)
-#best mtry = 12, splitrule = extratrees, min.node.size = 10
+#best mtry = 20, splitrule = extratrees, min.node.size = 15
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(modelOpenness_Experiences2, newdata=test_dfOpenness_Experiences2)
@@ -3881,7 +3957,7 @@ modelOpenness_Experiences2_1 <- train(Openness_Experiences2 ~ .,
 modelOpenness_Experiences2_1
 summary(modelOpenness_Experiences2_1)
 plot(modelOpenness_Experiences2_1)
-#best mtry = 11, splitrule = extratrees, min.node.size = 5
+#best mtry = 20, splitrule = extratrees, min.node.size = 15
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(modelOpenness_Experiences2_1, newdata=test_dfOpenness_Experiences2)
@@ -4566,7 +4642,7 @@ saveRDS(tree1000_Alk_janein, "./tree1000_Alk_janein.rds")
 #final Model definieren
 
 set.seed(1997)
-modelAlk_ja_neinfinal <- modelAlk_ja_nein1
+modelAlk_ja_neinfinal <- modelAlk_ja_nein
 
 # Print model
 print(modelAlk_ja_neinfinal)
@@ -10441,6 +10517,18 @@ spearmanHard3 <- cor.test(predictions3, test_dfHard_num$Corona_Massnahmen_muesst
 spearmanHard3
 
 
+#testing baseline accuracy with mean and median
+
+mean_Hardliner <- rep(mean(test_dfHard_num$Corona_Massnahmen_muessten_haerter_sein), nrow(test_dfHard_num))
+median_Hardliner <- rep(median(test_dfHard_num$Corona_Massnahmen_muessten_haerter_sein), nrow(test_dfHard_num))
+
+MAE(predictions3, mean_Hardliner)
+RMSE(predictions3, mean_Hardliner)
+
+MAE(predictions3, median_Hardliner)
+RMSE(predictions3, median_Hardliner)
+
+
 #--------------Variable Direction: Partial Plots-----------------------------------------
 
 #checking direction of the 20 most important variables
@@ -10674,6 +10762,18 @@ pearsonSoft3
 
 spearmanSoft3 <- cor.test(predictions3, test_dfSoft_num$Corona_Massnahmen_uebertrieben, method = "spearman")
 spearmanSoft3
+
+
+#testing baseline accuracy with mean and median
+
+mean_Softliner <- rep(mean(test_dfSoft_num$Corona_Massnahmen_uebertrieben), nrow(test_dfSoft_num))
+median_Softliner <- rep(median(test_dfSoft_num$Corona_Massnahmen_uebertrieben), nrow(test_dfSoft_num))
+
+MAE(predictions3, mean_Softliner)
+RMSE(predictions3, mean_Softliner)
+
+MAE(predictions3, median_Softliner)
+RMSE(predictions3, median_Softliner)
 
 
 #--------------Variable Direction: Partial Plots-----------------------------------------
@@ -10910,6 +11010,17 @@ pearsonSkeptiker_fin
 
 spearmanSkeptiker_fin <- cor.test(predictions3, test_Skeptiker_num$Corona_ist_harmlos_gleich_Grippe, method = "spearman")
 spearmanSkeptiker_fin
+
+#testing baseline accuracy with mean and median
+
+mean_Skeptiker <- rep(mean(test_Skeptiker_num$Corona_ist_harmlos_gleich_Grippe), nrow(test_Skeptiker_num))
+median_Skeptiker <- rep(median(test_Skeptiker_num$Corona_ist_harmlos_gleich_Grippe), nrow(test_Skeptiker_num))
+
+MAE(predictions3, mean_Skeptiker)
+RMSE(predictions3, mean_Skeptiker)
+
+MAE(predictions3, median_Skeptiker)
+RMSE(predictions3, median_Skeptiker)
 
 
 #--------------Variable Direction: Partial Plots-----------------------------------------
@@ -11149,6 +11260,16 @@ pearsonLeugner_fin
 spearmanLeugner_fin <- cor.test(predictions3, test_dfLeugner_num$Glaube_nicht_an_Corona, method = "spearman")
 spearmanLeugner_fin
 
+#testing baseline accuracy with mean and median
+
+mean_Leugner <- rep(mean(test_dfLeugner_num$Glaube_nicht_an_Corona), nrow(test_dfLeugner_num))
+median_Leugner <- rep(median(test_dfLeugner_num$Glaube_nicht_an_Corona), nrow(test_dfLeugner_num))
+
+MAE(predictions3, mean_Leugner)
+RMSE(predictions3, mean_Leugner)
+
+MAE(predictions3, median_Leugner)
+RMSE(predictions3, median_Leugner)
 
 #--------------Variable Direction: Partial Plots-----------------------------------------
 
@@ -12036,6 +12157,16 @@ pearsonGreen1_fin
 spearmanGreen1_fin <- cor.test(predictions, test_dfGreen1$Green_Values, method = "spearman")
 spearmanGreen1_fin
 
+#testing baseline accuracy with mean and median
+
+mean_Green <- rep(mean(test_dfGreen1$Green_Values), nrow(test_dfGreen1))
+median_Green <- rep(median(test_dfGreen1$Green_Values), nrow(test_dfGreen1))
+
+MAE(predictions, mean_Green)
+RMSE(predictions, mean_Green)
+
+MAE(predictions, median_Green)
+RMSE(predictions, median_Green)
 
 #--------------Variable Direction: Partial Plots-----------------------------------------
 
