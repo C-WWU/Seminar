@@ -508,7 +508,7 @@ saveRDS(tree1000_Alter, "./tree1000_Alter.rds")
 ####-------tree 3: Final --------------------------------------------------
 
 set.seed(1997)
-modelAlterfinal <- modelAlterRF1
+modelAlterfinal <- modelAlterRF
 
 # Print model
 print(modelAlterfinal)
@@ -2572,7 +2572,7 @@ saveRDS(tree1000_Conscentiousness1, "./tree1000_Conscentiousness1.rds")
 
 #define final model
 set.seed(1997)
-modelConscientiousnessfinal <- modelConscientiousnessRF
+modelConscientiousnessfinal <- modelConscientiousnessRF1
 
 # Print model
 print(modelConscientiousnessfinal)
@@ -10996,7 +10996,7 @@ plot(varImp(RFSkeptikernum_fin), 20, main = "Corona_ist_harmlos_gleich_Grippe")
 
 
 # predict outcome using model from train_df applied to the test_df
-predictions3 <- predict(RFSkeptikernum_fin, newdata=test_Skeptiker_num)
+predictions3 <- as.numeric(predict(RFSkeptikernum_fin, newdata=test_Skeptiker_num))
 
 MAE(predictions3, test_Skeptiker_num$Corona_ist_harmlos_gleich_Grippe)
 RMSE(predictions3, test_Skeptiker_num$Corona_ist_harmlos_gleich_Grippe)
