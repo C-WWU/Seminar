@@ -154,8 +154,6 @@ RFAgeRange <- train(Age_Range ~ .,
 RFAgeRange
 summary(RFAgeRange)
 plot(RFAgeRange)
-#mtry = 13, extratrees, min.node.size = 5
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(RFAgeRange, newdata=test_dfAgeRange)
@@ -175,9 +173,6 @@ test_roc <- function(model, data) {
 RFAgeRange %>%
   test_roc(data = test_dfAgeRange) %>%
   auc()
-
-#AUC 0.7889
-#Accuracy 0.6554
 
 
 #save model to disk 
@@ -204,8 +199,6 @@ RFAgeRange1 <- train(Age_Range ~ .,
 # Print models
 RFAgeRange1
 summary(RFAgeRange1)
-#mtry = xx, extratrees, min.node.size = xx
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RFAgeRange1, newdata=test_dfAgeRange)
@@ -234,8 +227,6 @@ tree1000_AgeRange <- RFAgeRange1
 saveRDS(tree1000_AgeRange, "./tree1000_AgeRange.rds")
 
 
-#model: 500 trees performs better
-#AUC
 
 ####-------tree 3: Final --------------------------------------------------
 
@@ -431,9 +422,6 @@ modelAlterRF
 summary(modelAlterRF)
 plot(modelAlterRF)
 
-
-#best mtry = 14, splitrule = extratrees, min.node.size = 5
-
 # predict outcome using model from train_df applied to the test_df
 
 predictions <- predict(modelAlterRF, newdata=test_dfAlter)
@@ -501,8 +489,6 @@ spearmanAlter1
 
 tree1000_Alter <- modelAlterRF1
 saveRDS(tree1000_Alter, "./tree1000_Alter.rds")
-
-#fit model with num.trees = xx trees (better performance)
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -678,8 +664,6 @@ modelGeschlechtRF
 summary(modelGeschlechtRF)
 plot(modelGeschlechtRF)
 
-#best mtry = xx, splitrule = xx, min.node.size = xx
-
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(modelGeschlechtRF, newdata=test_dfGeschlechtMW)
 
@@ -822,8 +806,6 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 tree1000_Geschlecht <- modelGeschlechtRF1
 saveRDS(tree1000_Geschlecht, "./tree1000_Geschlecht.rds")
 
-
-#fit model with num.trees = xx trees (better performance)
 
 ####-------tree 3: Final --------------------------------------------------
 
@@ -1019,7 +1001,6 @@ modelOst_West <- train(Ost_West ~ .,
 modelOst_West
 summary(modelOst_West)
 plot(modelOst_West)
-#best mtry =13, splitrule = extratrees, min.node.size = 10
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(modelOst_West, newdata=test_dfOst_West)
@@ -1101,7 +1082,6 @@ modelOst_West1 <- train(Ost_West ~ .,
 modelOst_West1
 summary(modelOst_West1)
 plot(modelOst_West1)
-#best mtry =11, splitrule = extratrees, min.node.size = 10
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(modelOst_West1, newdata=test_dfOst_West)
@@ -1164,8 +1144,6 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 tree1000_Ost_West <- modelOst_West1
 saveRDS(tree1000_Ost_West, "./tree1000_OstWest.rds")
 
-
-#fit model with num.trees = xx trees (better performance)
 
 ####-------tree 3: Final --------------------------------------------------
 
@@ -1352,9 +1330,6 @@ modelExtraversionRF
 summary(modelExtraversionRF)
 plot(modelExtraversionRF)
 
-
-#best mtry = 10, splitrule = extratrees, min.node.size = 15
-
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(modelExtraversionRF, newdata=test_dfExtraversion)
 
@@ -1422,7 +1397,6 @@ tree1000_Extraversion1 <- modelExtraversionRF1
 saveRDS(tree1000_Extraversion1, "./tree1000_Extraversion1.rds")
 
 
-#fit model with num.trees = xx trees (better performance)
 
 ####-------tree 3: Final --------------------------------------------------
 
@@ -1591,7 +1565,6 @@ modelExtraversion2 <- train(Extraversion2 ~ .,
 modelExtraversion2
 summary(modelExtraversion2)
 plot(modelExtraversion2)
-#best mtry = 10, splitrule = extratrees, min.node.size = 5
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(modelExtraversion2, newdata=test_dfExtraversion2)
@@ -1675,7 +1648,6 @@ modelExtraversion2_1 <- train(Extraversion2 ~ .,
 modelExtraversion2_1
 summary(modelExtraversion2_1)
 plot(modelExtraversion2_1)
-#best mtry = 10, splitrule = extratrees, min.node.size = 5
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(modelExtraversion2_1, newdata=test_dfExtraversion2)
@@ -1920,7 +1892,6 @@ modelAgreeablenessRF <- train(Agreeableness ~ .,
 modelAgreeablenessRF
 summary(modelAgreeablenessRF)
 plot(modelAgreeablenessRF)
-#best mtry = 11, splitrule = extratrees, min.node.size = 15
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(modelAgreeablenessRF, newdata=test_dfAgreeableness)
@@ -1989,7 +1960,6 @@ tree1000_Agreeableness1 <- modelAgreeablenessRF1
 saveRDS(tree1000_Agreeableness1, "./tree1000_Agreeableness1.rds")
 
 
-#fit model with num.trees = xx trees (better performance)
 
 ####-------tree 3: Final --------------------------------------------------
 
@@ -2163,7 +2133,6 @@ modelAgreeableness2 <- train(Agreeableness2 ~ .,
 modelAgreeableness2
 summary(modelAgreeableness2)
 plot(modelAgreeableness2)
-#best mtry = 18, splitrule = extratrees, min.node.size = 5
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(modelAgreeableness2, newdata=test_dfAgreeableness2)
@@ -2247,7 +2216,6 @@ modelAgreeableness2_1 <- train(Agreeableness2 ~ .,
 modelAgreeableness2_1
 summary(modelAgreeableness2_1)
 plot(modelAgreeableness2_1)
-#best mtry = 18, splitrule = extratrees, min.node.size = 5
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(modelAgreeableness2_1, newdata=test_dfAgreeableness2)
@@ -2496,8 +2464,6 @@ modelConscientiousnessRF <- train(Conscientiousness ~ .,
 modelConscientiousnessRF
 summary(modelConscientiousnessRF)
 plot(modelConscientiousnessRF)
-#best mtry = 10, splitrule = extratrees, min.node.size = 15
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(modelConscientiousnessRF, newdata=test_dfConscientiousness)
@@ -2565,8 +2531,6 @@ spearmanConscientiousness1
 tree1000_Conscentiousness1 <- modelConscientiousnessRF1
 saveRDS(tree1000_Conscentiousness1, "./tree1000_Conscentiousness1.rds")
 
-
-#fit model with num.trees = xx trees (better performance)
 
 ####-------tree 3: Final --------------------------------------------------
 
@@ -2737,7 +2701,6 @@ modelConscientiousness2 <- train(Conscientiousness2 ~ .,
 modelConscientiousness2
 summary(modelConscientiousness2)
 plot(modelConscientiousness2)
-#best mtry = 20, splitrule = extratrees, min.node.size = 15
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(modelConscientiousness2, newdata=test_dfConscientiousness2)
@@ -2819,7 +2782,6 @@ modelConscientiousness2_1 <- train(Conscientiousness2 ~ .,
 modelConscientiousness2_1
 summary(modelConscientiousness2_1)
 plot(modelConscientiousness2_1)
-#best mtry = 20, splitrule = extratrees, min.node.size = 15
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(modelConscientiousness2_1, newdata=test_dfConscientiousness2)
@@ -3067,8 +3029,6 @@ modelEmotional_stablityRF <- train(Emotional_stablity ~ .,
 modelEmotional_stablityRF
 summary(modelEmotional_stablityRF)
 plot(modelEmotional_stablityRF)
-#best mtry = 10, splitrule = extratrees, min.node.size = 10
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(modelEmotional_stablityRF, newdata=test_dfEmotional_stablity)
@@ -3135,8 +3095,6 @@ spearmanEmotional_stablity1
 tree1000_EmotionalStability <- modelEmotional_stablityRF1
 saveRDS(tree1000_EmotionalStability, "./tree1000_EmotionalStability.rds")
 
-
-#fit model with num.trees = xx trees (better performance)
 
 ####-------tree 3: Final --------------------------------------------------
 
@@ -3308,7 +3266,6 @@ modelEmotional_stablity2 <- train(Emotional_stablity2 ~ .,
 modelEmotional_stablity2
 summary(modelEmotional_stablity2)
 plot(modelEmotional_stablity2)
-#best mtry = 17, splitrule = extratrees, min.node.size = 10
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(modelEmotional_stablity2, newdata=test_dfEmotional_stablity2)
@@ -3387,7 +3344,6 @@ modelEmotional_stablity2_1 <- train(Emotional_stablity2 ~ .,
 modelEmotional_stablity2_1
 summary(modelEmotional_stablity2_1)
 plot(modelEmotional_stablity2_1)
-#best mtry = 17, splitrule = extratrees, min.node.size = 10
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(modelEmotional_stablity2_1, newdata=test_dfEmotional_stablity2)
@@ -3635,7 +3591,6 @@ modelOpenness_to_ExperiencesRF <- train(Openness_to_Experiences ~ .,
 modelOpenness_to_ExperiencesRF
 summary(modelOpenness_to_ExperiencesRF)
 plot(modelOpenness_to_ExperiencesRF)
-#best mtry = 11, splitrule = extratrees, min.node.size = 15
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(modelOpenness_to_ExperiencesRF, newdata=test_dfOpenness_to_Experiences)
@@ -3703,8 +3658,6 @@ spearmanOpenness_to_Experiences1
 tree1000_OpennessToExperiences1 <- modelOpenness_to_ExperiencesRF1
 saveRDS(tree1000_OpennessToExperiences1, "./tree1000_OpennessToExperiences1.rds")
 
-
-#fit model with num.trees = xx trees (better performance)
 
 ####-------tree 3: Final --------------------------------------------------
 
@@ -3875,7 +3828,6 @@ modelOpenness_Experiences2 <- train(Openness_Experiences2 ~ .,
 modelOpenness_Experiences2
 summary(modelOpenness_Experiences2)
 plot(modelOpenness_Experiences2)
-#best mtry = 20, splitrule = extratrees, min.node.size = 15
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(modelOpenness_Experiences2, newdata=test_dfOpenness_Experiences2)
@@ -3957,7 +3909,6 @@ modelOpenness_Experiences2_1 <- train(Openness_Experiences2 ~ .,
 modelOpenness_Experiences2_1
 summary(modelOpenness_Experiences2_1)
 plot(modelOpenness_Experiences2_1)
-#best mtry = 20, splitrule = extratrees, min.node.size = 15
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(modelOpenness_Experiences2_1, newdata=test_dfOpenness_Experiences2)
@@ -4215,8 +4166,6 @@ RFAlkoholgruppe <- train(Alkoholgruppe ~ .,
 RFAlkoholgruppe
 summary(RFAlkoholgruppe)
 plot(RFAlkoholgruppe)
-#mtry = 20, extratrees, min.node.size = 5
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions1 <- predict(RFAlkoholgruppe, newdata=test_dfAlkoholgruppe)
@@ -4261,7 +4210,6 @@ RFAlkoholgruppe1 <- train(Alkoholgruppe ~ .,
 RFAlkoholgruppe1
 summary(RFAlkoholgruppe1)
 plot(RFAlkoholgruppe1)
-#mtry = 20, extratrees, min.node.size = 5
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RFAlkoholgruppe1, newdata=test_dfAlkoholgruppe)
@@ -4491,7 +4439,6 @@ modelAlk_ja_nein <- train(Alkohol_ja_nein ~ .,
 modelAlk_ja_nein
 summary(modelAlk_ja_nein)
 plot(modelAlk_ja_nein)
-#best mtry = 10, splitrule = extratrees, min.node.size = 5
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(modelAlk_ja_nein, newdata=test_dfAlk_ja_nein)
@@ -4572,7 +4519,6 @@ modelAlk_ja_nein1 <- train(Alkohol_ja_nein ~ .,
 modelAlk_ja_nein1
 summary(modelAlk_ja_nein1)
 plot(modelAlk_ja_nein1)
-#best mtry = 10, splitrule = extratrees, min.node.size = 5
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(modelAlk_ja_nein1, newdata=test_dfAlk_ja_nein)
@@ -4634,8 +4580,6 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 tree1000_Alk_janein <- modelAlk_ja_nein1
 saveRDS(tree1000_Alk_janein, "./tree1000_Alk_janein.rds")
 
-
-#fit model with num.trees = xx trees (better performance)
 
 ####-------tree 3: Final --------------------------------------------------
 
@@ -4836,8 +4780,6 @@ RFZigarettengruppe <- train(Zigarettengruppe ~ .,
 RFZigarettengruppe
 summary(RFZigarettengruppe)
 plot(RFZigarettengruppe)
-#mtry = 18, extratrees, min.node.size = 15
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions1 <- predict(RFZigarettengruppe, newdata=test_dfZigarettengruppe)
@@ -4882,7 +4824,6 @@ RFZigarettengruppe1 <- train(Zigarettengruppe ~ .,
 RFZigarettengruppe1
 summary(RFZigarettengruppe1)
 plot(RFZigarettengruppe1)
-#mtry = 13, extratrees, min.node.size = 15
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RFZigarettengruppe1, newdata=test_dfZigarettengruppe)
@@ -5116,7 +5057,6 @@ modelZig_ja_nein <- train(Zigaretten_ja_nein ~ .,
 modelZig_ja_nein
 summary(modelZig_ja_nein)
 plot(modelZig_ja_nein)
-#best mtry = 10, splitrule = extratrees, min.node.size = 10
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(modelZig_ja_nein, newdata=test_dfZig_ja_nein)
@@ -5197,7 +5137,6 @@ modelZig_ja_nein1 <- train(Zigaretten_ja_nein ~ .,
 modelZig_ja_nein1
 summary(modelZig_ja_nein1)
 plot(modelZig_ja_nein1)
-#best mtry = 10, splitrule = extratrees, min.node.size = 10
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(modelZig_ja_nein1, newdata=test_dfZig_ja_nein)
@@ -5259,9 +5198,6 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 tree1000_Zigaretten_janein <- modelZig_ja_nein1
 saveRDS(tree1000_Zigaretten_janein, "./tree1000_Zigaretten_janein.rds")
 
-
-
-#fit model with num.trees = xx trees (better performance)
 
 ####-------tree 3: Final --------------------------------------------------
 
@@ -5459,8 +5395,6 @@ RFDrogengruppe <- train(Drogengruppe ~ .,
 RFDrogengruppe
 summary(RFDrogengruppe)
 plot(RFDrogengruppe)
-#mtry = 11, extratrees, min.node.size = 10
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions1 <- predict(RFDrogengruppe, newdata=test_dfDrogengruppe)
@@ -5504,8 +5438,6 @@ RFDrogengruppe1 <- train(Drogengruppe ~ .,
 RFDrogengruppe1
 summary(RFDrogengruppe1)
 plot(RFDrogengruppe1)
-#mtry = 11, extratrees, min.node.size = 10
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RFDrogengruppe1, newdata=test_dfDrogengruppe)
@@ -5741,7 +5673,6 @@ modelDrogen_ja_nein <- train(Drogen_ja_nein ~ .,
 modelDrogen_ja_nein
 summary(modelDrogen_ja_nein)
 plot(modelDrogen_ja_nein)
-#best mtry = 11, splitrule = extratrees, min.node.size = 10
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(modelDrogen_ja_nein, newdata=test_dfDrogen_ja_nein)
@@ -5823,7 +5754,6 @@ modelDrogen_ja_nein1 <- train(Drogen_ja_nein ~ .,
 modelDrogen_ja_nein1
 summary(modelDrogen_ja_nein1)
 plot(modelDrogen_ja_nein1)
-#best mtry = 11, splitrule = extratrees, min.node.size = 10
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(modelDrogen_ja_nein1, newdata=test_dfDrogen_ja_nein)
@@ -5884,8 +5814,6 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 tree1000_Drogen_janein <- modelDrogen_ja_nein1
 saveRDS(tree1000_Drogen_janein, "./tree1000_Drogen_janein.rds")
 
-
-#fit model with num.trees = xx trees (better performance)
 
 ####-------tree 3: Final --------------------------------------------------
 
@@ -6095,7 +6023,6 @@ RFPartei_1 <- train(Wahl_Partei ~ .,
 RFPartei_1
 summary(RFPartei_1)
 plot(RFPartei_1)
-#mtry = 19, extratrees, min.node.size = 5
 
 # predict outcome using model from train_df applied to the test_df
 predictions1 <- predict(RFPartei_1, newdata=test_dfPartei)
@@ -6111,7 +6038,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0.6428
+#model auc
 RFPartei_1 %>%
   test_roc(data = test_dfPartei) %>%
   auc()
@@ -6120,7 +6047,6 @@ RFPartei_1 %>%
 
 tree500_WahlPartei <- RFPartei_1
 saveRDS(tree500_WahlPartei, "./tree500_WahlPartei.rds")
-
 
 
 ####-------tree 2: num.tree prüfen --------------------------------------------------
@@ -6141,7 +6067,6 @@ RFPartei_2 <- train(Wahl_Partei ~ .,
 RFPartei_2
 summary(RFPartei_2)
 plot(RFPartei_2)
-#mtry = 19, extratrees, min.node.size = 5
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RFPartei_2, newdata=test_dfPartei)
@@ -6149,7 +6074,7 @@ predictions2 <- predict(RFPartei_2, newdata=test_dfPartei)
 # Create confusion matrix
 confusionMatrix(data=as.factor(predictions2), as.factor(test_dfPartei$Wahl_Partei))
 
-#check for auc: 0,637
+#check for auc
 test_roc <- function(model, data) {
   
   multiclass.roc(test_dfPartei$Wahl_Partei,
@@ -6195,7 +6120,7 @@ predictions3 <- predict(RFPartei_fin, newdata=test_dfPartei)
 confusionMatrix(data=as.factor(predictions3), as.factor(test_dfPartei$Wahl_Partei))
 
 
-#check for auc: 0,6421
+#check for auc
 test_roc <- function(model, data) {
   
   multiclass.roc(test_dfPartei$Wahl_Partei,
@@ -6488,7 +6413,6 @@ RfAfD_1 <- train(AfD_Waehler ~ .,
 RfAfD_1
 summary(RfAfD_1)
 plot(RfAfD_1)
-#mtry = 11, extratrees, min.node.size = 5
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -6498,7 +6422,7 @@ predictions <- predict(RfAfD_1, newdata=test_dfAfD)
 confusionMatrix(data=as.factor(predictions), as.factor(test_dfAfD$AfD_Waehler))
 
 
-#check for auc: 0,8608
+#check for auc
 test_roc <- function(model, data) {
   
   roc(test_dfAfD$AfD_Waehler,
@@ -6575,7 +6499,6 @@ RfAfD_2 <- train(AfD_Waehler ~ .,
 RfAfD_2
 summary(RfAfD_2)
 plot(RfAfD_2)
-#mtry = 12, extratrees, min.node.size = 5
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -6593,7 +6516,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,8526
+#model auc
 RfAfD_2 %>%
   test_roc(data = test_dfAfD) %>%
   auc()
@@ -6640,9 +6563,6 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 tree1000_AfD <- RfAfD_2
 saveRDS(tree1000_AfD, "./tree1000_AfD.rds")
 
-
-
-#better num.trees: 500 trees
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -6849,7 +6769,6 @@ RF_Gruene1 <- train(Gruene_Waehler ~ .,
 RF_Gruene1
 summary(RF_Gruene1)
 plot(RF_Gruene1)
-#mtry = 13, extratrees, min.node.size = 10
 
 
 # predict outcome using model from train_df applied to the test_df
@@ -6867,7 +6786,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,812
+#model auc
 RF_Gruene1 %>%
   test_roc(data = test_dfGruen) %>%
   auc()
@@ -6936,8 +6855,6 @@ RF_Gruene2 <- train(Gruene_Waehler ~ .,
 RF_Gruene2
 summary(RF_Gruene2)
 plot(RF_Gruene2)
-#mtry = 13, extratrees, min.node.size = 10
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RF_Gruene2, newdata=test_dfGruen)
@@ -6953,7 +6870,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,811
+#model auc:
 RF_Gruene2 %>%
   test_roc(data = test_dfGruen) %>%
   auc()
@@ -7000,8 +6917,6 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 tree1000_Gruene <- RF_Gruene2
 saveRDS(tree1000_Gruene, "./tree1000_Gruene.rds")
 
-#better num.trees: 500 trees --> better at classifying voters correctly
-
 
 ####-------tree 3: Final --------------------------------------------------
 
@@ -7035,7 +6950,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,7591
+#model auc:
 RFGruene_fin %>%
   test_roc(data = test_dfGruen) %>%
   auc()
@@ -7202,8 +7117,6 @@ RF_CDU1 <- train(CDU_CSU_Waehler ~ .,
 RF_CDU1
 summary(RF_CDU1)
 plot(RF_CDU1)
-#mtry = 16, extratrees, min.node.size = 10
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions1 <- predict(RF_CDU1, newdata=test_dfCDU)
@@ -7220,7 +7133,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0.622
+#model auc: 
 RF_CDU1 %>%
   test_roc(data = test_dfCDU) %>%
   auc()
@@ -7288,7 +7201,6 @@ RF_CDU2 <- train(CDU_CSU_Waehler ~ .,
 RF_CDU2
 summary(RF_CDU2)
 plot(RF_CDU2)
-#mtry = 16, extratrees, min.node.size = 10
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RF_CDU2, newdata=test_dfCDU)
@@ -7304,7 +7216,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,6233
+#model auc:
 RF_CDU2 %>%
   test_roc(data = test_dfCDU) %>%
   auc()
@@ -7349,9 +7261,6 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 tree1000_CDU <- RF_CDU2
 saveRDS(tree1000_CDU, "./tree1000_CDU.rds")
-
-
-#better num.trees: 1000 trees 
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -7552,8 +7461,6 @@ RF_Linke1 <- train(Linke_Waehler ~ .,
 RF_Linke1
 summary(RF_Linke1)
 plot(RF_Linke1)
-#mtry = 10, extratrees, min.node.size = 5
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions1 <- predict(RF_Linke1, newdata=test_dfLinke)
@@ -7570,7 +7477,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,7731
+#model auc:
 RF_Linke1 %>%
   test_roc(data = test_dfLinke) %>%
   auc()
@@ -7636,8 +7543,6 @@ RF_Linke2 <- train(Linke_Waehler ~ .,
 
 RF_Linke2
 summary(RF_Linke2)
-#mtry = 10, extratrees, min.node.size = 5
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RF_Linke2, newdata=test_dfLinke)
@@ -7653,7 +7558,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,7713
+#model auc:
 RF_Linke2 %>%
   test_roc(data = test_dfLinke) %>%
   auc()
@@ -7699,8 +7604,6 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 tree1000_Linke <- RF_Linke2
 saveRDS(tree1000_Linke, "./tree1000_Linke.rds")
-
-#better num.trees: 1000 trees is slightly better to predict "ja"
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -7900,8 +7803,6 @@ RF_SPD1 <- train(SPD_Waehler ~ .,
 RF_SPD1
 summary(RF_SPD1)
 plot(RF_SPD1)
-#mtry = 19, extratrees, min.node.size = 15
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions1 <- predict(RF_SPD1, newdata=test_dfSPD)
@@ -7918,7 +7819,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,5305
+#model auc:
 RF_SPD1 %>%
   test_roc(data = test_dfSPD) %>%
   auc()
@@ -7988,8 +7889,6 @@ RF_SPD2 <- train(SPD_Waehler ~ .,
 RF_SPD2
 summary(RF_SPD2)
 plot(RF_SPD2)
-#mtry = 10, extratrees, min.node.size = 5
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RF_SPD2, newdata=test_dfSPD)
@@ -8005,7 +7904,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,5344
+#model auc: 
 RF_SPD2 %>%
   test_roc(data = test_dfSPD) %>%
   auc()
@@ -8053,9 +7952,6 @@ tree1000_SPD <- RF_SPD2
 saveRDS(tree1000_SPD, "./tree1000_SPD.rds")
 
 
-#better num.trees: 1000 trees because of better sensitivity and AUC
-
-
 ####-------tree 3: Final --------------------------------------------------
 
 #final Model
@@ -8088,7 +7984,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,5344
+#model auc:
 RF_SPD_fin %>%
   test_roc(data = test_dfSPD) %>%
   auc()
@@ -8256,8 +8152,6 @@ RF_FDP1 <- train(FDP_Waehler ~ .,
 RF_FDP1
 summary(RF_FDP1)
 plot(RF_FDP1)
-#mtry = 20, extratrees, min.node.size = 5
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions1 <- predict(RF_FDP1, newdata=test_dfFDP)
@@ -8274,7 +8168,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0.6881
+#model auc: 
 RF_FDP1 %>%
   test_roc(data = test_dfFDP) %>%
   auc()
@@ -8342,8 +8236,6 @@ RF_FDP2 <- train(FDP_Waehler ~ .,
 RF_FDP2
 summary(RF_FDP2)
 plot(RF_FDP2)
-#mtry = 20, extratrees, min.node.size = 5
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RF_FDP2, newdata=test_dfFDP)
@@ -8359,7 +8251,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,6917
+#model auc: 
 RF_FDP2 %>%
   test_roc(data = test_dfFDP) %>%
   auc()
@@ -8407,9 +8299,6 @@ tree1000_FDP <- RF_FDP2
 saveRDS(tree1000_FDP, "./tree1000_FDP.rds")
 
 
-#better num.trees: 1000 trees 
-
-
 ####-------tree 3: Final --------------------------------------------------
 
 #final getunte Werte einsetzen
@@ -8442,7 +8331,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,6319
+#model auc: 
 RF_FDP_fin %>%
   test_roc(data = test_dfFDP) %>%
   auc()
@@ -8610,8 +8499,6 @@ RF_Nichtwahler1 <- train(Nichtwahler ~ .,
 RF_Nichtwahler1
 summary(RF_Nichtwahler1)
 plot(RF_Nichtwahler1)
-#mtry = 11, extratrees, min.node.size = 5
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions1 <- predict(RF_Nichtwahler1, newdata=test_dfNichtwahler)
@@ -8628,7 +8515,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,7405
+#model auc:
 RF_Nichtwahler1 %>%
   test_roc(data = test_dfNichtwahler) %>%
   auc()
@@ -8697,8 +8584,6 @@ RF_Nichtwahler2 <- train(Nichtwahler ~ .,
 RF_Nichtwahler2
 summary(RF_Nichtwahler2)
 plot(RF_Nichtwahler2)
-#mtry = 11, extratrees, min.node.size = 5
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RF_Nichtwahler2, newdata=test_dfNichtwahler)
@@ -8714,7 +8599,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,7386
+#model auc:
 RF_Nichtwahler2 %>%
   test_roc(data = test_dfNichtwahler) %>%
   auc()
@@ -8762,9 +8647,6 @@ tree1000_Nichtwahler <- RF_Nichtwahler2
 saveRDS(tree1000_Nichtwahler, "./tree1000_Nichtwahler.rds")
 
 
-#better num.trees: 1000 trees
-
-
 ####-------tree 3: Final --------------------------------------------------
 
 #final getunte Werte einsetzen
@@ -8797,7 +8679,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,6804
+#model auc:
 RF_Nichtwahler_fin %>%
   test_roc(data = test_dfNichtwahler) %>%
   auc()
@@ -8969,8 +8851,6 @@ RFHardliner1 <- train(Corona_Hardliner ~ .,
 RFHardliner1
 summary(RFHardliner1)
 plot(RFHardliner1)
-#mtry = 13, extratrees, min.node.size = 15
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions1 <- predict(RFHardliner1, newdata=test_dfHardliner)
@@ -8987,7 +8867,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0.5857
+#model auc:
 RFHardliner1 %>%
   test_roc(data = test_dfHardliner) %>%
   auc()
@@ -9056,8 +8936,6 @@ RFHardliner2 <- train(Corona_Hardliner ~ .,
 RFHardliner2
 summary(RFHardliner2)
 plot(RFHardliner2)
-#mtry = 13, extratrees, min.node.size = 15
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RFHardliner2, newdata=test_dfHardliner)
@@ -9074,7 +8952,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,5843
+#model auc: 
 RFHardliner2 %>%
   test_roc(data = test_dfHardliner) %>%
   auc()
@@ -9331,8 +9209,6 @@ RFSoftliner1 <- train(Corona_Softliner ~ .,
 RFSoftliner1
 summary(RFSoftliner1)
 plot(RFSoftliner1)
-#mtry = 13, extratrees, min.node.size = 10
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions1 <- predict(RFSoftliner1, newdata=test_dfSoftliner)
@@ -9349,7 +9225,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,6115
+#model auc: 
 RFSoftliner1 %>%
   test_roc(data = test_dfSoftliner) %>%
   auc()
@@ -9416,8 +9292,6 @@ RFSoftliner2 <- train(Corona_Softliner ~ .,
 RFSoftliner2
 summary(RFSoftliner2)
 plot(RFSoftliner2)
-#mtry = 13, extratrees, min.node.size = 10
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RFSoftliner2, newdata=test_dfSoftliner)
@@ -9434,7 +9308,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,6137
+#model auc
 RFSoftliner2 %>%
   test_roc(data = test_dfSoftliner) %>%
   auc()
@@ -9474,8 +9348,6 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   scale_color_manual(values = custom_col) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
-
-#better num.trees: 500 trees ist minimal besser
 
 #save model to disk 
 
@@ -9518,7 +9390,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,6721
+#model auc
 RFSoftliner_fin %>%
   test_roc(data = test_dfSoftliner) %>%
   auc()
@@ -9695,8 +9567,6 @@ RFSkeptiker1 <- train(Corona_Skeptiker ~ .,
 RFSkeptiker1
 summary(RFSkeptiker1)
 plot(RFSkeptiker1)
-#mtry = 11, extratrees, min.node.size = 10
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions1 <- predict(RFSkeptiker1, newdata=test_dfSkeptiker)
@@ -9713,7 +9583,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,6864
+#model auc
 RFSkeptiker1 %>%
   test_roc(data = test_dfSkeptiker) %>%
   auc()
@@ -9781,7 +9651,6 @@ RFSkeptiker2 <- train(Corona_Skeptiker ~ .,
 RFSkeptiker2
 summary(RFSkeptiker2)
 plot(RFSkeptiker2)
-#mtry = 11, extratrees, min.node.size = 10
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RFSkeptiker2, newdata=test_dfSkeptiker)
@@ -9798,7 +9667,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,6921
+#model auc
 RFSkeptiker2 %>%
   test_roc(data = test_dfSkeptiker) %>%
   auc()
@@ -9838,8 +9707,6 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   scale_color_manual(values = custom_col) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
-
-#better num.trees: 500 trees --> better predictions for Skeptiker
 
 tree1000_Corona_Skeptiker <- RFSkeptiker2
 saveRDS(tree1000_Corona_Skeptiker, "./tree1000_Corona_Skeptiker.rds")
@@ -10054,8 +9921,6 @@ RFLeugner1 <- train(Corona_Leugner ~ .,
 RFLeugner1
 summary(RFLeugner1)
 plot(RFLeugner1)
-#mtry = 14, extratrees, min.node.size = 10
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions1 <- predict(RFLeugner1, newdata=test_dfLeugner)
@@ -10072,7 +9937,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,7164
+#model auc:
 RFLeugner1 %>%
   test_roc(data = test_dfLeugner) %>%
   auc()
@@ -10139,7 +10004,6 @@ RFLeugner2 <- train(Corona_Leugner ~ .,
 RFLeugner2
 summary(RFLeugner2)
 plot(RFLeugner2)
-#mtry = 14, extratrees, min.node.size = 10
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RFLeugner2, newdata=test_dfLeugner)
@@ -10156,7 +10020,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,7242
+#model auc
 RFLeugner2 %>%
   test_roc(data = test_dfLeugner) %>%
   auc()
@@ -10196,9 +10060,6 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   scale_color_manual(values = custom_col) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
-
-#better num.trees: 1000 trees --> better predictions
-
 
 #save model to disk 
 
@@ -10405,10 +10266,6 @@ RFHard_num1
 summary(RFHard_num1)
 plot(RFHard_num1)
 
-#best mtry:10
-#splitrule: extratrees
-#min.node.size used: 15
-
 # predict outcome using model from train_df applied to the test_df
 predictions1 <- predict(RFHard_num1, newdata=test_dfHard_num)
 
@@ -10452,9 +10309,6 @@ RFHard_num2 <- train(Corona_Massnahmen_muessten_haerter_sein ~ .,
 RFHard_num2
 summary(RFHard_num2)
 plot(RFHard_num2)
-#best mtry:10
-#splitrule: extratrees
-#min.node.size used: 15
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RFHard_num2, newdata=test_dfHard_num)
@@ -10653,10 +10507,6 @@ RFSoft_num1
 summary(RFSoft_num1)
 plot(RFSoft_num1)
 
-#best mtry:11
-#splitrule: extratrees
-#min.node.size used: 5
-
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(RFSoft_num1, newdata=test_dfSoft_num)
 
@@ -10699,9 +10549,6 @@ RFSoft_num2 <- train(Corona_Massnahmen_uebertrieben ~ .,
 RFSoft_num2
 summary(RFSoft_num2)
 plot(RFSoft_num2)
-#best mtry:10
-#splitrule: extratrees
-#min.node.size used: 5
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RFSoft_num2, newdata=test_dfSoft_num)
@@ -10719,8 +10566,6 @@ pearsonSoft2
 
 spearmanSoft2 <- cor.test(predictions2, test_dfSoft_num$Corona_Massnahmen_uebertrieben, method = "spearman")
 spearmanSoft2
-
-#num.trees 1000 performs slightly better
 
 #save model to disk 
 
@@ -10900,10 +10745,6 @@ RFSkeptiker_num1
 summary(RFSkeptiker_num1)
 plot(RFSkeptiker_num1)
 
-#best mtry:12
-#splitrule: extratrees
-#min.node.size used: 15
-
 # predict outcome using model from train_df applied to the test_df
 predictions1 <- predict(RFSkeptiker_num1, newdata=test_Skeptiker_num)
 
@@ -10948,10 +10789,6 @@ RFSkeptikernum_2
 summary(RFSkeptikernum_2)
 plot(RFSkeptiker_num2)
 
-#best mtry:11
-#splitrule: extratrees
-#min.node.size used: 15
-
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RFSkeptikernum_2, newdata=test_Skeptiker_num)
 
@@ -10968,8 +10805,6 @@ pearsonSkeptiker2
 
 spearmanSkeptiker2 <- cor.test(predictions2, test_Skeptiker_num$Corona_ist_harmlos_gleich_Grippe, method = "spearman")
 spearmanSkeptiker2
-
-#num.trees 500 performs better
 
 #save model to disk 
 
@@ -11149,10 +10984,6 @@ RFLeugner_num1
 summary(RFLeugner_num1)
 plot(RFLeugner_num1)
 
-#best mtry:11
-#splitrule: extratrees
-#min.node.size used: 15
-
 # predict outcome using model from train_df applied to the test_df
 predictions1 <- predict(RFLeugner_num1, newdata=test_dfLeugner_num)
 
@@ -11196,10 +11027,6 @@ RFLeugner_num2
 summary(RFLeugner_num2)
 plot(RFLeugner_num2)
 
-#best mtry:10
-#splitrule: extratrees
-#min.node.size used: 15
-
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RFLeugner_num2, newdata=test_dfLeugner_num)
 
@@ -11216,8 +11043,6 @@ pearsonLeugner2
 
 spearmanLeugner2 <- cor.test(predictions2, test_dfLeugner_num$Glaube_nicht_an_Corona, method = "spearman")
 spearmanLeugner2
-
-#num.trees 1000 performs better
 
 #save model to disk 
 
@@ -11401,8 +11226,6 @@ RFEinkommen_1 <- train(Einkommensgruppe ~ .,
 RFEinkommen_1
 summary(RFEinkommen_1)
 plot(RFEinkommen_1)
-#mtry = 17, extratrees, min.node.size = 15
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions1 <- predict(RFEinkommen_1, newdata=test_dfEinkommen)
@@ -11418,7 +11241,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,6772
+#model auc
 RFEinkommen_1 %>%
   test_roc(data = test_dfEinkommen) %>%
   auc()
@@ -11448,8 +11271,6 @@ RFEinkommen_2 <- train(Einkommensgruppe ~ .,
 RFEinkommen_2
 summary(RFEinkommen_2)
 plot(RFEinkommen_2)
-#mtry = 15, extratrees, min.node.size = 5
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RFEinkommen_2, newdata=test_dfEinkommen)
@@ -11459,7 +11280,7 @@ predictions2 <- predict(RFEinkommen_2, newdata=test_dfEinkommen)
 confusionMatrix(data=as.factor(predictions2), as.factor(test_dfEinkommen$Einkommensgruppe))
 
 
-#check for auc: 0,6715
+#check for auc
 test_roc <- function(model, data) {
   
   multiclass.roc(test_dfEinkommen$Einkommensgruppe,
@@ -11512,7 +11333,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,6772
+#model auc
 RFEinkommen_fin %>%
   test_roc(data = test_dfEinkommen) %>%
   auc()
@@ -11694,8 +11515,6 @@ RFDurchschnittseinkommen1 <- train(Durchschnittseinkommen ~ .,
 RFDurchschnittseinkommen1
 summary(RFDurchschnittseinkommen1)
 plot(RFDurchschnittseinkommen1)
-#mtry = 10, extratrees, min.node.size = 15
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions1 <- predict(RFDurchschnittseinkommen1, newdata=test_dfDurchschnittseinkommen)
@@ -11712,7 +11531,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,7306
+#model auc
 RFDurchschnittseinkommen1 %>%
   test_roc(data = test_dfDurchschnittseinkommen) %>%
   auc()
@@ -11778,10 +11597,7 @@ RFDurchschnittseinkommen2 <- train(Durchschnittseinkommen ~ .,
 
 RFDurchschnittseinkommen2
 summary(RFDurchschnittseinkommen2)
-pot(RFDurchschnittseinkommen2)
-#mtry = 10, extratrees, min.node.size = 15
-
-
+plot(RFDurchschnittseinkommen2)
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RFDurchschnittseinkommen2, newdata=test_dfDurchschnittseinkommen)
@@ -11798,7 +11614,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,728
+#model auc
 RFDurchschnittseinkommen2 %>%
   test_roc(data = test_dfDurchschnittseinkommen) %>%
   auc()
@@ -12045,10 +11861,6 @@ RFGreen1_1
 summary(RFGreen1_1)
 plot(RFGreen1_1)
 
-#best mtry:11
-#splitrule: extratrees
-#min.node.size used: 15
-
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(RFGreen1_1, newdata=test_dfGreen1)
 
@@ -12093,8 +11905,6 @@ RFGreen1_2 <- train(Green_Values ~ .,
 RFGreen1_2
 summary(RFGreen1_2)
 plot(RFGreen1_2)
-#mtry = 10, extratrees, min.node.size = 10
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(RFGreen1_2, newdata=test_dfGreen1)
@@ -12113,13 +11923,10 @@ pearsonGreen1_2
 spearmanGreen1_2 <- cor.test(predictions, test_dfGreen1$Green_Values, method = "spearman")
 spearmanGreen1_2
 
-#num.trees 1000 performs slightly better
-
 #save model to disk 
 
 tree1000_GreenValues_num <- RFGreen1_2
 saveRDS(tree1000_GreenValues_num, "./tree1000_GreenValues_num.rds")
-
 
 
 ####-------tree 3: Final --------------------------------------------------
@@ -12293,8 +12100,6 @@ RFGreen2_1 <- train(Green2 ~ .,
 RFGreen2_1
 summary(RFGreen2_1)
 plot(RFGreen2_1)
-#mtry = 11, extratrees, min.node.size = 10
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions1 <- predict(RFGreen2_1, newdata=test_dfGreen2)
@@ -12311,7 +12116,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,6469
+#model auc
 RFGreen2_1 %>%
   test_roc(data = test_dfGreen2) %>%
   auc()
@@ -12380,8 +12185,6 @@ RFGreen2_2 <- train(Green2 ~ .,
 RFGreen2_2
 summary(RFGreen2_2)
 plot(RFGreen2_2)
-#mtry = 11, extratrees, min.node.size = 10
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RFGreen2_2, newdata=test_dfGreen2)
@@ -12398,7 +12201,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,646
+#model auc
 RFGreen2_2 %>%
   test_roc(data = test_dfGreen2) %>%
   auc()
@@ -12438,8 +12241,6 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
   scale_color_manual(values = custom_col) +
   geom_abline(intercept = 0, slope = 1, color = "gray", size = 1) +
   theme_bw(base_size = 18)
-
-#better num.trees: 1000 trees --> better at predicting imbalanced class
 
 #save model to disk 
 
@@ -12483,7 +12284,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,646
+#model auc
 RFGreen2_fin %>%
   test_roc(data = test_dfGreen2) %>%
   auc()
@@ -12667,8 +12468,6 @@ RFBeschaeftigung <- train(Beschaeftigung ~ .,
 RFBeschaeftigung
 summary(RFBeschaeftigung)
 plot(RFBeschaeftigung)
-#mtry = 14, extratrees, min.node.size = 10
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(RFBeschaeftigung, newdata=test_dfBeschaeftigung)
@@ -12713,8 +12512,6 @@ RFBeschaeftigung1 <- train(Beschaeftigung ~ .,
 # Print models
 RFBeschaeftigung1
 summary(RFBeschaeftigung1)
-#mtry = xx, extratrees, min.node.size = xx
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RFBeschaeftigung1, newdata=test_dfBeschaeftigung)
@@ -13043,9 +12840,6 @@ modelArbeitend_oder_nichtRF
 summary(modelArbeitend_oder_nichtRF)
 plot(modelArbeitend_oder_nichtRF)
 
-#best mtry = 18, splitrule = extratrees, min.node.size = 10
-
-
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(modelArbeitend_oder_nichtRF, newdata=test_dfArbeitend_oder_nicht)
 
@@ -13187,8 +12981,6 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 tree1000_Arbeitend_oder_nicht <- modelArbeitend_oder_nichtRF1
 saveRDS(tree1000_Arbeitend_oder_nicht, "./tree1000_Arbeitend_oder_nicht.rds")
 
-
-#fit model with num.trees = 500 trees (better performance)
 
 ####-------tree 3: Final --------------------------------------------------
 
@@ -13392,8 +13184,6 @@ RFBildungsgruppe <- train(Bildungsgruppe ~ .,
 RFBildungsgruppe
 summary(RFBildungsgruppe)
 plot(RFBildungsgruppe)
-#mtry = 15, extratrees, min.node.size = 5
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(RFBildungsgruppe, newdata=test_dfBildungsgruppe)
@@ -13440,8 +13230,6 @@ RFBildungsgruppe1 <- train(Bildungsgruppe ~ .,
 # Print models
 RFBildungsgruppe1
 summary(RFBildungsgruppe1)
-#mtry = xx, extratrees, min.node.size = xx
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RFBildungsgruppe1, newdata=test_dfBildungsgruppe)
@@ -13694,8 +13482,6 @@ RFReligion <- train(Religion ~ .,
 RFReligion
 summary(RFReligion)
 plot(RFReligion)
-#mtry = 14, extratrees, min.node.size = 10
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(RFReligion, newdata=test_dfReligion)
@@ -13703,7 +13489,7 @@ predictions <- predict(RFReligion, newdata=test_dfReligion)
 # Create confusion matrix
 confusionMatrix(data=as.factor(predictions), as.factor(test_dfReligion$Religion))
 
-#check for auc: 0,7635
+#check for auc
 test_roc <- function(model, data) {
   
   multiclass.roc(test_dfReligion$Religion,
@@ -13739,8 +13525,6 @@ RFReligion1 <- train(Religion ~ .,
 # Print models
 RFReligion1
 summary(RFReligion1)
-#mtry = 20, extratrees, min.node.size = 5
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RFReligion1, newdata=test_dfReligion)
@@ -13758,7 +13542,7 @@ test_roc <- function(model, data) {
   
 }
 
-#model auc: 0,762
+#model auc
 RFReligion1 %>%
   test_roc(data = test_dfReligion) %>%
   auc()
@@ -14126,9 +13910,6 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 tree1000_Religioes <- modelReligioesRF1
 saveRDS(tree1000_Religioes, "./tree1000_Religioes.rds")
 
-
-#fit model with num.trees = xx trees (better performance)
-
 ####-------tree 3: Final --------------------------------------------------
 
 
@@ -14327,8 +14108,6 @@ modelIslamChristRF
 summary(modelIslamChristRF)
 plot(modelIslamChristRF)
 
-#best mtry = 18, splitrule = extratrees, min.node.size = 10
-
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(modelIslamChristRF, newdata=test_dfIslamChrist)
 
@@ -14473,9 +14252,6 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 tree1000_Islam_Christ <- modelIslamChristRF1
 saveRDS(tree1000_Islam_Christ , "./tree1000_Islam_Christ .rds")
-
-
-#fit model with num.trees = xx trees (better performance)
 
 ####-------tree 3: Final --------------------------------------------------
 
@@ -14673,8 +14449,6 @@ modelMigrationshintergrundRF
 summary(modelMigrationshintergrundRF)
 plot(modelMigrationshintergrundRF)
 
-#best mtry = 18, splitrule = extratrees, min.node.size = 10
-
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(modelMigrationshintergrundRF, newdata=test_dfMigrationshintergrund)
 
@@ -14816,9 +14590,6 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 tree1000_Migrationshintergrund <- modelMigrationshintergrundRF1
 saveRDS(tree1000_Migrationshintergrund, "./tree1000_Migrationshintergrund.rds")
 
-
-
-#fit model with num.trees = xx trees (better performance)
 
 ####-------tree 3: Final --------------------------------------------------
 
@@ -15022,8 +14793,6 @@ RFSexuelle_Orientierung <- train(Sexuelle_Orientierung ~ .,
 RFSexuelle_Orientierung
 summary(RFSexuelle_Orientierung)
 plot(RFSexuelle_Orientierung)
-#mtry = 14, extratrees, min.node.size = 10
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(RFSexuelle_Orientierung, newdata=test_dfSexuelle_Orientierung)
@@ -15067,8 +14836,6 @@ RFSexuelle_Orientierung1 <- train(Sexuelle_Orientierung ~ .,
 # Print models
 RFSexuelle_Orientierung1
 summary(RFSexuelle_Orientierung1)
-#mtry = xx, extratrees, min.node.size = xx
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RFSexuelle_Orientierung1, newdata=test_dfSexuelle_Orientierung)
@@ -15310,9 +15077,6 @@ modelHeteroRF
 summary(modelHeteroRF)
 plot(modelHeteroRF)
 
-#best mtry = 18, splitrule = extratrees, min.node.size = 10
-
-
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(modelHeteroRF, newdata=test_dfHetero)
 
@@ -15457,8 +15221,6 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 tree1000_Hetero <- modelHeteroRF1
 saveRDS(tree1000_Hetero, "./tree1000_Hetero.rds")
 
-
-#fit model with num.trees = xx trees (better performance)
 
 ####-------tree 3: Final --------------------------------------------------
 
@@ -15661,9 +15423,6 @@ modelAlleinBeziehungRF
 summary(modelAlleinBeziehungRF)
 plot(modelAlleinBeziehungRF)
 
-#best mtry = 10, splitrule = extratrees, min.node.size = 10
-
-
 # predict outcome using model from train_df applied to the test_df
 
 predictions <- predict(modelAlleinBeziehungRF, newdata=test_dfAlleinBeziehung)
@@ -15673,7 +15432,7 @@ confusionMatrix(data=predictions, test_dfAlleinBeziehung$Allein_vs_Beziehung)
 
 
 
-#check for AUC: 0,559
+#check for AU
 test_roc <- function(model, data) {
   
   roc(test_dfAlleinBeziehung$Allein_vs_Beziehung,
@@ -15747,7 +15506,6 @@ modelAlleinBeziehungRF1 <- train(Allein_vs_Beziehung ~ .,
 modelAlleinBeziehungRF1
 summary(modelAlleinBeziehungRF1)
 plot(modelAlleinBeziehungRF1)
-#best mtry = 10, splitrule = extratrees, min.node.size = 5
 
 # predict outcome using model from train_df applied to the test_df
 
@@ -15757,7 +15515,7 @@ predictions1 <- predict(modelAlleinBeziehungRF1, newdata=test_dfAlleinBeziehung)
 confusionMatrix(data=predictions1, test_dfAlleinBeziehung$Allein_vs_Beziehung)
 
 
-#check for AUC: 0,5515
+#check for AUC
 test_roc <- function(model, data) {
   
   roc(test_dfAlleinBeziehung$Allein_vs_Beziehung,
@@ -15813,11 +15571,7 @@ saveRDS(tree1000_AlleinBeziehung, "./tree1000_AlleinBeziehung.rds")
 
 
 
-#fit model with num.trees = 500 trees (better performance)
-
 ####-------tree 3: Final --------------------------------------------------
-
-### hier das finale model mit bestmtry und node size einfügen , auch best num.tree anpassen
 
 modelAlleinBeziehungfinal <- modelAlleinBeziehungRF
 
@@ -16034,8 +15788,6 @@ RFBeziehungsstatus <- train(Beziehungsstatus ~ .,
 RFBeziehungsstatus
 summary(RFBeziehungsstatus)
 plot(RFBeziehungsstatus)
-#mtry = 15, extratrees, min.node.size = 15
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions <- predict(RFBeziehungsstatus, newdata=test_dfBeziehungsstatus)
@@ -16080,8 +15832,6 @@ RFBeziehungsstatus1 <- train(Beziehungsstatus ~ .,
 # Print models
 RFBeziehungsstatus1
 summary(RFBeziehungsstatus1)
-#mtry = 13, extratrees, min.node.size = 10
-
 
 # predict outcome using model from train_df applied to the test_df
 predictions2 <- predict(RFBeziehungsstatus1, newdata=test_dfBeziehungsstatus)
@@ -16335,9 +16085,6 @@ modelKinderRF
 summary(modelKinderRF)
 plot(modelKinderRF)
 
-#best mtry = 13, splitrule = extratrees, min.node.size = 15
-
-
 # predict outcome using model from train_df applied to the test_df
 
 predictions <- predict(modelKinderRF, newdata=test_dfKinder)
@@ -16419,7 +16166,6 @@ modelKinderRF1 <- train(Kinder ~ .,
 modelKinderRF1
 summary(modelKinderRF1)
 plot(modelKinderRF1)
-#mtry = 13, extratrees, min.node.size = 15
 
 # predict outcome using model from train_df applied to the test_df
 
@@ -16482,9 +16228,6 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 tree1000_Kinder <- modelKinderRF1
 saveRDS(tree1000_Kinder, "./tree1000_Kinder.rds")
 
-
-
-#fit model with num.trees = 500 trees (better predictions)
 
 ####-------tree 3: Final --------------------------------------------------
 
@@ -16559,7 +16302,6 @@ ggplot(aes(x = fpr,  y = tpr, group = model), data = results_df_roc) +
 
 
 #--------------Variable Direction: Partial Plots-----------------------------------------
-
 
 #checking direction of the 20 most important variables
 
