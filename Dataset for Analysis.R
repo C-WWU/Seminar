@@ -9,6 +9,9 @@ install.packages("randomForest")
 install.packages("pROC")
 install.packages("caret")
 install.packages("e1071")
+install.packages("rpart")
+install.packages("rpart.plot")
+
 
 library(readr)
 library(plyr)
@@ -22,6 +25,8 @@ library(randomForest)
 library(pROC)
 library(caret)
 library(e1071)
+library(rpart)
+library(rpart.plot)
 
 
 
@@ -668,9 +673,9 @@ data <- subset(data, Kinder != "NA")
 
 #make sure that control questions were answered correctly
 
-data <- data[(data$Kontrollfrage_Persoenlichkeit == 6),] #xx respondents remain
-data <- data[(data$Kontrollfrage_Ziele_im_Leben == 7),] #xx respondents remain
-data <- data[(data$Kontrollfrage_Umwelt == 6),] #xx respondents remain
+data <- data[(data$Kontrollfrage_Persoenlichkeit == 6),] 
+data <- data[(data$Kontrollfrage_Ziele_im_Leben == 7),] 
+data <- data[(data$Kontrollfrage_Umwelt == 6),] 
 
 #check that all bad respondents were eliminated
 table(data$Finished) #20 respondents still are not marked as finished; however those are respondents who answered all questions but then did not press "continue" to end the questionnaire; we can still include them in the analysis
@@ -943,9 +948,7 @@ data$Accounts_followed <- rowSums(data[ ,c(Account_names)], na.rm = TRUE)
 summary(data$Accounts_followed)
 table(data$Accounts_followed)
 
-#Ausschluss von respondents, die keinem der Accounts folgen:
-#data <- data %>% subset(Accounts_followed > 0)
-
+#quick visualization to check for outliers
 
 ggplot(data, aes(Accounts_followed))+
   geom_histogram(bins = 229)
@@ -957,16 +960,11 @@ ggplot(data, aes(Accounts_followed))+
 #####
 #check descriptives and get to know the data and respondents
 
-#####
-#Descriptives for Variables and Respondents
-#decide: are there respondents (outliers) to get rid of? 
-
-
 #Descriptives of the Respondents
 
 #Instagram usage: how often and how many accounts
 #Frequency
-table(data$`Instagram_Nutzungshaeufigkeit`) #exclude 9 people with "Once Per Week" usage?
+table(data$`Instagram_Nutzungshaeufigkeit`) #exclude people with "Once Per Week" usage?
 usage <- as.data.frame(table(data$`Instagram_Nutzungshaeufigkeit`))
 usage_order <- c("Täglich", "4- bis 6-mal pro Woche", "2- bis 3-mal pro Woche", "Einmal pro Woche")
 
@@ -1214,20 +1212,6 @@ table(data$Zigaretten_ja_nein)
 table(data$Drogen_ja_nein)
 
 
-#prüfen: gibt es Zusammenhänge zwischen den variablen?
-#Alter <-> Accounts_followed
-
-
-#Green Values zu Partei
-ggplot(data, aes(Green_Values, fill = Wahl_Partei))+
-  geom_dotplot(binwidth = 0.1)
-
-ggplot(data, aes(Green_Values, y = factor(Wahl_Partei)))+
-  geom_boxplot()
-
-#weitere?
-#...
-
 
 #Korrelationen zwischen Accounts?
 cor_accounts_df <- as.data.frame(cor(Accounts))
@@ -1242,20 +1226,13 @@ ggplot(cor_accounts_df, aes(Tagesschau))+
 Accounts <- data[,c(27:255)]
 Followers_Accounts <- as.data.frame(colSums(Accounts, na.rm = TRUE))
 colnames(Followers_Accounts) <- "Followers"
-
-#Are there accounts which have too little followers? 
-#list of less than "a" followers:
-a <- 50
-delete <- Followers_Accounts %>% filter(Followers < a)
-keep <-Followers_Accounts %>% filter(Followers > a) 
-#but: keep in sample nonetheless, just be aware!
-
+summary(Followers_Accounts)
 
 #final check:
 summary(data)
 str(data)
 head(data)
-#the dataset looks to be ready for analysis!
+
 
 #save dataset
 write.csv(data, "/Users/Miriam/Documents/Uni/Master/3. Semester/Seminar SRA/datasets/neu/data_for_analysis.csv")
@@ -1263,7 +1240,7 @@ save(data, file = 'data_for_analysis.RData')
 
 
 
-#handle outliers in the dataset: define by IQR
+#handle outliers in the dataset: cut by upper and lower 1%
 
 duration_zu_groß <- quantile(data$`Duration (in seconds)`, 0.99)
 duration_zu_klein <- quantile(data$`Duration (in seconds)`, 0.01)
@@ -1290,11 +1267,439 @@ write.csv(reduced_set, "/Users/Miriam/Documents/Uni/Master/3. Semester/Seminar S
 save(reduced_set, file = 'data_reduced.RData')
 
 
+###check descriptives again after cleaning: has something changed? 
+
+#Accounts
+#Followers per Account
+Accounts2 <- reduced_set[,c(27:255)]
+Followers_Accounts2 <- as.data.frame(colSums(Accounts2, na.rm = TRUE))
+colnames(Followers_Accounts2) <- "Followers"
+Followers_Accounts2 <- Followers_Accounts2 %>% arrange(-Followers)
+
+#Are there accounts which have too little followers? 
+#list of less than "a" followers:
+a <- 50
+delete <- Followers_Accounts2 %>% filter(Followers < a)
+keep <-Followers_Accounts2 %>% filter(Followers > a) 
+#but: keep in sample nonetheless, just be aware!
+
+mean(Followers_Accounts2$Followers)
+median(Followers_Accounts2$Followers)
 
 
-#####
-#Analysis
-#run models
+#how many accounts do respondents follow?
+mean(reduced_set$Accounts_followed)
+median(reduced_set$Accounts_followed)
 
 
-#test assumptions and robustness
+#Descriptives of the Respondents
+
+#Instagram usage: how often and how many accounts
+#Frequency
+table(reduced_set$`Instagram_Nutzungshaeufigkeit`) #exclude people with "Once Per Week" usage?
+usage <- as.data.frame(table(reduced_set$`Instagram_Nutzungshaeufigkeit`))
+usage_order <- c("Täglich", "4- bis 6-mal pro Woche", "2- bis 3-mal pro Woche", "Einmal pro Woche")
+
+ggplot(usage, aes(factor(Var1, levels = usage_order), Freq))+
+  geom_col()+
+  geom_text(aes(label = Freq), vjust = -1)+
+  labs(x = "Usage", y = "", title = "Count")+
+  ylim(0,1700)
+
+#how many accounts?
+table(reduced_set$Accounts_followed) #better now!
+ggplot(reduced_set, aes(Accounts_followed))+
+  geom_histogram(binwidth = 1)
+
+
+#gender #1=female, 2=male, 3=diverse
+
+table(reduced_set$Geschlecht) 
+round(table(reduced_set$Geschlecht)/sum(table(reduced_set$Geschlecht)),2) #relative spread: 62% female, 38% male, diverse almost 0; marginal change from values before cleaning
+
+#age
+
+summary(reduced_set$Alter)
+ggplot(reduced_set, aes(x = Alter))+
+  geom_density()
+ggplot(reduced_set, aes(x = Alter))+
+  geom_histogram()
+
+#Age range
+
+table(reduced_set$Age_Range)
+Ordered_ranges <- c('niedriges.Alter', 'mittleres.Alter', 'hohes.Alter')
+
+ggplot(reduced_set, aes(x = factor(Age_Range, levels = Ordered_ranges)))+
+  geom_bar()+
+  geom_text(stat = "count", aes(label =..count..), vjust = -1)+
+  labs(x = "Age Ranges", y = "Count", title = "Abs. Count per Age Range")+
+  ylim(0,1200)
+
+
+
+#PLZ --> Münster Region dominiert noch immer
+table(reduced_set$PLZ)
+ggplot(reduced_set, aes(x = PLZ))+
+  geom_bar()+
+  geom_text(stat = "count", aes(label =..count..), vjust = -1)+
+  labs(x = "PLZ", y = "Count", title = "Abs. Count per PLZ")+
+  ylim(0,200)
+
+#PLZ zusammengefasst in Ost/West
+table(reduced_set$Ost_West) #passt zum Deutschlandweiten Verhältnis von ca. 1:5
+
+#Beziehungsstatus
+table(reduced_set$Beziehungsstatus)
+#zusammengefasst:
+table(reduced_set$Allein_vs_Beziehung)
+
+
+#sexuelle Orientierung
+table(reduced_set$`Sexuelle_Orientierung`)
+table(reduced_set$`Sexuelle_Orientierung`)/sum(table(reduced_set$`Sexuelle_Orientierung`))
+#sonstiges ist nicht weiter relevant für uns (nur n = 6)
+
+#Children
+table(reduced_set$Kinder)
+table(reduced_set$Kinder)/sum(table(reduced_set$Kinder))
+
+
+#Education
+table(reduced_set$Bildungsabschluss)
+#zusammengefasst:
+table(reduced_set$Bildungsgruppe)
+
+
+
+#Beschäftigung
+table(reduced_set$Beschaeftigung)
+table(reduced_set$Beschaeftigung)/sum(table(reduced_set$Beschaeftigung))
+#zusammengefasst:
+table(reduced_set$Arbeitend_oder_nicht)
+
+#Migrationshintergrund
+table(reduced_set$Migrationshintergrund)
+round(table(reduced_set$Migrationshintergrund)/sum(table(reduced_set$Migrationshintergrund)), 2) #17% mit Migrationshintergrund
+
+#woher Migration
+table(reduced_set$`Woher_Vorfahren`) #Hintergrund vorwiegend aus Europa und Asien --> vermutlich viele Europäer und Türken
+
+
+#Religion
+table(reduced_set$Religion)
+
+#Religiösität
+table(reduced_set$Religioes) #2/3 sind gläubig nach eigener Angabe
+#Islam vs. Christen
+table(reduced_set$Islam_oder_Christ) #deutlich mehr Christen
+
+#Personality
+#Extraversion
+summary(reduced_set$Extraversion)
+
+ggplot(reduced_set, aes(Extraversion))+
+  geom_density()
+ggplot(reduced_set, aes(Extraversion))+
+  geom_histogram(binwidth = 0.5)
+
+#Agreeableness
+summary(reduced_set$Agreeableness)
+
+ggplot(reduced_set, aes(Agreeableness))+
+  geom_density()
+ggplot(reduced_set, aes(Agreeableness))+
+  geom_histogram(binwidth = 0.5)
+
+#Conscientiousness
+summary(reduced_set$Conscientiousness)
+
+ggplot(reduced_set, aes(Conscientiousness))+
+  geom_density()
+ggplot(reduced_set, aes(Conscientiousness))+
+  geom_histogram(binwidth = 0.5)
+
+#Emotional stability
+summary(reduced_set$Emotional_stablity)
+
+ggplot(reduced_set, aes(Emotional_stablity))+
+  geom_density()
+ggplot(reduced_set, aes(Emotional_stablity))+
+  geom_histogram(binwidth = 0.5)
+
+#Openness to Experiences
+summary(reduced_set$Openness_to_Experiences)
+
+ggplot(reduced_set, aes(Openness_to_Experiences))+
+  geom_density()
+ggplot(reduced_set, aes(Openness_to_Experiences))+
+  geom_histogram(binwidth = 0.5)
+
+#Variablen: Extraversion2, Agreeableness2 usw. teilen in zwei Gruppen auf:
+table(reduced_set$Extraversion2)/sum(table(reduced_set$Extraversion2)) #51% Introvertiert
+table(reduced_set$Agreeableness2)/sum(table(reduced_set$Agreeableness2)) #83% Agreeable
+table(reduced_set$Conscientiousness2)/sum(table(reduced_set$Conscientiousness2)) #92% Conscentious
+table(reduced_set$Emotional_stablity2)/sum(table(reduced_set$Emotional_stablity2)) #73% Emotionally Stable
+table(reduced_set$Openness_Experiences2)/sum(table(reduced_set$Openness_Experiences2)) #90% open to new experiences
+
+
+#Green Values
+table(reduced_set$Green_Values)
+summary(reduced_set$Green_Values)
+
+ggplot(reduced_set, aes(Green_Values))+
+  geom_density()
+ggplot(reduced_set, aes(Green_Values))+
+  geom_histogram(binwidth = 0.33)
+
+#zusammengefasste Variable: Green Values ja oder nein
+table(reduced_set$Green2)/sum(table(reduced_set$Green2)) #84% mit eher grünen Werten
+
+
+#General Goals in Life
+table(reduced_set$Gefuehl_der_Zugehoerigkeit)
+table(reduced_set$Spannung)
+table(reduced_set$Herzliche_Beziehung_zu_anderen_Menschen)
+table(reduced_set$Selbstverwirklichung)
+table(reduced_set$Respekt_vor_Anderen)
+table(reduced_set$Spass_und_Freude_am_Leben)
+table(reduced_set$Sicherheit)
+table(reduced_set$Selbstachtung)
+table(reduced_set$Gefuehl_von_Erfolg)
+#important for most people: Spaß, Herzliche Beziehungen
+#no controverse goals, usually majority >5
+
+#General Goals in Life
+summary(reduced_set$Gefuehl_der_Zugehoerigkeit)
+summary(reduced_set$Spannung)
+summary(reduced_set$Herzliche_Beziehung_zu_anderen_Menschen)
+summary(reduced_set$Selbstverwirklichung)
+summary(reduced_set$Respekt_vor_Anderen)
+summary(reduced_set$Spass_und_Freude_am_Leben)
+summary(reduced_set$Sicherheit)
+summary(reduced_set$Selbstachtung)
+summary(reduced_set$Gefuehl_von_Erfolg)
+#für Analyse schwer, da stets viele hohe Werte und wenig Abweichungen!
+
+
+#Zusammengefasst: Variablen zu Wichtigkeit des Ziels
+table(reduced_set$Zugehoerigkeit_wichtig) 
+table(reduced_set$Spannung_wichtig) 
+table(reduced_set$Herzliche_Beziehung_wichtig) 
+table(reduced_set$Selbstverwirklichung_wichtig) 
+table(reduced_set$Respekt_wichtig) 
+table(reduced_set$Spass_Freude_wichtig) 
+table(reduced_set$Sicherheit_wichtig) 
+table(reduced_set$Selbstachtung_wichtig) 
+table(reduced_set$Erfolg_wichtig) 
+#Problematik bleibt bestehen, jedes Ziel ist fast jedem wichtig, stark imbalanced
+
+#Parteien
+round(table(reduced_set$`Wahl_Partei`)/sum(table(reduced_set$`Wahl_Partei`)), 2) #relative shares of voters in our dataset
+#quasi unverändert zu Daten vor Cleaning
+
+Partei <- as.data.frame(table(reduced_set$`Wahl_Partei`)/sum(table(reduced_set$`Wahl_Partei`)))
+
+Partei_Order <- c("CDU/CSU", "SPD", "Bündnis 90/Die Grünen", "AfD", "Die Linke", "FDP", "Die Partei", "Sonstige:", "Ich würde nicht wählen gehen")
+ggplot(Partei, aes(factor(Var1, levels = Partei_Order), Freq))+
+  geom_col()+
+  geom_text(aes(label = percent(Freq)), vjust = -1)+
+  labs(x = "Parties", y = "", title = "Voters per Party")+
+  ylim(0,0.3)
+
+
+
+#Corona: 4 Gruppen eingeteilt: Hardliner, Softliner, Skeptiker, Leugner
+table(reduced_set$Corona_Hardliner) #1068 Hardliner: Wollen härtere Maßnahmen
+table(reduced_set$Corona_Softliner) #480 Softliner: Wollen softere Maßnahmen
+table(reduced_set$Corona_Skeptiker) #260 Skeptiker: Bezweifeln Gefährlichkeit des Virus
+table(reduced_set$Corona_Leugner) #104 Leugner: Glauben nicht an Virus
+#alle außer Hardliner sind imbalanced
+
+#numerische Ausprägungen: 
+summary(reduced_set$Corona_Massnahmen_muessten_haerter_sein) #Verteilung einigermaßen ausgeglichen
+summary(reduced_set$Corona_Massnahmen_uebertrieben) #median ist 2, mean ist 2.845
+summary(reduced_set$Corona_ist_harmlos_gleich_Grippe) #median ist 1
+summary(reduced_set$Glaube_nicht_an_Corona) #median ist 1
+
+
+#Alkohol, Zigaretten, Drogen
+table(reduced_set$Alkohol_Konsum)
+table(reduced_set$Zigaretten_Konsum)
+table(reduced_set$Drogen_Konsum)
+#zusammengefasst: V1 mit 3 Ausprägungen
+table(reduced_set$Alkoholgruppe)
+table(reduced_set$Zigarettengruppe)
+table(reduced_set$Drogengruppe)
+#zusammengefasst: V2 mit 2 Ausprägungen
+table(reduced_set$Alkohol_ja_nein)
+table(reduced_set$Zigaretten_ja_nein)
+table(reduced_set$Drogen_ja_nein)
+
+
+
+#Korrelationen zwischen Accounts?
+cor_accounts_df <- as.data.frame(cor(Accounts))
+view(cor_accounts_df)
+
+
+
+#----------------------------------------------------
+#first insights: growing a single tree for three selected variables: Age Range, Alter, Geschlecht
+
+data <- reduced_set
+
+#######################
+#Alter: Age Ranges Categorical (hoch, mittel, niedrig)
+######################
+
+#define data for analysis
+data_AgeRange <- data[,c(312, 27:255)]
+
+#Gibt es NAs in der DV?
+sum(is.na(data_AgeRange$Age_Range))
+data_AgeRange <- data_AgeRange %>% subset(data_AgeRange$Age_Range != "NA")
+
+
+#ist die Variable unbalanced?
+table(data_AgeRange$Age_Range) 
+max(table(data_AgeRange$Age_Range)/sum(table(data_AgeRange$Age_Range)))
+
+#IV als Faktor:
+data_AgeRange$Age_Range <- as.factor(data_AgeRange$Age_Range)
+
+#----------------------------------------DATA PARTITIONING------------------------------------
+
+#Training und Test Dataset
+set.seed(1997)
+
+# Partitioning of the data: Create index matrix of selected values
+
+index <- createDataPartition(data_AgeRange$Age_Range, p=.8, list= FALSE, times= 1)
+
+# Create train_df & test_df
+
+train_dfAgeRange <- data_AgeRange[index,]
+test_dfAgeRange <- data_AgeRange[-index,]
+
+
+#---------------------------------Build decision tree------------------------------------------------
+
+set.seed(1997)
+tree_agerange <- rpart(Age_Range ~ . ,
+                       data = train_dfAgeRange,
+                       method = "class")
+
+rpart.plot(tree_agerange)
+
+importances <- varImp(tree_agerange)
+importances %>%
+  arrange(desc(Overall))
+
+predictions <- predict(tree_agerange, newdata = test_dfAgeRange, type = "class")
+predictions
+
+confusionMatrix(predictions, test_dfAgeRange$Age_Range)
+
+
+
+#######################
+#Alter: numerisch
+######################
+
+data_Alter<- data[,c(24, 27:255)]
+
+cols_Alter <- names(data_Alter)
+data_Alter$Alter <- as.numeric(data_Alter$Alter)
+
+#Gibt es NAs in der DV?
+sum(is.na(data_Alter$Alter)) #keine NAs
+
+#----------------------------------------DATA PARTITIONING------------------------------------
+
+#Training und Test Dataset
+set.seed(1997)
+
+# Partitioning of the data: Create index matrix of selected values
+index <- createDataPartition(data_Alter$Alter, p=.8, list= FALSE, times= 1)
+
+# Create train_df & test_df
+train_dfAlter <- data_Alter[index,]
+test_dfAlter <- data_Alter[-index,]
+
+
+#---------------------------------Build decision tree------------------------------------------------
+
+set.seed(1997)
+tree_Alter <- rpart(Alter ~ . ,
+                    data = train_dfAlter,
+                    method = "anova")
+
+rpart.plot(tree_Alter)
+
+importances <- varImp(tree_Alter)
+importances %>%
+  arrange(desc(Overall))
+
+predictionsAlter <- predict(tree_Alter, newdata = test_dfAlter, type = "vector")
+predictionsAlter
+
+
+
+
+#######################
+#Geschlecht
+######################
+
+data_GeschlechtMW <- data[,c(313, 27:255)]
+
+cols_Geschlecht <- names(data_GeschlechtMW)
+data_GeschlechtMW$weiblich_maennlich <- as.factor(data_GeschlechtMW$weiblich_maennlich)
+
+#Gibt es NAs in der DV?
+sum(is.na(data_GeschlechtMW$weiblich_maennlich))  
+data_GeschlechtMW <- data_GeschlechtMW %>% subset(data_GeschlechtMW$weiblich_maennlich != "NA")
+
+
+#ist die Variable unbalanced?
+table(data_GeschlechtMW$weiblich_maennlich) #Verteilung in Ordnung
+max(table(data_GeschlechtMW$weiblich_maennlich)/sum(table(data_GeschlechtMW$weiblich_maennlich)))
+
+
+#----------------------------------------DATA PARTITIONING------------------------------------
+
+#Training und Test Dataset
+set.seed(1997)
+
+# Partitioning of the data: Create index matrix of selected values
+
+index <- createDataPartition(data_GeschlechtMW$weiblich_maennlich, p=.8, list= FALSE, times= 1)
+
+# Create train_df & test_df
+
+train_dfGeschlechtMW <- data_GeschlechtMW[index,]
+test_dfGeschlechtMW <- data_GeschlechtMW[-index,]
+
+
+#---------------------------------Build decision tree------------------------------------------------
+
+set.seed(1997)
+tree_Geschlecht <- rpart(weiblich_maennlich ~ . ,
+                         data = train_dfGeschlechtMW,
+                         method = "class")
+
+rpart.plot(tree_Geschlecht)
+
+importances <- varImp(tree_Geschlecht)
+importances %>%
+  arrange(desc(Overall))
+
+predictionsGeschlecht <- predict(tree_Geschlecht, newdata = test_dfGeschlechtMW, type = "class")
+predictionsGeschlecht
+
+confusionMatrix(predictionsGeschlecht, test_dfGeschlechtMW$weiblich_maennlich)
+
+
+
+
+
